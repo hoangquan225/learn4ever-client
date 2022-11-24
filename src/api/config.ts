@@ -7,7 +7,8 @@ const axiosInstance = axios.create();
 axiosInstance.defaults.baseURL = `${ENDPOINT_LOCAL}/${PREFIX_API}`;
 axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.timeout = 20000;
-// axiosInstance.defaults.headers = { "Content-Type": "application/json" };
+// axiosInstance.defaults.headers = { ["Content-Type"]: "application/json" };
+axiosInstance.defaults.headers["Content-Type"] = "application/json";
 
 export const ApiConfig = async (url: string, payload?: any, _method = "POST", apiPrefix = PREFIX_API) => {
     const method = _method.toLowerCase() as AxiosRequestConfig["method"];
