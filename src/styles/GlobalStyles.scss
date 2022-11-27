@@ -1,0 +1,90 @@
+// style chung
+@import "normalize.css";
+
+:root {
+  //color
+  --primaryColor: #009d9d;
+  --secondaryColor: #ffa800;
+  --hoverSecondaryColor: #ffa800cc;
+  --titleColor: #0a342f;
+  --textColor: #333333;
+
+  //font
+  --font-family: "SVN-Poppins";
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--textColor);
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+  overflow-y: overlay;
+}
+
+//scroll bar
+html *::-webkit-scrollbar {
+  border-radius: 0;
+  width: 0.8rem;
+}
+
+html *::-webkit-scrollbar-thumb {
+  border-radius: 0.4rem;
+  background-color: #d0d0d0;
+}
+
+html *::-webkit-scrollbar-track {
+  border-radius: 0;
+  background-color: #f9f9f9;
+}
+
+a {
+  color: var(--textColor);
+  text-decoration: none;
+}
+
+button,
+input,
+[tabindex] {
+  outline: none;
+  border: none;
+}
+
+//fonts embedded
+@font-face {
+  font-family: "SVN-Poppins";
+  src: url("../assets/font/SVN-Poppins.woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "SVN-Poppins";
+  src: url("../assets/font/SVN-PoppinsBold.woff2");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "SVN-Poppins";
+  src: url("../assets/font/SVN-PoppinsMedium.woff2");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "SVN-Poppins";
+  src: url("../assets/font/SVN-PoppinsSemiBold.woff2");
+  font-weight: 600;
+}
