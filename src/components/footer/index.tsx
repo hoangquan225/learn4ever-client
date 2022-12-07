@@ -6,6 +6,7 @@ import {
 import { Col, Row } from "antd";
 import classNames from "classnames/bind";
 import styles from "./footer.module.scss";
+import logo from "../../assets/img/logo.png"
 
 const cx = classNames.bind(styles);
 
@@ -20,7 +21,7 @@ const Footer = () => {
                 <div className={cx("footer__info")}>
                   <span className={cx("footer__info-item")}>
                     <img
-                      src="../../assets/img/logo2.svg"
+                      src={logo}
                       alt="logo"
                       className={cx("footer__logo")}
                     />
