@@ -20,7 +20,20 @@ export const RegisterPages = () => {
   };
 
   const genderData = ["Nam", "Nữ", "Khác"];
-  const classData = ["Lớp 10", "Lớp 11", "Lớp 12"];
+  const classData = [
+    "Lớp 1",
+    "Lớp 2",
+    "Lớp 3",
+    "Lớp 4",
+    "Lớp 5",
+    "Lớp 6",
+    "Lớp 7",
+    "Lớp 8",
+    "Lớp 9",
+    "Lớp 10",
+    "Lớp 11",
+    "Lớp 12",
+  ];
 
   return (
     <>
@@ -214,6 +227,7 @@ export const RegisterPages = () => {
                       </React.Fragment>
                     }
                     size={"large"}
+                    listHeight={128}
                   >
                     {classData.map((data) => (
                       <Select.Option

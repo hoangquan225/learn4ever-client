@@ -1,12 +1,16 @@
 import React from "react";
-import { LoginPages } from "./pages/login";
-import { RegisterPages } from "./pages/register";
+import Footer from "./components/footer";
+import Header from "./components/header";
+// import { LoginPages } from "./pages/login";
+// import { RegisterPages } from "./pages/register";
 
 function App() {
   return (
     <div className="App">
       {/* <LoginPages /> */}
-      <RegisterPages />
+      {/* <RegisterPages /> */}
+      <Header />
+      <Footer />
     </div>
   );
 }

@@ -5,7 +5,7 @@
   //color
   --primaryColor: #009d9d;
   --secondaryColor: #ffa800;
-  --hoverSecondaryColor: #ffa800cc;
+  --hoverSecondaryColor: #ffb933;
   --titleColor: #0a342f;
   --textColor: #333333;
 
@@ -52,6 +52,7 @@ html *::-webkit-scrollbar-track {
   background-color: #f9f9f9;
 }
 
+// reset the a, button va input
 a {
   color: var(--textColor);
   text-decoration: none;
@@ -87,4 +88,11 @@ input,
   font-family: "SVN-Poppins";
   src: url("../assets/font/SVN-PoppinsSemiBold.woff2");
   font-weight: 600;
+}
+
+//grid
+.wide {
+  max-width: 1170px;
+  margin: 0 auto;
+  width: 100%;
 }

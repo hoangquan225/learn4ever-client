@@ -1,0 +1,63 @@
+.header {
+  height: 8rem;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  position: absolute;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.header__container {
+  padding: 0 2.4rem;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header__logo {
+  width: 28.6rem;
+  height: 6rem;
+  background-color: #ccc;
+}
+
+.header__link {
+  color: transparent;
+  background-color: transparent;
+}
+
+.header__img {
+  width: 100%;
+  height: 100%;
+}
+
+.header__auth {
+  display: flex;
+}
+
+.header__button {
+  min-width: 6.4rem;
+  margin-left: 1rem;
+  color: #fff;
+  background-color: var(--secondaryColor);
+  border-radius: 1rem;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-family: var(--font-family);
+  line-height: 1.7;
+  padding: 0.6rem 0.8rem;
+  transition: ease 0.5s;
+
+  &:hover {
+    background-color: var(--hoverSecondaryColor);
+    transform: translateY(-0.4rem);
+  }
+}
