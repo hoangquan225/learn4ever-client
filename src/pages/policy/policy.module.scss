@@ -1,0 +1,27 @@
+.policy {
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  color: var(--textColor);
+  background-color: rgb(243, 247, 249);
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+.policy__container {
+  padding-top: 10rem;
+  padding-bottom: 10rem;
+}
+
+.policy__title {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.policy__subtitle {
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.policy__list {
+  padding-inline-start: 4.8rem;
+}

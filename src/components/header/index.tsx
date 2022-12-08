@@ -1,6 +1,7 @@
 // import { UserOutlined } from "@ant-design/icons";
 import classNames from "classnames/bind";
 import styles from "./header.module.scss";
+import logo from "../../assets/img/logo.png";
 
 const cx = classNames.bind(styles);
 
@@ -12,7 +13,7 @@ const Header = () => {
           <div className={cx("header__container")}>
             <div className={cx("header__logo")}>
               <a href="/" className={cx("header__link")}>
-                <img src="" alt="logo" className={cx("header__img")} />
+                <img src={logo} alt="logo" className={cx("header__img")} />
               </a>
             </div>
             <div className={cx("header__nav")}>
