@@ -1,13 +1,13 @@
 import { RocketFilled } from "@ant-design/icons";
 import { Col, Row } from "antd";
 import classNames from "classnames/bind";
-import styles from "./banner.module.scss";
+import styles from "./banner1.module.scss";
 import bannerImg from "../../assets/img/banner.webp";
 import { CheckIcon } from "../icons/icons";
 
 const cx = classNames.bind(styles);
 
-const Banner = () => {
+const Banner1 = () => {
   return (
     <>
       <div className={cx("banner")}>
@@ -70,4 +70,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default Banner1;

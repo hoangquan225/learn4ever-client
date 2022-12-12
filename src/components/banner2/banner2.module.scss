@@ -1,0 +1,150 @@
+$height: 50rem;
+
+.banner {
+  background-color: #f3f6fd;
+  padding: 2rem 0;
+}
+
+.banner__container {
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.banner__up,
+.banner__down {
+  padding: 2rem 0;
+}
+
+.banner__wrapper {
+  width: 70%;
+  height: $height;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &.banner__wrapper--up {
+    border-top-left-radius: 10rem;
+    margin-left: auto;
+  }
+
+  &.banner__wrapper--down {
+    border-top-right-radius: 10rem;
+    margin-right: auto;
+  }
+}
+
+.banner__content {
+  width: 50%;
+}
+
+.banner__up .banner__img {
+  position: absolute;
+  width: calc($height * 0.8);
+  height: calc($height * 0.8);
+  left: calc(0rem - ($height * 0.8 / 2));
+}
+
+.banner__down .banner__img {
+  position: absolute;
+  width: calc($height * 0.8);
+  height: calc($height * 0.8);
+  right: calc(0rem - ($height * 0.8 / 2));
+}
+
+.img__banner {
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
+.banner__title {
+  font-weight: 700;
+  text-transform: capitalize;
+
+  & h2 {
+    color: var(--secondaryColor);
+    position: relative;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+
+    &::after {
+      position: absolute;
+      content: "";
+      width: 100%;
+      height: 0.4rem;
+      background-color: var(--secondaryColor);
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  & p {
+    margin: 1rem 0 2.5rem;
+    color: var(--primaryColor);
+    font-size: 2.5rem;
+  }
+}
+
+.banner__desc {
+  width: 80%;
+  text-align: justify;
+}
+
+.banner__button--up {
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
+  font-size: 1.8rem;
+  font-family: var(--font-family);
+  line-height: 1.7;
+  border-radius: 2.5rem;
+  font-weight: 600;
+  margin: 3rem 1rem 0;
+  color: #fff;
+  background: linear-gradient(
+    298.48deg,
+    var(--primaryColor) 13.52%,
+    #1adac3 100.5%
+  );
+  transition: all 0.5s;
+
+  &:hover {
+    color: #fff;
+    transform: translateY(-4px);
+    cursor: pointer;
+  }
+}
+
+.banner__button--down {
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
+  font-size: 1.8rem;
+  font-family: var(--font-family);
+  line-height: 1.7;
+  border-radius: 2.5rem;
+  font-weight: 600;
+  margin: 3rem 1rem 0;
+  color: #fff;
+  background: linear-gradient(
+    298.48deg,
+    var(--secondaryColor) 13.52%,
+    #ffbd3c 100.5%
+  );
+  transition: all 0.5s;
+
+  &:hover {
+    color: #fff;
+    transform: translateY(-4px);
+    cursor: pointer;
+  }
+}

@@ -1,5 +1,7 @@
 import React from "react";
-import Banner from "./components/banner";
+import Banner1 from "./components/banner1";
+import Banner2 from "./components/banner2";
+import Describe from "./components/describe";
 import Feedback from "./components/feedback";
 import Footer from "./components/footer";
 import Header from "./components/header";
@@ -15,7 +17,9 @@ function App() {
       {/* <LoginPages /> */}
       {/* <RegisterPages /> */}
       <Header />
-      <Banner />
+      {/* <Describe /> */}
+      <Banner1 />
+      <Banner2 />
       <Panel />
       <Feedback />
       <Footer />

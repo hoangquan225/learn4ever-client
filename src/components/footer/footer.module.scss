@@ -1,5 +1,5 @@
 .footer {
-  padding: 5rem 0 4rem;
+  padding: 4rem 0 4rem;
   background-color: #d2e6e9;
 }
 
@@ -10,7 +10,7 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .footer__info {
@@ -67,6 +67,7 @@
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 2.4rem;
+  margin-top: 2.8rem;
 }
 
 .footer__nav--item {
@@ -87,6 +88,7 @@
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 2.4rem;
+  margin-top: 2.8rem;
 }
 
 .footer__social--icon {
@@ -119,4 +121,13 @@
   100% {
     transform: rotateZ(0);
   }
+}
+
+.footer__col {
+  width: 100% !important;
+}
+
+.social__row {
+  display: flex;
+  justify-content: center;
 }

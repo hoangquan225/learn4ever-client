@@ -22,7 +22,7 @@ const Footer = () => {
         <div className={cx("wide")}>
           <div className={cx("footer__container")}>
             <Row style={{ width: "100%" }} gutter={16}>
-              <Col className={cx("footer__col")} sm={4} md={6} lg={8}>
+              <Col className={cx("footer__col")} sm={24} md={24} lg={8}>
                 <div className={cx("footer__info")}>
                   <span className={cx("footer__info-item")}>
                     <img
@@ -58,8 +58,8 @@ const Footer = () => {
               </Col>
               <Col
                 className={cx("footer__col")}
-                sm={4}
-                md={6}
+                sm={24}
+                md={16}
                 lg={8}
                 style={{ display: "flex", justifyContent: "center" }}
               >
@@ -92,48 +92,58 @@ const Footer = () => {
                   </Col>
                 </Row>
               </Col>
-              <Col className={cx("footer__col")} sm={4} md={6} lg={8}>
+              <Col className={cx("footer__col")} sm={24} md={8} lg={8}>
                 <div className={cx("footer__social")}>
                   <div className={cx("footer__social--title")}>
                     Kết nối với learn4ever
                   </div>
                   <div className={cx("footer__social--icon")}>
-                    <a href="" className={cx("footer__social--link")}>
-                      <span className={cx("footer__social--wrapper")}>
-                        <img
-                          src={logoFacebook}
-                          alt="facebook"
-                          className={cx("footer__social--img")}
-                        />
-                      </span>
-                    </a>
-                    <a href="" className={cx("footer__social--link")}>
-                      <span className={cx("footer__social--wrapper")}>
-                        <img
-                          src={logoPinterest}
-                          alt="pinterest"
-                          className={cx("footer__social--img")}
-                        />
-                      </span>
-                    </a>
-                    <a href="" className={cx("footer__social--link")}>
-                      <span className={cx("footer__social--wrapper")}>
-                        <img
-                          src={logoTwitter}
-                          alt="twitter"
-                          className={cx("footer__social--img")}
-                        />
-                      </span>
-                    </a>
-                    <a href="" className={cx("footer__social--link")}>
-                      <span className={cx("footer__social--wrapper")}>
-                        <img
-                          src={logoYoutube}
-                          alt="youtube"
-                          className={cx("footer__social--img")}
-                        />
-                      </span>
-                    </a>
+                    <Row className={cx("social__row")}>
+                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                        <a href="" className={cx("footer__social--link")}>
+                          <span className={cx("footer__social--wrapper")}>
+                            <img
+                              src={logoFacebook}
+                              alt="facebook"
+                              className={cx("footer__social--img")}
+                            />
+                          </span>
+                        </a>
+                      </Col>
+                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                        <a href="" className={cx("footer__social--link")}>
+                          <span className={cx("footer__social--wrapper")}>
+                            <img
+                              src={logoPinterest}
+                              alt="pinterest"
+                              className={cx("footer__social--img")}
+                            />
+                          </span>
+                        </a>
+                      </Col>
+                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                        <a href="" className={cx("footer__social--link")}>
+                          <span className={cx("footer__social--wrapper")}>
+                            <img
+                              src={logoTwitter}
+                              alt="twitter"
+                              className={cx("footer__social--img")}
+                            />
+                          </span>
+                        </a>
+                      </Col>
+                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                        <a href="" className={cx("footer__social--link")}>
+                          <span className={cx("footer__social--wrapper")}>
+                            <img
+                              src={logoYoutube}
+                              alt="youtube"
+                              className={cx("footer__social--img")}
+                            />
+                          </span>
+                        </a>
+                      </Col>
+                    </Row>
                   </div>
                   <div className={cx("footer__protect")}>
                     <a href="" className={cx("footer__protect--link")}>

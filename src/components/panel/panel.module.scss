@@ -5,6 +5,7 @@
   background-size: cover;
   background-position: 50%;
   margin-bottom: -0.1rem;
+  margin-top: -0.1rem;
 }
 
 .panel__title {
@@ -107,4 +108,8 @@
   margin-bottom: 1rem;
   -webkit-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
+}
+
+.panel__col {
+  width: 100% !important;
 }

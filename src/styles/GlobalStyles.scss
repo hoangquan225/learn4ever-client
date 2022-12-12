@@ -1,6 +1,27 @@
 // style chung
 @import "normalize.css";
 
+// responsive
+@mixin responsive($breakpoint) {
+  @if $breakpoint== sm {
+    @media (min-width: 576px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== md {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== lg {
+    @media (min-width: 992px) {
+      @content;
+    }
+  }
+}
+
 :root {
   //color
   --primaryColor: #009d9d;
@@ -29,7 +50,7 @@ html {
 body {
   font-family: var(--font-family);
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 1.4rem;
   color: var(--textColor);
   line-height: 1.5;
   text-rendering: optimizeSpeed;
