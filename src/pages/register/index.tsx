@@ -8,14 +8,15 @@ import {
   WomanOutlined,
 } from "@ant-design/icons";
 import { Button, Form, Input, Row, Col, Select } from "antd";
-import classNames from "classnames/bind";
 import React from "react";
+
 import styles from "./register.module.scss";
-import {isValidPhone, PhoneRegExp} from "../../submodule/utils/validation";
+import classNames from "classnames/bind";
+import { isValidPhone, PhoneRegExp } from "../../submodule/utils/validation";
 
 const cx = classNames.bind(styles);
 
-export const RegisterPages = () => {
+const RegisterPages = () => {
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
   };
@@ -129,7 +130,7 @@ export const RegisterPages = () => {
                   rules={[
                     {
                       pattern: PhoneRegExp,
-                      message: 'vui lòng nhập số điện thoại',
+                      message: "vui lòng nhập số điện thoại",
                     },
                     {
                       required: true,
@@ -347,3 +348,5 @@ export const RegisterPages = () => {
     </>
   );
 };
+
+export default RegisterPages;

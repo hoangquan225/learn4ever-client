@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   MailOutlined,
   PhoneOutlined,
@@ -12,6 +13,7 @@ import logoFacebook from "../../assets/img/facebook.svg";
 import logoPinterest from "../../assets/img/pinterest.svg";
 import logoTwitter from "../../assets/img/twitter.svg";
 import logoDmca from "../../assets/img/dmca.png";
+import { NavLink } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -25,11 +27,13 @@ const Footer = () => {
               <Col className={cx("footer__col")} sm={24} md={24} lg={8}>
                 <div className={cx("footer__info")}>
                   <span className={cx("footer__info-item")}>
-                    <img
-                      src={logoImg}
-                      alt="logo"
-                      className={cx("footer__logo")}
-                    />
+                    <NavLink to={"/"}>
+                      <img
+                        src={logoImg}
+                        alt="logo"
+                        className={cx("footer__logo")}
+                      />
+                    </NavLink>
                   </span>
                 </div>
                 <div className={cx("footer__info")}>
@@ -67,27 +71,41 @@ const Footer = () => {
                   <Col className={cx("footer__col")} span={12}>
                     <div className={cx("footer__nav--title")}>Về chúng tôi</div>
                     <div className={cx("footer__nav--item")}>
-                      <a href="" className={cx("footer__nav--link")}>
+                      <NavLink
+                        to={"/introduce"}
+                        className={cx("footer__nav--link")}
+                      >
                         Giới thiệu
-                      </a>
+                      </NavLink>
                     </div>
                     <div className={cx("footer__nav--item")}>
-                      <a href="" className={cx("footer__nav--link")}>
+                      <NavLink
+                        to={"/contact"}
+                        className={cx("footer__nav--link")}
+                      >
                         Liên hệ
-                      </a>
+                      </NavLink>
                     </div>
                   </Col>
                   <Col className={cx("footer__col")} span={12}>
                     <div className={cx("footer__nav--title")}>Chính sách</div>
                     <div className={cx("footer__nav--item")}>
-                      <a href="" className={cx("footer__nav--link")}>
+                      <NavLink
+                        to={"/policy"}
+                        className={cx("footer__nav--link")}
+                        target="_blank"
+                      >
                         Điều khoản sử dụng
-                      </a>
+                      </NavLink>
                     </div>
                     <div className={cx("footer__nav--item")}>
-                      <a href="" className={cx("footer__nav--link")}>
+                      <NavLink
+                        to={"/privacy"}
+                        className={cx("footer__nav--link")}
+                        target="_blank"
+                      >
                         Chính sách bảo mật
-                      </a>
+                      </NavLink>
                     </div>
                   </Col>
                 </Row>
@@ -100,7 +118,12 @@ const Footer = () => {
                   <div className={cx("footer__social--icon")}>
                     <Row className={cx("social__row")}>
                       <Col className={cx("social__col")} sm={8} md={5} lg={3}>
-                        <a href="" className={cx("footer__social--link")}>
+                        <a
+                          href="https://www.facebook.com"
+                          className={cx("footer__social--link")}
+                          target={"_blank"}
+                          rel="noreferrer"
+                        >
                           <span className={cx("footer__social--wrapper")}>
                             <img
                               src={logoFacebook}
@@ -111,7 +134,12 @@ const Footer = () => {
                         </a>
                       </Col>
                       <Col className={cx("social__col")} sm={8} md={5} lg={3}>
-                        <a href="" className={cx("footer__social--link")}>
+                        <a
+                          href="https://www.pinterest.com"
+                          className={cx("footer__social--link")}
+                          target={"_blank"}
+                          rel="noreferrer"
+                        >
                           <span className={cx("footer__social--wrapper")}>
                             <img
                               src={logoPinterest}
@@ -122,7 +150,12 @@ const Footer = () => {
                         </a>
                       </Col>
                       <Col className={cx("social__col")} sm={8} md={5} lg={3}>
-                        <a href="" className={cx("footer__social--link")}>
+                        <a
+                          href="https://twitter.com"
+                          className={cx("footer__social--link")}
+                          target={"_blank"}
+                          rel="noreferrer"
+                        >
                           <span className={cx("footer__social--wrapper")}>
                             <img
                               src={logoTwitter}
@@ -133,7 +166,12 @@ const Footer = () => {
                         </a>
                       </Col>
                       <Col className={cx("social__col")} sm={8} md={5} lg={3}>
-                        <a href="" className={cx("footer__social--link")}>
+                        <a
+                          href="https://www.youtube.com"
+                          className={cx("footer__social--link")}
+                          target={"_blank"}
+                          rel="noreferrer"
+                        >
                           <span className={cx("footer__social--wrapper")}>
                             <img
                               src={logoYoutube}

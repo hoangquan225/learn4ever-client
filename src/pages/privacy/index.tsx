@@ -3,7 +3,7 @@ import styles from "./privacy.module.scss";
 
 const cx = classNames.bind(styles);
 
-const Privacy = () => {
+const PrivacyPages = () => {
   return (
     <>
       <div className={cx("privacy")}>
@@ -253,4 +253,4 @@ const Privacy = () => {
   );
 };
 
-export default Privacy;
+export default PrivacyPages;

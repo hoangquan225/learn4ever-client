@@ -3,7 +3,7 @@ import styles from "./policy.module.scss";
 
 const cx = classNames.bind(styles);
 
-const Policy = () => {
+const PolicyPages = () => {
   return (
     <>
       <div className={cx("policy")}>
@@ -383,4 +383,4 @@ const Policy = () => {
   );
 };
 
-export default Policy;
+export default PolicyPages;

@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 // import { UserOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./header.module.scss";
 import logo from "../../assets/img/logo.png";
@@ -9,17 +11,25 @@ const Header = () => {
   return (
     <>
       <header className={cx("header")}>
-        <div className={cx("wide")}>
+        <div className={cx("wide", "header__wrapper")}>
           <div className={cx("header__container")}>
             <div className={cx("header__logo")}>
-              <a href="/" className={cx("header__link")}>
+              <Link to={"/"} className={cx("header__link")}>
                 <img src={logo} alt="logo" className={cx("header__img")} />
-              </a>
+              </Link>
             </div>
             <div className={cx("header__nav")}>
               <div className={cx("header__auth")}>
-                <button className={cx("header__button")}>Đăng nhập</button>
-                <button className={cx("header__button")}>Đăng ký</button>
+                <button className={cx("header__button")}>
+                  <Link to={"/login"} className={cx("header__btn--link")}>
+                    Đăng nhập
+                  </Link>
+                </button>
+                <button className={cx("header__button")}>
+                  <Link to={"/register"} className={cx("header__btn--link")}>
+                    Đăng ký
+                  </Link>
+                </button>
                 {/* <button className={cx("header__button")}>
                   <UserOutlined />
                 </button> */}

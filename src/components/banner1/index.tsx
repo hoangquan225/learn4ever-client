@@ -15,7 +15,13 @@ const Banner1 = () => {
           <div className={cx("banner__container")}>
             <div className={cx("banner__wrapper")}></div>
             <Row style={{ width: "100%" }}>
-              <Col className={cx("banner__col")} sm={12} md={12} lg={12}>
+              <Col
+                className={cx("banner__col")}
+                xs={16}
+                sm={16}
+                md={16}
+                lg={12}
+              >
                 <div className={cx("banner__left")}>
                   <div className={cx("banner__title")}>
                     <span>HỌC THÔNG MINH</span>
@@ -51,7 +57,7 @@ const Banner1 = () => {
                 </div>
               </Col>
 
-              <Col className={cx("banner__col")} sm={12} md={12} lg={12}>
+              <Col className={cx("banner__col")} xs={8} sm={8} md={8} lg={12}>
                 <div className={cx("banner__right")}>
                   <span className={cx("banner__right--img")}>
                     <img

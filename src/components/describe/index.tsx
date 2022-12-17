@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Breadcrumb, Col, Row } from "antd";
+import { NavLink } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./describe.module.scss";
 import describeConten1 from "../../assets/img/describe1.webp";
@@ -30,17 +31,20 @@ const Describe = () => {
               <div className={cx("describe__breadcrumb")}>
                 <Breadcrumb separator="›">
                   <Breadcrumb.Item>
-                    <a href="" className={cx("describe__breadcumb--link")}>
+                    <NavLink
+                      to={"/"}
+                      className={cx("describe__breadcumb--link")}
+                    >
                       Trang chủ
-                    </a>
+                    </NavLink>
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
-                    <a
-                      href=""
+                    <NavLink
+                      to={"/introduce"}
                       className={cx("describe__breadcumb--link", "active")}
                     >
                       Giới thiệu
-                    </a>
+                    </NavLink>
                   </Breadcrumb.Item>
                 </Breadcrumb>
               </div>
@@ -162,8 +166,11 @@ const Describe = () => {
                 <h2 className={cx("describe__member--topic")}>
                   Đội ngũ phát triển
                 </h2>
-                <Row gutter={{ sm: 24, md: 16, lg: 24 }}>
-                  <Col className={cx("describe__col")} sm={24} md={8} lg={6}>
+                <Row
+                  gutter={{ sm: 24, md: 16, lg: 24 }}
+                  style={{ justifyContent: "center" }}
+                >
+                  <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
                     <div className={cx("describe__member--inner")}>
                       <div className={cx("describe__member--center")}>
                         <div className={cx("describe__member--img")}>
@@ -193,7 +200,7 @@ const Describe = () => {
                     lg={3}
                   ></Col>
 
-                  <Col className={cx("describe__col")} sm={24} md={8} lg={6}>
+                  <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
                     <div className={cx("describe__member--inner")}>
                       <div className={cx("describe__member--center")}>
                         <div className={cx("describe__member--img")}>
@@ -223,7 +230,7 @@ const Describe = () => {
                     lg={3}
                   ></Col>
 
-                  <Col className={cx("describe__col")} sm={24} md={8} lg={6}>
+                  <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
                     <div className={cx("describe__member--inner")}>
                       <div className={cx("describe__member--center")}>
                         <div className={cx("describe__member--img")}>

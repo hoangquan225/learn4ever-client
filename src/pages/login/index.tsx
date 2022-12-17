@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { getPost } from "../../api/services";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input } from "antd";
+
 import classNames from "classnames/bind";
 import styles from "./login.module.scss";
 
 const cx = classNames.bind(styles);
 
-export const LoginPages = () => {
+const LoginPages = () => {
   useEffect(() => {
     getPosts();
   }, []);
@@ -113,3 +114,5 @@ export const LoginPages = () => {
     </>
   );
 };
+
+export default LoginPages;
