@@ -1,7 +1,13 @@
 import { ApiConfig } from "./config";
+import EndPoint from "../submodule/common/endpont"
+import { UserInfo } from "../submodule/models/user";
 
 export const apiLogin = (payload: { account: string; password: string }) => {
-  return ApiConfig("login", payload);
+  return ApiConfig(EndPoint.LOGIN, payload);
+};
+
+export const apiRegister = (payload: { userInfo: UserInfo }) => {
+  return ApiConfig(EndPoint.REGISTER, payload);
 };
 
 export const getPost = () => {

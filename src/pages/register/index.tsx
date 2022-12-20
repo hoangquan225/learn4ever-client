@@ -7,53 +7,167 @@ import {
   UserOutlined,
   WomanOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Row, Col, Select } from "antd";
+import { Button, Form, Input, Row, Col, Select, notification } from "antd";
 import React from "react";
 
 import styles from "./register.module.scss";
 import classNames from "classnames/bind";
 import { isValidPhone, PhoneRegExp } from "../../submodule/utils/validation";
+import { encrypt } from "../../submodule/utils/crypto";
+import { apiRegister } from "../../api/services";
+import TTCSconfig from "../../submodule/common/config";
+import { Link } from "react-router-dom";
+import { NotificationPlacement } from "antd/es/notification/interface";
 
 const cx = classNames.bind(styles);
 
 const RegisterPages = () => {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  const [api, contextHolder] = notification.useNotification();
+
+  const genderData = [
+    {
+      label: "Nam",
+      value: 0
+    },
+    {
+      label: "Nữ",
+      value: 1
+    },
+    {
+      label: "Khác",
+      value: 2
+    }
+  ];
+  const classData = [
+    {
+      label: "Lớp 1",
+      value: 1
+    },
+    {
+      label: "Lớp 2",
+      value: 2
+    },
+    {
+      label: "Lớp 3",
+      value: 3
+    },
+    {
+      label: "Lớp 4",
+      value: 4
+    },
+    {
+      label: "Lớp 5",
+      value: 5
+    },
+    {
+      label: "Lớp 6",
+      value: 6
+    },
+    {
+      label: "Lớp 7",
+      value: 7
+    },
+    {
+      label: "Lớp 8",
+      value: 8
+    },
+    {
+      label: "Lớp 9",
+      value: 9
+    },
+    {
+      label: "Lớp 10",
+      value: 10
+    },
+    {
+      label: "Lớp 11",
+      value: 11
+    },
+    {
+      label: "Lớp 12",
+      value: 12
+    },
+  ];
+
+  const openNotification = (placement: NotificationPlacement, toastMessage: any, type: any) => {
+    switch (type) {
+      case "warning":
+        api.warning({
+          message: `${toastMessage}`,
+          placement,
+        });
+        break;
+
+      case "info":
+        api.info({
+          message: `${toastMessage}`,
+          placement,
+        });
+        break;
+
+      case "success":
+        api.success({
+          message: `${toastMessage}`,
+          placement,
+        });
+        break;
+
+      case "error":
+        api.error({
+          message: `${toastMessage}`,
+          placement,
+        });
+        break;
+    }
   };
 
-  const genderData = ["Nam", "Nữ", "Khác"];
-  const classData = [
-    "Lớp 1",
-    "Lớp 2",
-    "Lớp 3",
-    "Lớp 4",
-    "Lớp 5",
-    "Lớp 6",
-    "Lớp 7",
-    "Lớp 8",
-    "Lớp 9",
-    "Lớp 10",
-    "Lớp 11",
-    "Lớp 12",
-  ];
+  const handleRegister = async (data: any) => {
+    const { confirm, ...rest } = data;
+    try {
+      const encodePassword = encrypt(data.password)
+      const res: any = await apiRegister({
+        ...rest,
+        password: encodePassword
+      })
+
+      switch (res.data.loginCode) {
+        case TTCSconfig.LOGIN_FAILED:
+          console.log("LOGIN_FAILED " + TTCSconfig.LOGIN_FAILED);
+          return handleMessage("Đăng ký thất bại", "warning");
+
+        case TTCSconfig.LOGIN_ACCOUNT_IS_USED:
+          console.log("LOGIN_ACCOUNT_IS_USED " + TTCSconfig.LOGIN_ACCOUNT_IS_USED);
+          return handleMessage("Tài khoản đã tồn tại", "warning");
+
+        case TTCSconfig.LOGIN_SUCCESS:
+          console.log("LOGIN_SUCCESS " + TTCSconfig.LOGIN_SUCCESS);
+          return handleMessage("Đăng ký thành công", "success");
+      }
+    } catch (err) {
+      handleMessage("Đăng ký thất bại", "warning");
+    }
+  }
+
+  const handleMessage = (toastMessage: any, type: any) => openNotification('topRight', toastMessage, type)
 
   return (
     <>
       <div className={cx("register__over")}>
         <div className={cx("register__wrapper")}>
           <h2 className={cx("register__title")}>Tạo tài khoản</h2>
+          {contextHolder}
           <Form
             name="register"
             className={cx("register__form")}
             initialValues={{
               remember: true,
             }}
-            onFinish={onFinish}
+            onFinish={handleRegister}
           >
             <Row gutter={16}>
               <Col className="gutter-row" span={12}>
                 <Form.Item
-                  name="username"
+                  name="account"
                   rules={[
                     {
                       required: true,
@@ -126,7 +240,7 @@ const RegisterPages = () => {
 
               <Col className="gutter-row" span={12}>
                 <Form.Item
-                  name="phone"
+                  name="phoneNumber"
                   rules={[
                     {
                       pattern: PhoneRegExp,
@@ -182,8 +296,8 @@ const RegisterPages = () => {
                   >
                     {genderData.map((data) => (
                       <Select.Option
-                        value={data}
-                        key={data}
+                        value={data.value}
+                        key={data.value}
                         label={
                           <React.Fragment>
                             <WomanOutlined
@@ -194,11 +308,11 @@ const RegisterPages = () => {
                               }}
                             />
                             &nbsp;
-                            {data}
+                            {data.label}
                           </React.Fragment>
                         }
                       >
-                        {data}
+                        {data.label}
                       </Select.Option>
                     ))}
                   </Select>
@@ -207,7 +321,7 @@ const RegisterPages = () => {
 
               <Col className="gutter-row" span={12}>
                 <Form.Item
-                  name="class"
+                  name="classNumber"
                   rules={[
                     {
                       required: true,
@@ -237,8 +351,8 @@ const RegisterPages = () => {
                   >
                     {classData.map((data) => (
                       <Select.Option
-                        value={data}
-                        key={data}
+                        value={data.value}
+                        key={data.value}
                         label={
                           <React.Fragment>
                             <ContactsOutlined
@@ -249,11 +363,11 @@ const RegisterPages = () => {
                               }}
                             />
                             &nbsp;
-                            {data}
+                            {data.label}
                           </React.Fragment>
                         }
                       >
-                        {data}
+                        {data.label}
                       </Select.Option>
                     ))}
                   </Select>
@@ -269,7 +383,7 @@ const RegisterPages = () => {
                       message: "Vui lòng nhập trường này!",
                     },
                   ]}
-                  //   hasFeedback
+                //   hasFeedback
                 >
                   <Input.Password
                     prefix={
@@ -335,9 +449,9 @@ const RegisterPages = () => {
                   </div>
                   <div className={cx("register__tologin")}>
                     Bạn đã có tài khoản?{" "}
-                    <a href="/" className={cx("register__tologinlink")}>
+                    <Link to="/login" className={cx("register__tologinlink")}>
                       Đăng nhập ngay!
-                    </a>
+                    </Link>
                   </div>
                 </Form.Item>
               </Col>
