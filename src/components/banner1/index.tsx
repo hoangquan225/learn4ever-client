@@ -24,11 +24,11 @@ const Banner1 = () => {
               >
                 <div className={cx("banner__left")}>
                   <div className={cx("banner__title")}>
-                    <span>HỌC THÔNG MINH</span>
+                    <span>HỌC MỌI LÚC</span>
                   </div>
                   <div className={cx("banner__subtitle")}>
                     <b>GIÁO DỤC </b>
-                    <span>Hướng tới tương lai</span>
+                    <span>MỌI NƠI</span>
                   </div>
                   <div className={cx("banner__list")}>
                     <div className={cx("banner__item")}>

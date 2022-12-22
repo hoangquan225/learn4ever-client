@@ -5,18 +5,31 @@ import { Button, Checkbox, Form, Input, message, notification } from "antd";
 
 import classNames from "classnames/bind";
 import styles from "./login.module.scss";
-import { Link } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
 import { NotificationPlacement } from "antd/es/notification/interface";
+import React from "react";
+import { authState, requestLogin } from "../../redux/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { RootState } from "../../redux/store";
+import Cookies from "js-cookie";
 
 const cx = classNames.bind(styles);
 
 const LoginPages = () => {
   const [api, contextHolder] = notification.useNotification();
+  const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  // lay token tu cookie
+
   useEffect(() => {
-    // getPosts();
-  }, []);
+    if (userInfo?._id) {
+      navigate('/')
+    }
+  }, [userInfo])
 
   const openNotification = (placement: NotificationPlacement, toastMessage: any, type: any) => {
     switch (type) {
@@ -64,12 +77,16 @@ const LoginPages = () => {
     password: string
   }) => {
     try {
-      console.log(data);
       const encodePassword = encrypt(data.password)
-      const res: any = await apiLogin({ account: data.account, password: encodePassword })
-      console.log(res);
+      // const res: any = await apiLogin({ account: data.account, password: encodePassword })
+      const actionResult = await dispatch(requestLogin({
+        account: data.account,
+        password: encodePassword
+      }))
 
-      switch (res.data.loginCode) {
+      const res = unwrapResult(actionResult);
+
+      switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
           console.log("LOGIN_FAILED " + TTCSconfig.LOGIN_FAILED);
           return handleMessage("Đăng nhập thất bại", "warning");
@@ -83,7 +100,10 @@ const LoginPages = () => {
           return handleMessage("Tài khoản hoặc mật khẩu không đúng", "warning");
 
         case TTCSconfig.LOGIN_SUCCESS:
-          console.log("LOGIN_SUCCESS " + TTCSconfig.LOGIN_SUCCESS);
+          console.log(res.token);
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30
+          })
           return handleMessage("Đăng nhập thành công", "success");
       }
     } catch (err) {
