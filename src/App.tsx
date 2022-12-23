@@ -1,8 +1,8 @@
 import Cookies from "js-cookie";
-import React, { useEffect, useLayoutEffect, useMemo } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Loading from "./components/loading";
 import ScrollToTop from "./helpers/ScrollToTop";
-import LoginPages from "./pages/login";
 import { useAppDispatch, useAppSelector } from "./redux/hook";
 import { requestGetUserFromToken } from "./redux/slices/authSlice";
 import { RootState } from "./redux/store";
@@ -15,9 +15,7 @@ function App() {
 
   useLayoutEffect(() => {
     const cookie = Cookies.get('token')
-    if (cookie) {
-      dispatch(requestGetUserFromToken({ token: cookie }))
-    }
+    dispatch(requestGetUserFromToken({ token: cookie || '' }))
   }, [])
 
   return (
@@ -27,14 +25,14 @@ function App() {
         <Routes>
           {publicRoutes.map((route, index) => {
             const Page = route.component;
-            return <Route key={index} path={route.path} element={<Page />} />;
-            // return isLoading ? <Route key={index} path={route.path} element={<>loading</>} /> : <Route key={index} path={route.path} element={<Page />} />;
-          })}
+            return isLoading ? <Route key={index} path={route.path} element={<Loading />} /> : <Route key={index} path={route.path} element={<Page />} />;
+            })}
           {privateRoutes.map((route, index) => {
             const Page = route.component;
-            return isLoading ? <Route key={index} path={route.path} element={<>loading</>} /> : <Route key={index} path={route.path} element={(userInfo?._id ? <Page /> : <Navigate to={'/login'} />)} />
+            return isLoading ? <Route key={index} path={route.path} element={<Loading />} /> : <Route key={index} path={route.path} element={(userInfo?._id ? <Page /> : <Navigate to={'/login'} />)} />
           })}
         </Routes>
+        
       </div>
     </BrowserRouter>
   );

@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { UserInfo } from "../../submodule/models/user";
-import { apiLogin } from "../../api/services";
+import { apiLogin, apiRegister } from "../../api/services";
 import { apiGetUserFromToken } from "../../api/user";
+import TTCSconfig from "../../submodule/common/config";
 // import _ from "lodash";
 
 export interface UserState {
@@ -17,13 +18,17 @@ const initialState: UserState = {
   loadingCheckLogin: true
 };
 
-export const requestLogin = createAsyncThunk(
-  "auth/login",
-  async (props: { account: string; password: string }) => {
+export const requestLogin = createAsyncThunk("auth/login", async (props: { account: string; password: string }) => {
     const res = await apiLogin(props);
     return res.data;
   }
 );
+
+
+export const requestRegister = createAsyncThunk("auth/register", async (props: { userInfo: UserInfo }) => {
+  const res = await apiRegister(props);
+  return res.data
+})
 
 export const requestGetUserFromToken = createAsyncThunk("user/requestGetUserFromToken", async (props: { token: string }) => {
   const res = await apiGetUserFromToken(props.token);
@@ -64,6 +69,21 @@ export const authSlice = createSlice({
 
       state.userInfo = action.payload.userInfo;
       state.loadingCheckLogin = false
+    });
+
+    /**
+     * register
+     */
+    builder.addCase(requestRegister.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(requestRegister.fulfilled, (state, action: PayloadAction<any>) => {
+      state.loading = false;
+      if(action.payload.loginCode === TTCSconfig.STATUS_SUCCESS)
+      state.userInfo = new UserInfo(action.payload.info);
+    });
+    builder.addCase(requestRegister.rejected, (state, action: PayloadAction<any>) => {
+      state.loading = false;
     })
   },
 });

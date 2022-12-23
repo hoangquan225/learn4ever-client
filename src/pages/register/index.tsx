@@ -7,22 +7,37 @@ import {
   UserOutlined,
   WomanOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Row, Col, Select, notification } from "antd";
-import React from "react";
+import { Button, Form, Input, Row, Col, Select, notification, message } from "antd";
+import React, { useEffect } from "react";
 
 import styles from "./register.module.scss";
 import classNames from "classnames/bind";
-import { isValidPhone, PhoneRegExp } from "../../submodule/utils/validation";
+import { EmailRegExp, isValidPhone, PhoneRegExp } from "../../submodule/utils/validation";
 import { encrypt } from "../../submodule/utils/crypto";
-import { apiRegister } from "../../api/services";
 import TTCSconfig from "../../submodule/common/config";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NotificationPlacement } from "antd/es/notification/interface";
+import { requestRegister } from "../../redux/slices/authSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { RootState } from "../../redux/store";
+import Cookies from "js-cookie";
 
 const cx = classNames.bind(styles);
 
 const RegisterPages = () => {
   const [api, contextHolder] = notification.useNotification();
+  const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  // lay token tu cookie
+
+  useEffect(() => {
+    console.log(userInfo?._id);
+    if (userInfo?._id) {
+      navigate('/')
+    }
+  }, [userInfo])
 
   const genderData = [
     {
@@ -125,22 +140,32 @@ const RegisterPages = () => {
     const { confirm, ...rest } = data;
     try {
       const encodePassword = encrypt(data.password)
-      const res: any = await apiRegister({
+      // const res: any = await apiRegister({
+      //   ...rest,
+      //   password: encodePassword
+      // })
+      const actionResult = await dispatch(requestRegister({
         ...rest,
         password: encodePassword
-      })
+      }))
+      const res = unwrapResult(actionResult);
 
-      switch (res.data.loginCode) {
+      switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
           console.log("LOGIN_FAILED " + TTCSconfig.LOGIN_FAILED);
+          
           return handleMessage("Đăng ký thất bại", "warning");
 
         case TTCSconfig.LOGIN_ACCOUNT_IS_USED:
           console.log("LOGIN_ACCOUNT_IS_USED " + TTCSconfig.LOGIN_ACCOUNT_IS_USED);
-          return handleMessage("Tài khoản đã tồn tại", "warning");
+          return handleMessage("ton tai", "success");
 
         case TTCSconfig.LOGIN_SUCCESS:
           console.log("LOGIN_SUCCESS " + TTCSconfig.LOGIN_SUCCESS);
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30  
+          })
+
           return handleMessage("Đăng ký thành công", "success");
       }
     } catch (err) {
@@ -193,7 +218,7 @@ const RegisterPages = () => {
                   name="email"
                   rules={[
                     {
-                      type: "email",
+                      pattern: EmailRegExp,
                       message: "Email không đúng định dạng!",
                     },
                     {
