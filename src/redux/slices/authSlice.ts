@@ -65,11 +65,12 @@ export const authSlice = createSlice({
       status: number,
       userInfo: UserInfo
     }>) => {
-      console.log(action.payload);
-
       state.userInfo = action.payload.userInfo;
       state.loadingCheckLogin = false
     });
+    builder.addCase(requestGetUserFromToken.rejected, (state) =>{
+      state.loadingCheckLogin = false
+    })
 
     /**
      * register

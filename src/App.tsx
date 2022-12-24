@@ -1,3 +1,5 @@
+import { unwrapResult } from "@reduxjs/toolkit";
+import { notification } from "antd";
 import Cookies from "js-cookie";
 import { useLayoutEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -14,9 +16,22 @@ function App() {
   const isLoading = useAppSelector((state: RootState) => state.authState.loadingCheckLogin)
 
   useLayoutEffect(() => {
-    const cookie = Cookies.get('token')
-    dispatch(requestGetUserFromToken({ token: cookie || '' }))
+    checkLogin()
   }, [])
+
+  const checkLogin =async () => {
+    const cookie = Cookies.get('token')
+    try {
+      const result = await dispatch(requestGetUserFromToken({ token: cookie || '' }))
+      unwrapResult(result)
+    } catch (error) {
+      if(cookie)
+      notification.error({
+        message: 'Server đang bị lỗi'
+      })
+    }
+    
+  }
 
   return (
     <BrowserRouter>
