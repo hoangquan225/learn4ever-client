@@ -28,8 +28,13 @@ const ProfilePages = () => {
   const [modalForm] = Form.useForm();
 
   const userInfo = useAppSelector(
-    (state: RootState) => state.authState.userInfo
+    (state: RootState) => state.authState.userInfo,
   );
+  const isLoading = useAppSelector(
+    (state: RootState) => state.authState.loadingCheckLogin,
+  );
+
+  console.log({ isLoading });
 
   useEffect(() => {
     infoForm.setFieldsValue({
@@ -50,9 +55,15 @@ const ProfilePages = () => {
     setIsModalOpen(false);
   };
 
+  const handleUpdate = () => {
+    infoForm.validateFields().then((value) => {
+      console.log(value);
+    });
+  };
+
   const handleCancelModal = () => {
     modalForm.setFieldsValue({
-      oldPassword: "",
+      password: "",
       newPassword: "",
       confirmNewPassword: "",
     });
@@ -319,7 +330,7 @@ const ProfilePages = () => {
                                 className={cx("profile__button", "btn-modal")}
                                 onClick={handleOkModal}
                               >
-                                Đổi mật khẩu
+                                Xác nhận
                               </Button>,
                             ]}
                           >
@@ -332,7 +343,7 @@ const ProfilePages = () => {
                               name="modal"
                             >
                               <Form.Item
-                                name="oldPassword"
+                                name="password"
                                 className={cx("profile__formitem")}
                               >
                                 <Input
@@ -352,20 +363,20 @@ const ProfilePages = () => {
                               <Form.Item
                                 name="newPassword"
                                 className={cx("profile__formitem")}
-                                dependencies={["oldPassword"]}
+                                dependencies={["password"]}
                                 rules={[
                                   ({ getFieldValue }) => ({
                                     validator(_, value) {
                                       if (
                                         !value ||
-                                        getFieldValue("oldPassword") !== value
+                                        getFieldValue("password") !== value
                                       ) {
                                         return Promise.resolve();
                                       }
                                       return Promise.reject(
                                         new Error(
-                                          "Mật khẩu mới phải khác mật khẩu hiện tại!"
-                                        )
+                                          "Mật khẩu mới phải khác mật khẩu hiện tại!",
+                                        ),
                                       );
                                     },
                                   }),
@@ -399,7 +410,7 @@ const ProfilePages = () => {
                                         return Promise.resolve();
                                       }
                                       return Promise.reject(
-                                        new Error("Mật khẩu không trùng khớp!")
+                                        new Error("Mật khẩu không trùng khớp!"),
                                       );
                                     },
                                   }),
@@ -424,6 +435,7 @@ const ProfilePages = () => {
 
                           <button
                             className={cx("btn-update", "profile__button")}
+                            onClick={handleUpdate}
                           >
                             Cập nhật
                           </button>

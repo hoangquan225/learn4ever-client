@@ -7,19 +7,23 @@ import { Link } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./header.module.scss";
 import logo from "../../assets/img/logo.png";
-import { useAppSelector } from "../../redux/hook";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
-import { Dropdown, MenuProps } from "antd";
+import { Dropdown, MenuProps, notification } from "antd";
 import { useCallback } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
+import { requestGetUserFromToken } from "../../redux/slices/authSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const cx = classNames.bind(styles);
 
 const Header = () => {
   const userInfo = useAppSelector(
-    (state: RootState) => state.authState.userInfo
+    (state: RootState) => state.authState.userInfo,
   );
+
+  const dispatch = useAppDispatch();
 
   const handleLogout = useCallback(() => {
     Cookies.remove("token");
@@ -35,6 +39,21 @@ const Header = () => {
         fontSize: "1.4rem",
         fontFamily: "var(--font-family)",
         padding: "0.8rem",
+      },
+      onClick: async () => {
+        const cookie = Cookies.get("token");
+        try {
+          const result = await dispatch(
+            requestGetUserFromToken({ token: cookie || "" }),
+          );
+
+          unwrapResult(result);
+        } catch (error) {
+          if (cookie)
+            notification.error({
+              message: "Server đang bị lỗi",
+            });
+        }
       },
     },
     {
