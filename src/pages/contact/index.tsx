@@ -21,7 +21,7 @@ const ContactPages = () => {
             <div className={cx("contact__wrapper")}>
               <Row
                 style={{ width: "100%" }}
-                gutter={16}
+                gutter={{ xl: 16, lg: 16, md: 0, sm: 0, xs: 0 }}
                 className={cx("contact__row")}
               >
                 <Col

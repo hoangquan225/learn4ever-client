@@ -16,16 +16,18 @@ import Cookies from "js-cookie";
 const cx = classNames.bind(styles);
 
 const LoginPages = () => {
-  const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
+  const userInfo = useAppSelector(
+    (state: RootState) => state.authState.userInfo
+  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // lay token tu cookie
 
   useEffect(() => {
     if (userInfo?._id) {
-      navigate('/')
+      navigate("/");
     }
-  }, [userInfo])
+  }, [userInfo]);
 
   // const getPosts = async () => {
   //   try {
@@ -37,56 +39,57 @@ const LoginPages = () => {
   // };
 
   const handleLogin: any = async (data: {
-    account: string,
-    password: string
+    account: string;
+    password: string;
   }) => {
     try {
-      const encodePassword = encrypt(data.password)
+      const encodePassword = encrypt(data.password);
       // const res: any = await apiLogin({ account: data.account, password: encodePassword })
-      const actionResult = await dispatch(requestLogin({
-        account: data.account,
-        password: encodePassword
-      }))
+      const actionResult = await dispatch(
+        requestLogin({
+          account: data.account,
+          password: encodePassword,
+        })
+      );
 
       const res = unwrapResult(actionResult);
-
       switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
           return notification.error({
-            message: 'Đăng nhập thất bại',
-            duration: 1.5
-          })
+            message: "Đăng nhập thất bại",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST:
           return notification.warning({
-            message: 'Tài khoản hoặc mật khẩu không đúng',
-            duration: 1.5
-          })
+            message: "Tài khoản hoặc mật khẩu không đúng",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_WRONG_PASSWORD:
           return notification.warning({
-            message: 'Tài khoản hoặc mật khẩu không đúng',
-            duration: 1.5
-          })
+            message: "Tài khoản hoặc mật khẩu không đúng",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_SUCCESS:
           console.log(res.token);
           Cookies.set("token", res.token, {
-            expires: 60 * 60 * 24 * 30
-          })
+            expires: 60 * 60 * 24 * 30,
+          });
           return notification.success({
-            message: 'Đăng nhập thành công',
-            duration: 1.5
-          })
+            message: "Đăng nhập thành công",
+            duration: 1.5,
+          });
       }
     } catch (err) {
       console.log("err");
       return notification.error({
-        message: 'Đăng nhập thất bại, lỗi server',
-        duration: 1.5
-      })
+        message: "Đăng nhập thất bại, lỗi server",
+        duration: 1.5,
+      });
     }
-  }
+  };
 
   return (
     <>

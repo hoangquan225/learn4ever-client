@@ -5,15 +5,15 @@ import LoginPages from "../pages/login";
 import NotFoundPages from "../pages/notfound";
 import PolicyPages from "../pages/policy";
 import PrivacyPages from "../pages/privacy";
+import ProfilePages from "../pages/profile";
 import RegisterPages from "../pages/register";
-
 
 // Public routers
 export const publicRoutes = [
   { path: "/", component: HomePages },
   { path: "/introduce", component: IntroducePages },
   { path: "/contact", component: ContactPages },
-  // { path: "/policy", component: PolicyPages },
+  { path: "/policy", component: PolicyPages },
   { path: "/privacy", component: PrivacyPages },
   { path: "/login", component: LoginPages },
   { path: "/register", component: RegisterPages },
@@ -21,6 +21,4 @@ export const publicRoutes = [
 ];
 
 // Private routes
-export const privateRoutes = [
-  { path: "/policy", component: PolicyPages },
-];
+export const privateRoutes = [{ path: "/profile", component: ProfilePages }];

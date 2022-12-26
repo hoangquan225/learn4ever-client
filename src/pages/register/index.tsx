@@ -7,12 +7,16 @@ import {
   UserOutlined,
   WomanOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Row, Col, Select, notification, message } from "antd";
+import { Button, Form, Input, Row, Col, Select, notification } from "antd";
 import React, { useEffect } from "react";
 
 import styles from "./register.module.scss";
 import classNames from "classnames/bind";
-import { EmailRegExp, isValidPhone, PhoneRegExp } from "../../submodule/utils/validation";
+import {
+  EmailRegExp,
+  isValidPhone,
+  PhoneRegExp,
+} from "../../submodule/utils/validation";
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,7 +30,9 @@ import { classes, genders } from "../../utils/contants";
 const cx = classNames.bind(styles);
 
 const RegisterPages = () => {
-  const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
+  const userInfo = useAppSelector(
+    (state: RootState) => state.authState.userInfo
+  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // lay token tu cookie
@@ -34,53 +40,55 @@ const RegisterPages = () => {
   useEffect(() => {
     console.log(userInfo?._id);
     if (userInfo?._id) {
-      navigate('/')
+      navigate("/");
     }
-  }, [userInfo])
+  }, [userInfo]);
 
   const handleRegister = async (data: any) => {
     const { confirm, ...rest } = data;
     try {
-      const encodePassword = encrypt(data.password)
+      const encodePassword = encrypt(data.password);
       // const res: any = await apiRegister({
       //   ...rest,
       //   password: encodePassword
       // })
-      const actionResult = await dispatch(requestRegister({
-        ...rest,
-        password: encodePassword
-      }))
+      const actionResult = await dispatch(
+        requestRegister({
+          ...rest,
+          password: encodePassword,
+        })
+      );
       const res = unwrapResult(actionResult);
 
       switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
           return notification.error({
-            message: 'Đăng ký thất bại',
-            duration: 1.5
-          })
+            message: "Đăng ký thất bại",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_ACCOUNT_IS_USED:
           return notification.warning({
-            message: 'Tài khoản đã tồn tại',
-            duration: 1.5
-          })
+            message: "Tài khoản đã tồn tại",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_SUCCESS:
           Cookies.set("token", res.token, {
-            expires: 60 * 60 * 24 * 30  
-          })
+            expires: 60 * 60 * 24 * 30,
+          });
           return notification.success({
-            message: 'Đăng ký thành công',
-            duration: 1.5
-          })
+            message: "Đăng ký thành công",
+            duration: 1.5,
+          });
       }
     } catch (err) {
       notification.error({
-        message: 'Đăng ký thất bại, lỗi server',
-        duration: 1.5
-      })
+        message: "Đăng ký thất bại, lỗi server",
+        duration: 1.5,
+      });
     }
-  }
+  };
 
   return (
     <>
@@ -96,7 +104,14 @@ const RegisterPages = () => {
             onFinish={handleRegister}
           >
             <Row gutter={16}>
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="account"
                   rules={[
@@ -119,7 +134,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="email"
                   rules={[
@@ -146,7 +168,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="name"
                   rules={[
@@ -169,7 +198,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="phoneNumber"
                   rules={[
@@ -196,7 +232,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="gender"
                   rules={[
@@ -250,7 +293,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="classNumber"
                   rules={[
@@ -305,7 +355,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="password"
                   rules={[
@@ -314,7 +371,7 @@ const RegisterPages = () => {
                       message: "Vui lòng nhập trường này!",
                     },
                   ]}
-                //   hasFeedback
+                  //   hasFeedback
                 >
                   <Input.Password
                     prefix={
@@ -330,7 +387,14 @@ const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="confirm"
                   dependencies={["password"]}

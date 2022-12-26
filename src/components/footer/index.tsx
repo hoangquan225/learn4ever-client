@@ -117,7 +117,7 @@ const Footer = () => {
                   </div>
                   <div className={cx("footer__social--icon")}>
                     <Row className={cx("social__row")}>
-                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                      <Col className={cx("social__col")} sm={2} md={5} lg={3}>
                         <a
                           href="https://www.facebook.com"
                           className={cx("footer__social--link")}
@@ -133,7 +133,7 @@ const Footer = () => {
                           </span>
                         </a>
                       </Col>
-                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                      <Col className={cx("social__col")} sm={2} md={5} lg={3}>
                         <a
                           href="https://www.pinterest.com"
                           className={cx("footer__social--link")}
@@ -149,7 +149,7 @@ const Footer = () => {
                           </span>
                         </a>
                       </Col>
-                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                      <Col className={cx("social__col")} sm={2} md={5} lg={3}>
                         <a
                           href="https://twitter.com"
                           className={cx("footer__social--link")}
@@ -165,7 +165,7 @@ const Footer = () => {
                           </span>
                         </a>
                       </Col>
-                      <Col className={cx("social__col")} sm={8} md={5} lg={3}>
+                      <Col className={cx("social__col")} sm={2} md={5} lg={3}>
                         <a
                           href="https://www.youtube.com"
                           className={cx("footer__social--link")}
