@@ -16,17 +16,16 @@ import { EmailRegExp, isValidPhone, PhoneRegExp } from "../../submodule/utils/va
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
 import { Link, useNavigate } from "react-router-dom";
-import { NotificationPlacement } from "antd/es/notification/interface";
 import { requestRegister } from "../../redux/slices/authSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
 import Cookies from "js-cookie";
+import { classes, genders } from "../../utils/contants";
 
 const cx = classNames.bind(styles);
 
 const RegisterPages = () => {
-  const [api, contextHolder] = notification.useNotification();
   const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -38,103 +37,6 @@ const RegisterPages = () => {
       navigate('/')
     }
   }, [userInfo])
-
-  const genderData = [
-    {
-      label: "Nam",
-      value: 0
-    },
-    {
-      label: "Nữ",
-      value: 1
-    },
-    {
-      label: "Khác",
-      value: 2
-    }
-  ];
-  const classData = [
-    {
-      label: "Lớp 1",
-      value: 1
-    },
-    {
-      label: "Lớp 2",
-      value: 2
-    },
-    {
-      label: "Lớp 3",
-      value: 3
-    },
-    {
-      label: "Lớp 4",
-      value: 4
-    },
-    {
-      label: "Lớp 5",
-      value: 5
-    },
-    {
-      label: "Lớp 6",
-      value: 6
-    },
-    {
-      label: "Lớp 7",
-      value: 7
-    },
-    {
-      label: "Lớp 8",
-      value: 8
-    },
-    {
-      label: "Lớp 9",
-      value: 9
-    },
-    {
-      label: "Lớp 10",
-      value: 10
-    },
-    {
-      label: "Lớp 11",
-      value: 11
-    },
-    {
-      label: "Lớp 12",
-      value: 12
-    },
-  ];
-
-  const openNotification = (placement: NotificationPlacement, toastMessage: any, type: any) => {
-    switch (type) {
-      case "warning":
-        api.warning({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "info":
-        api.info({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "success":
-        api.success({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "error":
-        api.error({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-    }
-  };
 
   const handleRegister = async (data: any) => {
     const { confirm, ...rest } = data;
@@ -152,35 +54,39 @@ const RegisterPages = () => {
 
       switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
-          console.log("LOGIN_FAILED " + TTCSconfig.LOGIN_FAILED);
-          
-          return handleMessage("Đăng ký thất bại", "warning");
+          return notification.error({
+            message: 'Đăng ký thất bại',
+            duration: 1.5
+          })
 
         case TTCSconfig.LOGIN_ACCOUNT_IS_USED:
-          console.log("LOGIN_ACCOUNT_IS_USED " + TTCSconfig.LOGIN_ACCOUNT_IS_USED);
-          return handleMessage("ton tai", "success");
+          return notification.warning({
+            message: 'Tài khoản đã tồn tại',
+            duration: 1.5
+          })
 
         case TTCSconfig.LOGIN_SUCCESS:
-          console.log("LOGIN_SUCCESS " + TTCSconfig.LOGIN_SUCCESS);
           Cookies.set("token", res.token, {
             expires: 60 * 60 * 24 * 30  
           })
-
-          return handleMessage("Đăng ký thành công", "success");
+          return notification.success({
+            message: 'Đăng ký thành công',
+            duration: 1.5
+          })
       }
     } catch (err) {
-      handleMessage("Đăng ký thất bại", "warning");
+      notification.error({
+        message: 'Đăng ký thất bại, lỗi server',
+        duration: 1.5
+      })
     }
   }
-
-  const handleMessage = (toastMessage: any, type: any) => openNotification('topRight', toastMessage, type)
 
   return (
     <>
       <div className={cx("register__over")}>
         <div className={cx("register__wrapper")}>
           <h2 className={cx("register__title")}>Tạo tài khoản</h2>
-          {contextHolder}
           <Form
             name="register"
             className={cx("register__form")}
@@ -319,7 +225,7 @@ const RegisterPages = () => {
                     }
                     size={"large"}
                   >
-                    {genderData.map((data) => (
+                    {genders.map((data) => (
                       <Select.Option
                         value={data.value}
                         key={data.value}
@@ -374,7 +280,7 @@ const RegisterPages = () => {
                     size={"large"}
                     listHeight={128}
                   >
-                    {classData.map((data) => (
+                    {classes.map((data) => (
                       <Select.Option
                         value={data.value}
                         key={data.value}

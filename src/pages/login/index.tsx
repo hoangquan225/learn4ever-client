@@ -1,15 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { apiLogin, getPost } from "../../api/services";
+import { useEffect } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, message, notification } from "antd";
 
 import classNames from "classnames/bind";
 import styles from "./login.module.scss";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
-import { NotificationPlacement } from "antd/es/notification/interface";
-import React from "react";
 import { authState, requestLogin } from "../../redux/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -19,7 +16,6 @@ import Cookies from "js-cookie";
 const cx = classNames.bind(styles);
 
 const LoginPages = () => {
-  const [api, contextHolder] = notification.useNotification();
   const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -30,38 +26,6 @@ const LoginPages = () => {
       navigate('/')
     }
   }, [userInfo])
-
-  const openNotification = (placement: NotificationPlacement, toastMessage: any, type: any) => {
-    switch (type) {
-      case "warning":
-        api.warning({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "info":
-        api.info({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "success":
-        api.success({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-
-      case "error":
-        api.error({
-          message: `${toastMessage}`,
-          placement,
-        });
-        break;
-    }
-  };
 
   // const getPosts = async () => {
   //   try {
@@ -88,38 +52,47 @@ const LoginPages = () => {
 
       switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
-          console.log("LOGIN_FAILED " + TTCSconfig.LOGIN_FAILED);
-          return handleMessage("Đăng nhập thất bại", "warning");
+          return notification.error({
+            message: 'Đăng nhập thất bại',
+            duration: 1.5
+          })
 
         case TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST:
-          console.log("LOGIN_ACCOUNT_NOT_EXIST " + TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST);
-          return handleMessage("Tài khoản hoặc mật khẩu không đúng", "warning");
+          return notification.warning({
+            message: 'Tài khoản hoặc mật khẩu không đúng',
+            duration: 1.5
+          })
 
         case TTCSconfig.LOGIN_WRONG_PASSWORD:
-          console.log("LOGIN_WRONG_PASSWORD " + TTCSconfig.LOGIN_WRONG_PASSWORD);
-          return handleMessage("Tài khoản hoặc mật khẩu không đúng", "warning");
+          return notification.warning({
+            message: 'Tài khoản hoặc mật khẩu không đúng',
+            duration: 1.5
+          })
 
         case TTCSconfig.LOGIN_SUCCESS:
           console.log(res.token);
           Cookies.set("token", res.token, {
             expires: 60 * 60 * 24 * 30
           })
-          return handleMessage("Đăng nhập thành công", "success");
+          return notification.success({
+            message: 'Đăng nhập thành công',
+            duration: 1.5
+          })
       }
     } catch (err) {
       console.log("err");
-      handleMessage("Đăng nhập thất bại", "warning");
+      return notification.error({
+        message: 'Đăng nhập thất bại, lỗi server',
+        duration: 1.5
+      })
     }
   }
-
-  const handleMessage = (toastMessage: any, type: any) => openNotification('topRight', toastMessage, type)
 
   return (
     <>
       <div className={cx("login__over")}>
         <div className={cx("login__wrapper")}>
           <h2 className={cx("login__title")}>Đăng Nhập</h2>
-          {contextHolder}
           <Form
             name="normal_login"
             className={cx("login__form")}
