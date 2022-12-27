@@ -1,5 +1,5 @@
 import { ApiConfig } from "./config";
-import EndPoint from "../submodule/common/endpont";
+import EndPoint from "../submodule/common/endpoint";
 import { UserInfo } from "../submodule/models/user";
 
 export const apiGetUserFromToken = (token: string) => {
@@ -16,7 +16,7 @@ export const apiUpdateUser = async (payload: {
 };
 
 export const apiChangePassword = async (payload: {
-  token: string;
+  token: any;
   password: string;
   newPassword: string;
 }) => {

@@ -35,16 +35,16 @@ import {
   requestUpdateUserInfo,
 } from "../../redux/slices/authSlice";
 import TTCSconfig from "../../submodule/common/config";
-import { initState, profileReducer, setBirth } from "./logic";
 import { encrypt } from "../../submodule/utils/crypto";
+import moment from "moment";
+import dayjs from "dayjs";
+import { apiChangePassword } from "../../api/user";
 
 const cx = classNames.bind(styles);
 
 const ProfilePages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
-
-  const [uiState, uiLogic] = useReducer(profileReducer, initState);
 
   const [infoForm] = Form.useForm();
   const [modalForm] = Form.useForm();
@@ -58,10 +58,9 @@ const ProfilePages = () => {
       name: userInfo?.name,
       email: userInfo?.email,
       phoneNumber: userInfo?.phoneNumber,
-      // birth: userInfo?.birth,
+      birth: dayjs(userInfo?.birth),
       classNumber: userInfo?.classNumber,
       gender: userInfo?.gender,
-      birth: uiLogic(setBirth(new Date(userInfo?.birth!))),
     });
   }, [infoForm]);
 
@@ -78,16 +77,21 @@ const ProfilePages = () => {
       const newPassEncode = encrypt(newPassword);
 
       try {
-        const actionResult = await dispatch(
-          requestChangePassword({
-            token: cookie,
-            password: passEncode,
-            newPassword: newPassEncode,
-          })
-        );
-        const res = unwrapResult(actionResult);
+        // const actionResult = await dispatch(
+        //   requestChangePassword({
+        //     token: cookie,
+        //     password: passEncode,
+        //     newPassword: newPassEncode,
+        //   })
+        // );
+        // const res = unwrapResult(actionResult);
+        const res: any = await apiChangePassword({
+          token: cookie,
+          password: passEncode,
+          newPassword: newPassEncode,
+        });
 
-        switch (res.loginCode) {
+        switch (res.data.loginCode) {
           case TTCSconfig.LOGIN_SUCCESS:
             handleCancelModal();
             return notification.success({
@@ -113,11 +117,12 @@ const ProfilePages = () => {
             });
 
           case TTCSconfig.LOGIN_TOKEN_INVALID:
-            window.location.href = "/login";
-            return notification.warning({
+            notification.warning({
               message: "Không thể tìm thấy token!",
               duration: 1.5,
             });
+            window.location.href = "/login";
+            break;
         }
       } catch (error) {
         return notification.warning({
@@ -131,10 +136,7 @@ const ProfilePages = () => {
   const handleUpdate = async () => {
     infoForm.validateFields().then(async (value) => {
       const cookie = Cookies.get("token");
-      // const { birth, ...rest } = value;
-      // const test = birth?.getTime();
-      // console.log(test);
-      // console.log(birth);
+      value.birth = value.birth?.valueOf();
 
       try {
         const actionResult = await dispatch(
@@ -187,7 +189,6 @@ const ProfilePages = () => {
                   name="profile"
                   className={cx("profile__form")}
                   form={infoForm}
-                  // onFinish={onFinish}
                 >
                   <Row>
                     <Col xl={8} lg={8} md={8} sm={24} xs={24}>
@@ -302,7 +303,6 @@ const ProfilePages = () => {
                               allowClear={false}
                               showToday={false}
                               className={cx("profile__datepicker")}
-                              // value={userInfo?.birth}
                             />
                           </Form.Item>
                         </Col>
