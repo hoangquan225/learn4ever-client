@@ -20,7 +20,7 @@ const cx = classNames.bind(styles);
 
 const Header = () => {
   const userInfo = useAppSelector(
-    (state: RootState) => state.authState.userInfo,
+    (state: RootState) => state.authState.userInfo
   );
 
   const dispatch = useAppDispatch();
@@ -44,7 +44,7 @@ const Header = () => {
         const cookie = Cookies.get("token");
         try {
           const result = await dispatch(
-            requestGetUserFromToken({ token: cookie || "" }),
+            requestGetUserFromToken({ token: cookie || "" })
           );
 
           unwrapResult(result);

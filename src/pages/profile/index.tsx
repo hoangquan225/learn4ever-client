@@ -1,9 +1,19 @@
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  notification,
+  Row,
+  Select,
+} from "antd";
 import classNames from "classnames/bind";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { AvatarIcon } from "../../components/icons/icons";
-import { useAppSelector } from "../../redux/hook";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
 import {
   FaRegUser,
@@ -14,36 +24,44 @@ import {
   FaRegAddressCard,
 } from "react-icons/fa";
 import styles from "./profile.module.scss";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { EmailRegExp, PhoneRegExp } from "../../submodule/utils/validation";
 import { classes, genders } from "../../utils/contants";
 import { LockOutlined } from "@ant-design/icons";
+import Cookies from "js-cookie";
+import { unwrapResult } from "@reduxjs/toolkit";
+import {
+  requestChangePassword,
+  requestUpdateUserInfo,
+} from "../../redux/slices/authSlice";
+import TTCSconfig from "../../submodule/common/config";
+import { initState, profileReducer, setBirth } from "./logic";
+import { encrypt } from "../../submodule/utils/crypto";
 
 const cx = classNames.bind(styles);
 
 const ProfilePages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useAppDispatch();
+
+  const [uiState, uiLogic] = useReducer(profileReducer, initState);
 
   const [infoForm] = Form.useForm();
   const [modalForm] = Form.useForm();
 
   const userInfo = useAppSelector(
-    (state: RootState) => state.authState.userInfo,
+    (state: RootState) => state.authState.userInfo
   );
-  const isLoading = useAppSelector(
-    (state: RootState) => state.authState.loadingCheckLogin,
-  );
-
-  console.log({ isLoading });
 
   useEffect(() => {
     infoForm.setFieldsValue({
       name: userInfo?.name,
       email: userInfo?.email,
       phoneNumber: userInfo?.phoneNumber,
-      birth: userInfo?.birth,
+      // birth: userInfo?.birth,
       classNumber: userInfo?.classNumber,
       gender: userInfo?.gender,
+      birth: uiLogic(setBirth(new Date(userInfo?.birth!))),
     });
   }, [infoForm]);
 
@@ -51,13 +69,98 @@ const ProfilePages = () => {
     setIsModalOpen(true);
   };
 
-  const handleOkModal = () => {
-    setIsModalOpen(false);
+  const handleChangePassword = () => {
+    modalForm.validateFields().then(async (value) => {
+      const cookie = Cookies.get("token");
+      const { password, newPassword, ...rest } = value;
+
+      const passEncode = encrypt(password);
+      const newPassEncode = encrypt(newPassword);
+
+      try {
+        const actionResult = await dispatch(
+          requestChangePassword({
+            token: cookie,
+            password: passEncode,
+            newPassword: newPassEncode,
+          })
+        );
+        const res = unwrapResult(actionResult);
+
+        switch (res.loginCode) {
+          case TTCSconfig.LOGIN_SUCCESS:
+            handleCancelModal();
+            return notification.success({
+              message: "Đổi mật khẩu thành công",
+              duration: 1.5,
+            });
+
+          case TTCSconfig.LOGIN_WRONG_PASSWORD:
+            modalForm.setFieldsValue({
+              password: "",
+              newPassword: "",
+              confirmNewPassword: "",
+            });
+            return notification.warning({
+              message: "Mật khẩu hiện tại không chính xác!",
+              duration: 1.5,
+            });
+
+          case TTCSconfig.LOGIN_FAILED:
+            return notification.warning({
+              message: "Lỗi server!",
+              duration: 1.5,
+            });
+
+          case TTCSconfig.LOGIN_TOKEN_INVALID:
+            window.location.href = "/login";
+            return notification.warning({
+              message: "Không thể tìm thấy token!",
+              duration: 1.5,
+            });
+        }
+      } catch (error) {
+        return notification.warning({
+          message: "Cập nhật thất bại, lỗi server!",
+          duration: 1.5,
+        });
+      }
+    });
   };
 
-  const handleUpdate = () => {
-    infoForm.validateFields().then((value) => {
-      console.log(value);
+  const handleUpdate = async () => {
+    infoForm.validateFields().then(async (value) => {
+      const cookie = Cookies.get("token");
+      // const { birth, ...rest } = value;
+      // const test = birth?.getTime();
+      // console.log(test);
+      // console.log(birth);
+
+      try {
+        const actionResult = await dispatch(
+          requestUpdateUserInfo({ token: cookie, userInfo: value })
+        );
+        const res = unwrapResult(actionResult);
+        console.log(res);
+        switch (res.status) {
+          case TTCSconfig.STATUS_SUCCESS:
+            return notification.success({
+              message: "Cập nhật thành công!",
+              duration: 1.5,
+            });
+
+          case TTCSconfig.STATUS_FAIL:
+            return notification.warning({
+              message: "Cập nhật thất bại!",
+              duration: 1.5,
+            });
+        }
+      } catch (error) {
+        return notification.warning({
+          message: "Cập nhật thất bại, lỗi server!",
+          duration: 1.5,
+        });
+      }
     });
   };
 
@@ -322,13 +425,13 @@ const ProfilePages = () => {
                           <Modal
                             className={cx("profile__modal")}
                             open={isModalOpen}
-                            onOk={handleOkModal}
+                            // onOk={handleOkModal}
                             onCancel={handleCancelModal}
                             footer={[
                               <Button
                                 key="changePassword"
                                 className={cx("profile__button", "btn-modal")}
-                                onClick={handleOkModal}
+                                onClick={handleChangePassword}
                               >
                                 Xác nhận
                               </Button>,
@@ -375,8 +478,8 @@ const ProfilePages = () => {
                                       }
                                       return Promise.reject(
                                         new Error(
-                                          "Mật khẩu mới phải khác mật khẩu hiện tại!",
-                                        ),
+                                          "Mật khẩu mới phải khác mật khẩu hiện tại!"
+                                        )
                                       );
                                     },
                                   }),
@@ -410,7 +513,7 @@ const ProfilePages = () => {
                                         return Promise.resolve();
                                       }
                                       return Promise.reject(
-                                        new Error("Mật khẩu không trùng khớp!"),
+                                        new Error("Mật khẩu không trùng khớp!")
                                       );
                                     },
                                   }),

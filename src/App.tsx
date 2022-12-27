@@ -11,27 +11,34 @@ import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 
 function App() {
-  const dispatch = useAppDispatch()
-  const userInfo = useAppSelector((state: RootState) => state.authState.userInfo)
-  const isLoading = useAppSelector((state: RootState) => state.authState.loadingCheckLogin)
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(
+    (state: RootState) => state.authState.userInfo
+  );
+  const isLoading = useAppSelector(
+    (state: RootState) => state.authState.loadingCheckLogin
+  );
+  console.log(userInfo?._id);
+  console.log(isLoading);
 
   useLayoutEffect(() => {
-    checkLogin()
-  }, [])
+    checkLogin();
+  }, []);
 
-  const checkLogin =async () => {
-    const cookie = Cookies.get('token')
+  const checkLogin = async () => {
+    const cookie = Cookies.get("token");
     try {
-      const result = await dispatch(requestGetUserFromToken({ token: cookie || '' }))
-      unwrapResult(result)
+      const result = await dispatch(
+        requestGetUserFromToken({ token: cookie || "" })
+      );
+      unwrapResult(result);
     } catch (error) {
-      if(cookie)
-      notification.error({
-        message: 'Server đang bị lỗi'
-      })
+      if (cookie)
+        notification.error({
+          message: "Server đang bị lỗi",
+        });
     }
-    
-  }
+  };
 
   return (
     <BrowserRouter>
@@ -40,14 +47,25 @@ function App() {
         <Routes>
           {publicRoutes.map((route, index) => {
             const Page = route.component;
-            return isLoading ? <Route key={index} path={route.path} element={<Loading />} /> : <Route key={index} path={route.path} element={<Page />} />;
-            })}
+            return isLoading ? (
+              <Route key={index} path={route.path} element={<Loading />} />
+            ) : (
+              <Route key={index} path={route.path} element={<Page />} />
+            );
+          })}
           {privateRoutes.map((route, index) => {
             const Page = route.component;
-            return isLoading ? <Route key={index} path={route.path} element={<Loading />} /> : <Route key={index} path={route.path} element={(userInfo?._id ? <Page /> : <Navigate to={'/login'} />)} />
+            return isLoading ? (
+              <Route key={index} path={route.path} element={<Loading />} />
+            ) : (
+              <Route
+                key={index}
+                path={route.path}
+                element={userInfo?._id ? <Page /> : <Navigate to={"/login"} />}
+              />
+            );
           })}
         </Routes>
-        
       </div>
     </BrowserRouter>
   );
