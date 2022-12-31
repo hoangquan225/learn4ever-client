@@ -13,7 +13,7 @@ import { Dropdown, MenuProps, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
-import { requestGetUserFromToken } from "../../redux/slices/authSlice";
+import { requestGetUserFromToken } from "../../redux/slices/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { FaBars } from "react-icons/fa";
 import { GrClose } from "react-icons/gr";
@@ -48,7 +48,6 @@ const Header = () => {
   }, []);
 
   const loadCategorys = async () => {
-    console.log("load");
     try {
       const actionResult = await dispatch(
         requestLoadCategorys({
@@ -62,8 +61,6 @@ const Header = () => {
       });
     }
   };
-
-  console.log(categorys);
 
   const items: MenuProps["items"] = [
     {
@@ -189,101 +186,7 @@ const Header = () => {
           <div className={cx("navbar__container")}>
             <div className={cx("navbar__list")}>
               {/* DESKTOP */}
-              {/* <div className={cx("navbar__list--desktop")}>
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 1</span>
-                    </div>
-                  </Link>
-                </div>
 
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 2</span>
-                    </div>
-                  </Link>
-                </div>
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 3</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 4</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 5</span>
-                    </div>
-                  </Link>
-                </div>
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 6</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 7</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 8</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 9</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 10</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 11</span>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className={cx("navbar__item--desktop")}>
-                  <Link to={"/"} className={cx("navbar__link--desktop")}>
-                    <div className={cx("navbar__title")}>
-                      <span>Lớp 12</span>
-                    </div>
-                  </Link>
-                </div>
-              </div> */}
               <div className={cx("navbar__list--desktop")}>
                 {categorys.map((data) => (
                   <div className={cx("navbar__item--desktop")}>
@@ -329,29 +232,18 @@ const Header = () => {
                     </button>
                   </div>
 
-                  <div className={cx("navbar__item--mobile")}>
-                    <Link to={"/"} className={cx("navbar__link--mobile")}>
-                      <div className={cx("navbar__title")}>
-                        <span>Luyện Thi THPT QG</span>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className={cx("navbar__item--mobile")}>
-                    <Link to={"/"} className={cx("navbar__link--mobile")}>
-                      <div className={cx("navbar__title")}>
-                        <span>Luyện Thi THPT QG</span>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className={cx("navbar__item--mobile")}>
-                    <Link to={"/"} className={cx("navbar__link--mobile")}>
-                      <div className={cx("navbar__title")}>
-                        <span>Luyện Thi THPT QG</span>
-                      </div>
-                    </Link>
-                  </div>
+                  {categorys.map((data) => (
+                    <div className={cx("navbar__item--mobile")}>
+                      <Link
+                        to={data.slug}
+                        className={cx("navbar__link--mobile")}
+                      >
+                        <div className={cx("navbar__title")}>
+                          <span>{data.name}</span>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

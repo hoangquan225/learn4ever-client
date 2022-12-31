@@ -33,7 +33,7 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import {
   requestChangePassword,
   requestUpdateUserInfo,
-} from "../../redux/slices/authSlice";
+} from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import moment from "moment";
@@ -143,7 +143,6 @@ const ProfilePages = () => {
           requestUpdateUserInfo({ token: cookie, userInfo: value })
         );
         const res = unwrapResult(actionResult);
-        console.log(res);
         switch (res.status) {
           case TTCSconfig.STATUS_SUCCESS:
             return notification.success({

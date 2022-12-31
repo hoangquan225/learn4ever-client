@@ -423,4 +423,9 @@
   color: var(--textColor);
   display: flex;
   align-items: center;
+
+  &:hover {
+    background-color: var(--primaryColor);
+    color: #fff;
+  }
 }

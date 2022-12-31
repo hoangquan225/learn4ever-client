@@ -6,7 +6,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./components/loading";
 import ScrollToTop from "./helpers/ScrollToTop";
 import { useAppDispatch, useAppSelector } from "./redux/hook";
-import { requestGetUserFromToken } from "./redux/slices/authSlice";
+import { requestGetUserFromToken } from "./redux/slices/userSlice";
 import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 
@@ -18,8 +18,6 @@ function App() {
   const isLoading = useAppSelector(
     (state: RootState) => state.authState.loadingCheckLogin
   );
-  console.log(userInfo?._id);
-  console.log(isLoading);
 
   useLayoutEffect(() => {
     checkLogin();

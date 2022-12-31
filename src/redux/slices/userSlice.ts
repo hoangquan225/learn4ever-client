@@ -1,28 +1,54 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { UserInfo } from "../../submodule/models/user";
-import _ from "lodash";
-import { apiChangePassword, apiUpdateUser } from "../../api/user";
-import { apiGetUserFromToken } from "../../api/user";
+import { apiLogin, apiRegister } from "../../api/auth";
+import {
+  apiChangePassword,
+  apiGetUserFromToken,
+  apiUpdateUser,
+} from "../../api/user";
 import TTCSconfig from "../../submodule/common/config";
+// import _ from "lodash";
 
 export interface UserState {
-  users: UserInfo[];
-  loading: boolean;
-  error: string;
   userInfo: UserInfo | null;
+  loading: boolean;
+  loadingCheckLogin: boolean;
 }
 
 const initialState: UserState = {
-  users: [],
-  loading: false,
-  error: "",
   userInfo: null,
+  loading: false,
+  loadingCheckLogin: true,
 };
+
+export const requestLogin = createAsyncThunk(
+  "auth/login",
+  async (props: { account: string; password: string }) => {
+    const res = await apiLogin(props);
+    return res.data;
+  }
+);
+
+export const requestRegister = createAsyncThunk(
+  "auth/register",
+  async (props: { userInfo: UserInfo }) => {
+    const res = await apiRegister(props);
+    return res.data;
+  }
+);
+
+export const requestGetUserFromToken = createAsyncThunk(
+  "user/requestGetUserFromToken",
+  async (props: { token: string }) => {
+    const res = await apiGetUserFromToken(props.token);
+    return res.data;
+  }
+);
 
 export const requestUpdateUserInfo = createAsyncThunk(
   "user/updateUserInfo",
-  async (props: { token: string; userInfo: UserInfo }) => {
+  async (props: { token: any; userInfo: UserInfo }) => {
     const res = await apiUpdateUser(props);
     return res.data;
   }
@@ -36,26 +62,80 @@ export const requestChangePassword = createAsyncThunk(
   }
 );
 
-export const userSlice = createSlice({
+export const authSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    loadUserInfo: (state, action: PayloadAction<UserInfo>) => {
+      state.userInfo = action.payload;
+    },
+  },
   extraReducers: (builder) => {
-    const actionList = [requestUpdateUserInfo];
-    actionList.forEach((action) => {
-      builder.addCase(action.pending, (state) => {
-        state.loading = true;
-      });
+    /**
+     * login
+     */
+    builder.addCase(requestLogin.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      requestLogin.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.userInfo = new UserInfo(action.payload.userLogin);
+      }
+    );
+    // requestGetUserFromToken
+    builder.addCase(requestGetUserFromToken.pending, (state) => {
+      state.loadingCheckLogin = true;
+    });
+    builder.addCase(
+      requestGetUserFromToken.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          status: number;
+          userInfo: UserInfo;
+        }>
+      ) => {
+        state.userInfo = action.payload.userInfo;
+        state.loadingCheckLogin = false;
+      }
+    );
+    builder.addCase(requestGetUserFromToken.rejected, (state) => {
+      state.loadingCheckLogin = false;
     });
 
     /**
-     * update user info
+     * register
      */
+    builder.addCase(requestRegister.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      requestRegister.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        if (action.payload.loginCode === TTCSconfig.STATUS_SUCCESS)
+          state.userInfo = new UserInfo(action.payload.info);
+      }
+    );
+    builder.addCase(
+      requestRegister.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+      }
+    );
+    /**
+     * updateUser
+     */
+    builder.addCase(requestUpdateUserInfo.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(
       requestUpdateUserInfo.fulfilled,
-      (state, action: PayloadAction<UserInfo>) => {
-        state.userInfo = action.payload;
+      (state, action: PayloadAction<any>) => {
         state.loading = false;
+        state.userInfo = new UserInfo(action.payload.userInfo);
       }
     );
 
@@ -71,7 +151,6 @@ export const userSlice = createSlice({
         state.loading = false;
         if (action.payload.loginCode === TTCSconfig.STATUS_SUCCESS)
           state.userInfo = new UserInfo(action.payload.userInfo);
-        console.log(action.payload);
       }
     );
     // builder.addCase(
@@ -83,6 +162,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const userState = (state: RootState) => state.userState;
+export const authState = (state: RootState) => state.authState;
 
-export default userSlice.reducer;
+export const { loadUserInfo } = authSlice.actions;
+export default authSlice.reducer;

@@ -7,7 +7,7 @@ import styles from "./login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
-import { authState, requestLogin } from "../../redux/slices/authSlice";
+import { authState, requestLogin } from "../../redux/slices/userSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
@@ -28,15 +28,6 @@ const LoginPages = () => {
       navigate("/");
     }
   }, [userInfo]);
-
-  // const getPosts = async () => {
-  //   try {
-  //     const data = await getPost();
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log({ error });
-  //   }
-  // };
 
   const handleLogin: any = async (data: {
     account: string;
@@ -73,7 +64,6 @@ const LoginPages = () => {
           });
 
         case TTCSconfig.LOGIN_SUCCESS:
-          console.log(res.token);
           Cookies.set("token", res.token, {
             expires: 60 * 60 * 24 * 30,
           });
@@ -83,7 +73,6 @@ const LoginPages = () => {
           });
       }
     } catch (err) {
-      console.log("err");
       return notification.error({
         message: "Đăng nhập thất bại, lỗi server",
         duration: 1.5,

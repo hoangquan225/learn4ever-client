@@ -20,7 +20,7 @@ import {
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
 import { Link, useNavigate } from "react-router-dom";
-import { requestRegister } from "../../redux/slices/authSlice";
+import { requestRegister } from "../../redux/slices/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";

@@ -1,12 +1,10 @@
 import { configureStore, Action } from "@reduxjs/toolkit";
-import authReducer from "./slices/authSlice";
-import userReducer from "./slices/userSlice";
+import authReducer from "./slices/userSlice";
 import categoryReducer from "./slices/categorySlice";
 
 export const store = configureStore({
   reducer: {
     authState: authReducer,
-    userState: userReducer,
     category: categoryReducer,
   },
   middleware: (getDefaultMiddle) =>
