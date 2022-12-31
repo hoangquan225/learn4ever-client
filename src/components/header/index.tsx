@@ -17,6 +17,10 @@ import { requestGetUserFromToken } from "../../redux/slices/authSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { FaBars } from "react-icons/fa";
 import { GrClose } from "react-icons/gr";
+import {
+  categoryState,
+  requestLoadCategorys,
+} from "../../redux/slices/categorySlice";
 
 const cx = classNames.bind(styles);
 
@@ -30,10 +34,36 @@ const Header = () => {
 
   const dispatch = useAppDispatch();
 
+  const categoryStates = useAppSelector(categoryState);
+  const categorys = categoryStates.categorys;
+  const loading = categoryStates.loading;
+
   const handleLogout = useCallback(() => {
     Cookies.remove("token");
     window.location.href = "/";
   }, []);
+
+  useEffect(() => {
+    loadCategorys();
+  }, []);
+
+  const loadCategorys = async () => {
+    console.log("load");
+    try {
+      const actionResult = await dispatch(
+        requestLoadCategorys({
+          status: 1,
+        })
+      );
+      const res = unwrapResult(actionResult);
+    } catch (error) {
+      notification.error({
+        message: "không tải được danh sach danh mục",
+      });
+    }
+  };
+
+  console.log(categorys);
 
   const items: MenuProps["items"] = [
     {
@@ -159,7 +189,7 @@ const Header = () => {
           <div className={cx("navbar__container")}>
             <div className={cx("navbar__list")}>
               {/* DESKTOP */}
-              <div className={cx("navbar__list--desktop")}>
+              {/* <div className={cx("navbar__list--desktop")}>
                 <div className={cx("navbar__item--desktop")}>
                   <Link to={"/"} className={cx("navbar__link--desktop")}>
                     <div className={cx("navbar__title")}>
@@ -253,6 +283,20 @@ const Header = () => {
                     </div>
                   </Link>
                 </div>
+              </div> */}
+              <div className={cx("navbar__list--desktop")}>
+                {categorys.map((data) => (
+                  <div className={cx("navbar__item--desktop")}>
+                    <Link
+                      to={data.slug}
+                      className={cx("navbar__link--desktop")}
+                    >
+                      <div className={cx("navbar__title")}>
+                        <span>{data.name}</span>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
               </div>
 
               {/* MOBILE */}
