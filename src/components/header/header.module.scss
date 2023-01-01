@@ -191,6 +191,12 @@
 
 .header__btn--link {
   color: #fff;
+
+  &.hide {
+    @include responsive(xs) {
+      display: none;
+    }
+  }
 }
 
 // NAVBAR

@@ -273,7 +273,10 @@ const Header = () => {
                   <Link to={"/login"} className={cx("header__btn--link")}>
                     <button className={cx("header__button")}>Đăng nhập</button>
                   </Link>
-                  <Link to={"/register"} className={cx("header__btn--link")}>
+                  <Link
+                    to={"/register"}
+                    className={cx("header__btn--link", "hide")}
+                  >
                     <button className={cx("header__button")}>Đăng ký</button>
                   </Link>
                 </>
