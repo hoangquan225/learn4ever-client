@@ -94,7 +94,7 @@ const HomePages = () => {
                         <div className={cx("category__img")}>
                           <img
                             className={cx("category-image")}
-                            src={data.avatar}
+                            src={data.avatar ?? ""}
                             alt={data.name}
                           />
                         </div>
