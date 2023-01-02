@@ -102,7 +102,10 @@ const HomePages = () => {
                           <div className={cx("categoty__name")}>
                             {data.name}
                           </div>
-                          <div className={cx("category__des")}>{data.des}</div>
+                          <div
+                            className={cx("category__des")}
+                            dangerouslySetInnerHTML={{ __html: data.des ?? "" }}
+                          />
                           <div className={cx("category__join")}>
                             <button className={cx("category__btn")}>
                               <span>Làm ngay</span>
@@ -133,8 +136,6 @@ const HomePages = () => {
                   >
                     Xem thêm
                     <div className={cx("category__more--loader")}>
-                      <span />
-                      <span />
                       <span />
                     </div>
                   </button>
