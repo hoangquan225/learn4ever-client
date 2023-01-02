@@ -6,22 +6,21 @@ import Banner2 from "../../components/banner2";
 import Panel from "../../components/panel";
 import Feedback from "../../components/feedback";
 import Footer from "../../components/footer";
-import { Col, notification, Row } from "antd";
+import { Carousel, notification } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
   categoryState,
   requestLoadCategorys,
 } from "../../redux/slices/categorySlice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { Link } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const cx = classNames.bind(styles);
 
 const HomePages = () => {
-  const [numberOfItemsShow, setNumberOfItemsShow] = useState(4);
-
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
 
@@ -46,16 +45,38 @@ const HomePages = () => {
     loadCategorys();
   }, []);
 
-  const handleShowMore = () => {
-    if (numberOfItemsShow + 4 <= categorys.length) {
-      setNumberOfItemsShow(numberOfItemsShow + 4);
-    } else {
-      setNumberOfItemsShow(categorys.length);
-    }
+  const PrevArrowCarousel = (props: any) => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: "#000",
+          fontSize: "2rem",
+        }}
+        onClick={onClick}
+      >
+        <FaChevronLeft />
+      </div>
+    );
   };
 
-  const handleShowLess = () => {
-    setNumberOfItemsShow(4);
+  const NextArrowCarousel = (props: any) => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: "#000",
+          fontSize: "2rem",
+        }}
+        onClick={onClick}
+      >
+        <FaChevronRight />
+      </div>
+    );
   };
 
   return (
@@ -79,68 +100,70 @@ const HomePages = () => {
                 </span>
               </div>
 
-              <Row
-                gutter={{ xs: 16, sm: 16, md: 16, lg: 16, xl: 16 }}
-                style={{
-                  width: "100%",
-                  justifyContent: "center",
-                  margin: "0 0",
-                }}
+              <Carousel
+                className={cx("category__carousel")}
+                dots={true}
+                autoplay={true}
+                pauseOnDotsHover={true}
+                pauseOnFocus={true}
+                infinite={false}
+                draggable={false}
+                autoplaySpeed={4000}
+                slidesToShow={4}
+                slidesToScroll={4}
+                arrows={true}
+                nextArrow={<NextArrowCarousel />}
+                prevArrow={<PrevArrowCarousel />}
+                responsive={[
+                  {
+                    breakpoint: 991,
+                    settings: {
+                      slidesToShow: 3,
+                      slidesToScroll: 3,
+                      arrows: false,
+                      draggable: true,
+                    },
+                  },
+                  {
+                    breakpoint: 767,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 2,
+                      arrows: false,
+                      draggable: true,
+                    },
+                  },
+                ]}
               >
-                {categorys.slice(0, numberOfItemsShow).map((data) => (
-                  <Col xl={6} lg={6} md={6} sm={12} xs={12}>
-                    <Link to={data.slug} className={cx("category__link")}>
-                      <div className={cx("category__item")}>
-                        <div className={cx("category__img")}>
-                          <img
-                            className={cx("category-image")}
-                            src={data.avatar ?? ""}
-                            alt={data.name}
-                          />
-                        </div>
-                        <div className={cx("category__info")}>
-                          <div className={cx("categoty__name")}>
-                            {data.name}
-                          </div>
-                          <div
-                            className={cx("category__des")}
-                            dangerouslySetInnerHTML={{ __html: data.des ?? "" }}
-                          />
-                          <div className={cx("category__join")}>
-                            <button className={cx("category__btn")}>
-                              <span>Làm ngay</span>
-                              <BiChevronRight
-                                className={cx("category__icon")}
-                              />
-                            </button>
-                          </div>
+                {categorys.map((data) => (
+                  <Link to={data.slug} className={cx("category__link")}>
+                    <div className={cx("category__item")}>
+                      <div className={cx("category__img")}>
+                        <img
+                          className={cx("category-image")}
+                          src={data.avatar ?? ""}
+                          alt={data.name}
+                        />
+                      </div>
+                      <div className={cx("category__info")}>
+                        <div className={cx("categoty__name")}>{data.name}</div>
+                        <div
+                          className={cx("category__des")}
+                          dangerouslySetInnerHTML={{
+                            __html: data.des ?? "",
+                          }}
+                        />
+                        <div className={cx("category__join")}>
+                          <button className={cx("category__btn")}>
+                            <span>Làm ngay</span>
+                            <BiChevronRight className={cx("category__icon")} />
+                          </button>
                         </div>
                       </div>
-                    </Link>
-                  </Col>
+                    </div>
+                  </Link>
                 ))}
-                {numberOfItemsShow === categorys.length ? (
-                  <button
-                    className={cx("category__less", "category__btn--option")}
-                    onClick={handleShowLess}
-                  >
-                    Ẩn bớt
-                    <div className={cx("category__less--loader")}>
-                      <span />
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    className={cx("category__more", "category__btn--option")}
-                    onClick={handleShowMore}
-                  >
-                    Xem thêm
-                    <div className={cx("category__more--loader")}>
-                      <span />
-                    </div>
-                  </button>
-                )}
-              </Row>
+              </Carousel>
             </div>
           </div>
         </div>
