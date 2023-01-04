@@ -9,7 +9,7 @@ import styles from "./header.module.scss";
 import logo from "../../assets/img/logo.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
-import { Dropdown, MenuProps, notification } from "antd";
+import { Dropdown, MenuProps, message, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
@@ -21,6 +21,7 @@ import {
   categoryState,
   requestLoadCategorys,
 } from "../../redux/slices/categorySlice";
+import { Category } from "../../submodule/models/category";
 
 const cx = classNames.bind(styles);
 
@@ -37,6 +38,13 @@ const Header = () => {
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
   const loading = categoryStates.loading;
+
+  const categoryList: Category[] = [];
+  for (var key in categorys) {
+    if (categorys.hasOwnProperty(key)) {
+      categoryList.push(categorys[key]);
+    }
+  }
 
   const handleLogout = useCallback(() => {
     Cookies.remove("token");
@@ -188,18 +196,25 @@ const Header = () => {
               {/* DESKTOP */}
 
               <div className={cx("navbar__list--desktop")}>
-                {categorys.map((data) => (
-                  <div className={cx("navbar__item--desktop")}>
-                    <Link
-                      to={data.slug}
-                      className={cx("navbar__link--desktop")}
-                    >
-                      <div className={cx("navbar__title")}>
-                        <span>{data.name}</span>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+                {categoryList.length
+                  ? categoryList
+                      .sort((a, b) => a.index - b.index)
+                      .map((data, index) => (
+                        <div
+                          key={index}
+                          className={cx("navbar__item--desktop")}
+                        >
+                          <Link
+                            to={data.slug}
+                            className={cx("navbar__link--desktop")}
+                          >
+                            <div className={cx("navbar__title")}>
+                              <span>{data.name}</span>
+                            </div>
+                          </Link>
+                        </div>
+                      ))
+                  : ""}
               </div>
 
               {/* MOBILE */}
@@ -232,18 +247,25 @@ const Header = () => {
                     </button>
                   </div>
 
-                  {categorys.map((data) => (
-                    <div className={cx("navbar__item--mobile")}>
-                      <Link
-                        to={data.slug}
-                        className={cx("navbar__link--mobile")}
-                      >
-                        <div className={cx("navbar__title")}>
-                          <span>{data.name}</span>
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
+                  {categoryList.length
+                    ? categoryList
+                        .sort((a, b) => a.index - b.index)
+                        .map((data, index) => (
+                          <div
+                            key={index}
+                            className={cx("navbar__item--mobile")}
+                          >
+                            <Link
+                              to={data.slug}
+                              className={cx("navbar__link--mobile")}
+                            >
+                              <div className={cx("navbar__title")}>
+                                <span>{data.name}</span>
+                              </div>
+                            </Link>
+                          </div>
+                        ))
+                    : ""}
                 </div>
               </div>
             </div>

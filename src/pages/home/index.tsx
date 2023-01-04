@@ -17,12 +17,20 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import { Link } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Category } from "../../submodule/models/category";
 
 const cx = classNames.bind(styles);
 
 const HomePages = () => {
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
+
+  const categoryList: Category[] = [];
+  for (var key in categorys) {
+    if (categorys.hasOwnProperty(key)) {
+      categoryList.push(categorys[key]);
+    }
+  }
 
   const dispatch = useAppDispatch();
 
@@ -135,34 +143,46 @@ const HomePages = () => {
                   },
                 ]}
               >
-                {categorys.map((data) => (
-                  <Link to={data.slug} className={cx("category__link")}>
-                    <div className={cx("category__item")}>
-                      <div className={cx("category__img")}>
-                        <img
-                          className={cx("category-image")}
-                          src={data.avatar ?? ""}
-                          alt={data.name}
-                        />
-                      </div>
-                      <div className={cx("category__info")}>
-                        <div className={cx("categoty__name")}>{data.name}</div>
-                        <div
-                          className={cx("category__des")}
-                          dangerouslySetInnerHTML={{
-                            __html: data.des ?? "",
-                          }}
-                        />
-                        <div className={cx("category__join")}>
-                          <button className={cx("category__btn")}>
-                            <span>Làm ngay</span>
-                            <BiChevronRight className={cx("category__icon")} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                {categoryList.length
+                  ? categoryList
+                      .sort((a, b) => a.index - b.index)
+                      .map((data, index) => (
+                        <Link
+                          key={index}
+                          to={data.slug}
+                          className={cx("category__link")}
+                        >
+                          <div className={cx("category__item")}>
+                            <div className={cx("category__img")}>
+                              <img
+                                className={cx("category-image")}
+                                src={data.avatar ?? ""}
+                                alt={data.name}
+                              />
+                            </div>
+                            <div className={cx("category__info")}>
+                              <div className={cx("categoty__name")}>
+                                {data.name}
+                              </div>
+                              <div
+                                className={cx("category__des")}
+                                dangerouslySetInnerHTML={{
+                                  __html: data.des ?? "",
+                                }}
+                              />
+                              <div className={cx("category__join")}>
+                                <button className={cx("category__btn")}>
+                                  <span>Làm ngay</span>
+                                  <BiChevronRight
+                                    className={cx("category__icon")}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      ))
+                  : ""}
               </Carousel>
             </div>
           </div>
