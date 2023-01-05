@@ -7,21 +7,88 @@ import {
   UserOutlined,
   WomanOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Row, Col, Select } from "antd";
-import classNames from "classnames/bind";
-import React from "react";
+import { Button, Form, Input, Row, Col, Select, notification } from "antd";
+import React, { useEffect } from "react";
+
 import styles from "./register.module.scss";
-import {isValidPhone, PhoneRegExp} from "../../submodule/utils/validation";
+import classNames from "classnames/bind";
+import {
+  EmailRegExp,
+  isValidPhone,
+  PhoneRegExp,
+} from "../../submodule/utils/validation";
+import { encrypt } from "../../submodule/utils/crypto";
+import TTCSconfig from "../../submodule/common/config";
+import { Link, useNavigate } from "react-router-dom";
+import { requestRegister } from "../../redux/slices/userSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { RootState } from "../../redux/store";
+import Cookies from "js-cookie";
+import { classes, genders } from "../../utils/contants";
 
 const cx = classNames.bind(styles);
 
-export const RegisterPages = () => {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
-  };
+const RegisterPages = () => {
+  const userInfo = useAppSelector(
+    (state: RootState) => state.authState.userInfo
+  );
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  // lay token tu cookie
 
-  const genderData = ["Nam", "Nữ", "Khác"];
-  const classData = ["Lớp 10", "Lớp 11", "Lớp 12"];
+  useEffect(() => {
+    console.log(userInfo?._id);
+    if (userInfo?._id) {
+      navigate("/");
+    }
+  }, [userInfo]);
+
+  const handleRegister = async (data: any) => {
+    const { confirm, ...rest } = data;
+    try {
+      const encodePassword = encrypt(data.password);
+      // const res: any = await apiRegister({
+      //   ...rest,
+      //   password: encodePassword
+      // })
+      const actionResult = await dispatch(
+        requestRegister({
+          ...rest,
+          password: encodePassword,
+        })
+      );
+      const res = unwrapResult(actionResult);
+
+      switch (res.loginCode) {
+        case TTCSconfig.LOGIN_FAILED:
+          return notification.error({
+            message: "Đăng ký thất bại",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_ACCOUNT_IS_USED:
+          return notification.warning({
+            message: "Tài khoản đã tồn tại",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_SUCCESS:
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30,
+          });
+          return notification.success({
+            message: "Đăng ký thành công",
+            duration: 1.5,
+          });
+      }
+    } catch (err) {
+      notification.error({
+        message: "Đăng ký thất bại, lỗi server",
+        duration: 1.5,
+      });
+    }
+  };
 
   return (
     <>
@@ -34,12 +101,19 @@ export const RegisterPages = () => {
             initialValues={{
               remember: true,
             }}
-            onFinish={onFinish}
+            onFinish={handleRegister}
           >
             <Row gutter={16}>
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
-                  name="username"
+                  name="account"
                   rules={[
                     {
                       required: true,
@@ -60,12 +134,19 @@ export const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="email"
                   rules={[
                     {
-                      type: "email",
+                      pattern: EmailRegExp,
                       message: "Email không đúng định dạng!",
                     },
                     {
@@ -87,7 +168,14 @@ export const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="name"
                   rules={[
@@ -110,13 +198,20 @@ export const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
-                  name="phone"
+                  name="phoneNumber"
                   rules={[
                     {
                       pattern: PhoneRegExp,
-                      message: 'vui lòng nhập số điện thoại',
+                      message: "vui lòng nhập số điện thoại",
                     },
                     {
                       required: true,
@@ -137,7 +232,14 @@ export const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="gender"
                   rules={[
@@ -166,10 +268,10 @@ export const RegisterPages = () => {
                     }
                     size={"large"}
                   >
-                    {genderData.map((data) => (
+                    {genders.map((data) => (
                       <Select.Option
-                        value={data}
-                        key={data}
+                        value={data.value}
+                        key={data.value}
                         label={
                           <React.Fragment>
                             <WomanOutlined
@@ -180,20 +282,27 @@ export const RegisterPages = () => {
                               }}
                             />
                             &nbsp;
-                            {data}
+                            {data.label}
                           </React.Fragment>
                         }
                       >
-                        {data}
+                        {data.label}
                       </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
-                  name="class"
+                  name="classNumber"
                   rules={[
                     {
                       required: true,
@@ -219,11 +328,12 @@ export const RegisterPages = () => {
                       </React.Fragment>
                     }
                     size={"large"}
+                    listHeight={128}
                   >
-                    {classData.map((data) => (
+                    {classes.map((data) => (
                       <Select.Option
-                        value={data}
-                        key={data}
+                        value={data.value}
+                        key={data.value}
                         label={
                           <React.Fragment>
                             <ContactsOutlined
@@ -234,18 +344,25 @@ export const RegisterPages = () => {
                               }}
                             />
                             &nbsp;
-                            {data}
+                            {data.label}
                           </React.Fragment>
                         }
                       >
-                        {data}
+                        {data.label}
                       </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="password"
                   rules={[
@@ -270,7 +387,14 @@ export const RegisterPages = () => {
                 </Form.Item>
               </Col>
 
-              <Col className="gutter-row" span={12}>
+              <Col
+                className="gutter-row"
+                xl={12}
+                lg={12}
+                md={12}
+                sm={12}
+                xs={24}
+              >
                 <Form.Item
                   name="confirm"
                   dependencies={["password"]}
@@ -320,9 +444,9 @@ export const RegisterPages = () => {
                   </div>
                   <div className={cx("register__tologin")}>
                     Bạn đã có tài khoản?{" "}
-                    <a href="/" className={cx("register__tologinlink")}>
+                    <Link to="/login" className={cx("register__tologinlink")}>
                       Đăng nhập ngay!
-                    </a>
+                    </Link>
                   </div>
                 </Form.Item>
               </Col>
@@ -333,3 +457,5 @@ export const RegisterPages = () => {
     </>
   );
 };
+
+export default RegisterPages;

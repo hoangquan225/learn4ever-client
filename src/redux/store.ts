@@ -1,11 +1,14 @@
 import { configureStore, Action } from "@reduxjs/toolkit";
-import authReducer from "./slices/authSlice";
+import authReducer from "./slices/userSlice";
+import categoryReducer from "./slices/categorySlice";
 
 export const store = configureStore({
-    reducer: {
-        authState: authReducer,
-    },
-    middleware: (getDefaultMiddle) => getDefaultMiddle({ serializableCheck: false }),
+  reducer: {
+    authState: authReducer,
+    category: categoryReducer,
+  },
+  middleware: (getDefaultMiddle) =>
+    getDefaultMiddle({ serializableCheck: false }),
 });
 
 export type AppDispatch = typeof store.dispatch;

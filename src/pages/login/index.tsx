@@ -1,28 +1,83 @@
 import { useEffect } from "react";
-import { getPost } from "../../api/services";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Checkbox, Form, Input, message, notification } from "antd";
+
 import classNames from "classnames/bind";
 import styles from "./login.module.scss";
+import { Link, useNavigate } from "react-router-dom";
+import { encrypt } from "../../submodule/utils/crypto";
+import TTCSconfig from "../../submodule/common/config";
+import { authState, requestLogin } from "../../redux/slices/userSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { RootState } from "../../redux/store";
+import Cookies from "js-cookie";
 
 const cx = classNames.bind(styles);
 
-export const LoginPages = () => {
+const LoginPages = () => {
+  const userInfo = useAppSelector(
+    (state: RootState) => state.authState.userInfo
+  );
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  // lay token tu cookie
+
   useEffect(() => {
-    getPosts();
-  }, []);
-
-  const getPosts = async () => {
-    try {
-      const data = await getPost();
-      console.log(data);
-    } catch (error) {
-      console.log({ error });
+    if (userInfo?._id) {
+      navigate("/");
     }
-  };
+  }, [userInfo]);
 
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  const handleLogin: any = async (data: {
+    account: string;
+    password: string;
+  }) => {
+    try {
+      const encodePassword = encrypt(data.password);
+      // const res: any = await apiLogin({ account: data.account, password: encodePassword })
+      const actionResult = await dispatch(
+        requestLogin({
+          account: data.account,
+          password: encodePassword,
+        })
+      );
+
+      const res = unwrapResult(actionResult);
+      switch (res.loginCode) {
+        case TTCSconfig.LOGIN_FAILED:
+          return notification.error({
+            message: "Đăng nhập thất bại",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST:
+          return notification.warning({
+            message: "Tài khoản hoặc mật khẩu không đúng",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_WRONG_PASSWORD:
+          return notification.warning({
+            message: "Tài khoản hoặc mật khẩu không đúng",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_SUCCESS:
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30,
+          });
+          return notification.success({
+            message: "Đăng nhập thành công",
+            duration: 1.5,
+          });
+      }
+    } catch (err) {
+      return notification.error({
+        message: "Đăng nhập thất bại, lỗi server",
+        duration: 1.5,
+      });
+    }
   };
 
   return (
@@ -36,10 +91,10 @@ export const LoginPages = () => {
             initialValues={{
               remember: true,
             }}
-            onFinish={onFinish}
+            onFinish={handleLogin}
           >
             <Form.Item
-              name="username"
+              name="account"
               rules={[
                 {
                   required: true,
@@ -102,9 +157,9 @@ export const LoginPages = () => {
               </div>
               <div className={cx("login__toregister")}>
                 Bạn chưa có tài khoản?{" "}
-                <a href="/" className={cx("login__toregisterlink")}>
+                <Link to="/register" className={cx("login__toregisterlink")}>
                   Đăng ký ngay!
-                </a>
+                </Link>
               </div>
             </Form.Item>
           </Form>
@@ -113,3 +168,5 @@ export const LoginPages = () => {
     </>
   );
 };
+
+export default LoginPages;
