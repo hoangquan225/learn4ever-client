@@ -75,6 +75,14 @@
   font-weight: 700;
   color: #4e565c;
   font-family: var(--font-family);
+
+  @include responsive(xs) {
+    margin-top: 2rem;
+  }
+
+  @include responsive(sm) {
+    margin-top: 2rem;
+  }
 }
 
 .notfound__message {
@@ -87,6 +95,14 @@
 .notfound__link {
   width: 100%;
   margin-top: 6rem;
+
+  @include responsive(xs) {
+    margin-top: 2rem;
+  }
+
+  @include responsive(sm) {
+    margin-top: 2rem;
+  }
 }
 
 .notfound__btn {

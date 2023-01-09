@@ -171,8 +171,9 @@
   }
 
   @include responsive(sm) {
-    width: calc(42.5rem * 0.7);
-    height: calc(42.5rem * 0.7);
+    width: calc(42.5rem * 0.6);
+    height: calc(42.5rem * 0.6);
+    left: calc(0rem - (50rem * 0.7 / 2));
   }
 
   @include responsive(md) {
@@ -202,8 +203,9 @@
   }
 
   @include responsive(sm) {
-    width: calc(42.5rem * 0.7);
-    height: calc(42.5rem * 0.7);
+    width: calc(42.5rem * 0.6);
+    height: calc(42.5rem * 0.6);
+    right: calc(0rem - (50rem * 0.7 / 2));
   }
 
   @include responsive(md) {

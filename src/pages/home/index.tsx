@@ -114,9 +114,10 @@ const HomePages = () => {
                 autoplay={true}
                 pauseOnDotsHover={true}
                 pauseOnFocus={true}
-                infinite={false}
+                infinite={true}
                 draggable={false}
                 autoplaySpeed={4000}
+                initialSlide={0}
                 slidesToShow={4}
                 slidesToScroll={4}
                 arrows={true}
@@ -128,6 +129,7 @@ const HomePages = () => {
                     settings: {
                       slidesToShow: 3,
                       slidesToScroll: 3,
+                      initialSlide: 0,
                       arrows: false,
                       draggable: true,
                     },
@@ -137,6 +139,7 @@ const HomePages = () => {
                     settings: {
                       slidesToShow: 2,
                       slidesToScroll: 2,
+                      initialSlide: 0,
                       arrows: false,
                       draggable: true,
                     },

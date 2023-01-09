@@ -1,6 +1,7 @@
 import ContactPages from "../pages/contact";
 import HomePages from "../pages/home";
 import IntroducePages from "../pages/introduce";
+import LearningPages from "../pages/learning";
 import LoginPages from "../pages/login";
 import NotFoundPages from "../pages/notfound";
 import PolicyPages from "../pages/policy";
@@ -21,4 +22,7 @@ export const publicRoutes = [
 ];
 
 // Private routes
-export const privateRoutes = [{ path: "/profile", component: ProfilePages }];
+export const privateRoutes = [
+  { path: "/profile", component: ProfilePages },
+  { path: "/learning", component: LearningPages },
+];

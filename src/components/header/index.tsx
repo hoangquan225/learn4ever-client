@@ -51,24 +51,24 @@ const Header = () => {
     window.location.href = "/";
   }, []);
 
-  useEffect(() => {
-    loadCategorys();
-  }, []);
+  // useEffect(() => {
+  //   loadCategorys();
+  // }, []);
 
-  const loadCategorys = async () => {
-    try {
-      const actionResult = await dispatch(
-        requestLoadCategorys({
-          status: 1,
-        })
-      );
-      const res = unwrapResult(actionResult);
-    } catch (error) {
-      notification.error({
-        message: "không tải được danh sach danh mục",
-      });
-    }
-  };
+  // const loadCategorys = async () => {
+  //   try {
+  //     const actionResult = await dispatch(
+  //       requestLoadCategorys({
+  //         status: 1,
+  //       })
+  //     );
+  //     const res = unwrapResult(actionResult);
+  //   } catch (error) {
+  //     notification.error({
+  //       message: "không tải được danh sach danh mục",
+  //     });
+  //   }
+  // };
 
   const items: MenuProps["items"] = [
     {
