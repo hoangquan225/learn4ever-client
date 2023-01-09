@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../redux/store";
 import { Category } from "../../submodule/models/category";
-import { apiLoadCategorys } from "../../api/category";
+import { apiLoadCategoryBySlug, apiLoadCategorys } from "../../api/category";
+import { Course } from "../../submodule/models/course";
 
 // Define a type for the slice state
 interface CategoryState {
@@ -10,6 +11,7 @@ interface CategoryState {
   loading: boolean;
   error: string;
   categoryInfo: Category | null;
+  courses: Course[];
 }
 
 // Define the initial state using that type
@@ -18,6 +20,7 @@ const initialState: CategoryState = {
   loading: false,
   error: "",
   categoryInfo: null,
+  courses: [],
 };
 
 export const requestLoadCategorys = createAsyncThunk(
@@ -28,13 +31,21 @@ export const requestLoadCategorys = createAsyncThunk(
   }
 );
 
+export const requestLoadCategoryBySlug = createAsyncThunk(
+  "category/requestLoadCategoryBySlug",
+  async (props: { slug: string }) => {
+    const res = await apiLoadCategoryBySlug(props);
+    return res.data;
+  }
+);
+
 export const categorySlice = createSlice({
   name: "category",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const actionList = [requestLoadCategorys];
+    const actionList = [requestLoadCategorys, requestLoadCategoryBySlug];
     actionList.forEach((action) => {
       builder.addCase(action.pending, (state) => {
         state.loading = true;
@@ -58,6 +69,25 @@ export const categorySlice = createSlice({
       ) => {
         state.loading = false;
         state.categorys = action.payload.data;
+      }
+    );
+
+    // load by slug
+    builder.addCase(
+      requestLoadCategoryBySlug.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          data: {
+            categorys: Category;
+            course: Course[];
+          };
+          status: number;
+        }>
+      ) => {
+        state.categoryInfo = action.payload.data.categorys;
+        state.courses = action.payload.data.course;
+        state.loading = false;
       }
     );
   },

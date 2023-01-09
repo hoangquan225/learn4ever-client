@@ -1,17 +1,16 @@
-import { useEffect } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, message, notification } from "antd";
-
-import classNames from "classnames/bind";
-import styles from "./login.module.scss";
-import { Link, useNavigate } from "react-router-dom";
-import { encrypt } from "../../submodule/utils/crypto";
-import TTCSconfig from "../../submodule/common/config";
-import { authState, requestLogin } from "../../redux/slices/userSlice";
-import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { Button, Checkbox, Form, Input, notification } from "antd";
+import { useEffect } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { RootState } from "../../redux/store";
+import classNames from "classnames/bind";
 import Cookies from "js-cookie";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { requestLogin } from "../../redux/slices/userSlice";
+import { RootState } from "../../redux/store";
+import TTCSconfig from "../../submodule/common/config";
+import { encrypt } from "../../submodule/utils/crypto";
+import styles from "./login.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -25,7 +24,7 @@ const LoginPages = () => {
 
   useEffect(() => {
     if (userInfo?._id) {
-      navigate("/");
+      navigate(-1);
     }
   }, [userInfo]);
 
