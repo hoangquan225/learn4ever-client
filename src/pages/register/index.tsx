@@ -38,9 +38,8 @@ const RegisterPages = () => {
   // lay token tu cookie
 
   useEffect(() => {
-    console.log(userInfo?._id);
     if (userInfo?._id) {
-      navigate("/");
+      navigate(-1);
     }
   }, [userInfo]);
 

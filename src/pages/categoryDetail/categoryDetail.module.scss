@@ -32,23 +32,22 @@
 
 .category {
   background-color: #f3f7f9;
-  padding-bottom: 3rem;
-  padding-top: 3rem;
 }
 
 .category__container {
   padding: 0 2.4rem;
+  font-family: var(--font-family);
 
   @include responsive(xs) {
     padding: 0 1.6rem;
   }
 
   @include responsive(sm) {
-    padding: 0 1.6rem;
+    padding: 0 2.4rem;
   }
 
   @include responsive(md) {
-    padding: 0 1.6rem;
+    padding: 0 2.4rem;
   }
 
   @include responsive(lg) {
@@ -56,72 +55,72 @@
   }
 }
 
-.category__text {
-  text-align: center;
-  margin-bottom: 3rem;
+.category__wrapper {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+
+  & nav {
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--textColor);
+  }
 }
 
-.category__title {
-  margin-bottom: 2.4rem;
+.category__breadcrumb {
+  margin-bottom: 2rem;
+}
+
+.category__breadcumb--link {
+  &:hover {
+    -webkit-text-decoration: underline;
+    text-decoration: underline;
+    background-color: transparent !important;
+  }
+}
+
+.category__breadcumb--link.active {
+  color: var(--primaryColor);
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  opacity: 0.9;
+
+  &:hover {
+    color: var(--primaryColor);
+    opacity: 1;
+  }
+}
+
+.category__topic {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.category__heading {
+  margin: 2.4rem 0;
   font-size: 3rem;
-  color: #000;
 
   @include responsive(xs) {
-    font-size: 2.4rem;
+    font-size: 2.8rem;
   }
 
   @include responsive(sm) {
-    font-size: 2.4rem;
+    font-size: 2.8rem;
   }
 
   @include responsive(md) {
-    font-size: 2.4rem;
+    font-size: 2.8rem;
   }
 
   @include responsive(lg) {
-    font-size: 3rem;
+    font-size: 2.8rem;
   }
 }
 
 .category__summary {
-  font-size: 1.4rem;
-}
-
-.category__carousel {
-  & > div:nth-child(1),
-  & > div:nth-child(3) {
-    &::before,
-    &::after {
-      content: "" !important;
-    }
-  }
-}
-
-.category__carousel > ul {
-  bottom: -2.4rem !important;
-  height: 1rem !important;
-
-  & > li {
-    height: 100% !important;
-    width: 1.5rem !important;
-
-    & > button {
-      font-size: 0 !important;
-      width: 1rem !important;
-      height: 1rem !important;
-      border-radius: 50% !important;
-      background-color: #96d7de !important;
-      transition: all ease 0.4s !important;
-      cursor: pointer !important;
-    }
-  }
-}
-
-.category__nextarrow,
-.category__prevarrow {
-  & > svg:hover {
-    opacity: 0.5;
-  }
+  font-size: 1.6rem;
+  color: var(--textColor);
 }
 
 .category__link {

@@ -49,6 +49,12 @@
 
   @include responsive(md) {
     height: 50rem;
+    background-position: 65%;
+  }
+
+  @include responsive(lg) {
+    height: 65rem;
+    background-position: 55%;
   }
 }
 

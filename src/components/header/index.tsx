@@ -3,13 +3,13 @@ import {
   LogoutOutlined,
   ProfileOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./header.module.scss";
 import logo from "../../assets/img/logo.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
-import { Dropdown, MenuProps, message, notification } from "antd";
+import { Dropdown, MenuProps, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
@@ -26,9 +26,9 @@ import { Category } from "../../submodule/models/category";
 const cx = classNames.bind(styles);
 
 const Header = () => {
+  const navigate = useNavigate();
   const [showNavbar, setShowNavbar] = useState(false);
   const [navbarStick, setNavbarStick] = useState(false);
-
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
@@ -204,14 +204,16 @@ const Header = () => {
                           key={index}
                           className={cx("navbar__item--desktop")}
                         >
-                          <Link
-                            to={data.slug}
+                          <div
+                            onClick={async () => {
+                              navigate(`/${data.slug}`);
+                            }}
                             className={cx("navbar__link--desktop")}
                           >
                             <div className={cx("navbar__title")}>
                               <span>{data.name}</span>
                             </div>
-                          </Link>
+                          </div>
                         </div>
                       ))
                   : ""}
@@ -255,14 +257,17 @@ const Header = () => {
                             key={index}
                             className={cx("navbar__item--mobile")}
                           >
-                            <Link
-                              to={data.slug}
+                            <div
+                              onClick={() => {
+                                navigate(`/${data.slug}`);
+                                setShowNavbar(!showNavbar);
+                              }}
                               className={cx("navbar__link--mobile")}
                             >
                               <div className={cx("navbar__title")}>
                                 <span>{data.name}</span>
                               </div>
-                            </Link>
+                            </div>
                           </div>
                         ))
                     : ""}

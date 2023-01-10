@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { useLayoutEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./components/loading";
+import ArrowToTop from "./helpers/ArrowToTop";
 import ScrollToTop from "./helpers/ScrollToTop";
 import { useAppDispatch, useAppSelector } from "./redux/hook";
 import { requestGetUserFromToken } from "./redux/slices/userSlice";
@@ -65,6 +66,7 @@ function App() {
           })}
         </Routes>
       </div>
+      <ArrowToTop />
     </BrowserRouter>
   );
 }
