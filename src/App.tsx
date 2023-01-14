@@ -42,7 +42,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <div className="App" style={{ overflow: "hidden" }}>
+      <div className="App">
         <Routes>
           {publicRoutes.map((route, index) => {
             const Page = route.component;

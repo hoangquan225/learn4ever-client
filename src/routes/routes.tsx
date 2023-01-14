@@ -1,4 +1,5 @@
 import CategoryDetail from "../pages/categoryDetail";
+import CourseDetail from "../pages/courseDetail";
 import ContactPages from "../pages/contact";
 import HomePages from "../pages/home";
 import IntroducePages from "../pages/introduce";
@@ -14,6 +15,7 @@ import RegisterPages from "../pages/register";
 export const publicRoutes = [
   { path: "/", component: HomePages },
   { path: "/:slug", component: CategoryDetail },
+  { path: "/:slug/:slugChild", component: CourseDetail },
   { path: "/introduce", component: IntroducePages },
   { path: "/contact", component: ContactPages },
   { path: "/policy", component: PolicyPages },

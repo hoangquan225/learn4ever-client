@@ -34,24 +34,24 @@ const HomePages = () => {
 
   const dispatch = useAppDispatch();
 
-  const loadCategorys = async () => {
-    try {
-      const actionResult = await dispatch(
-        requestLoadCategorys({
-          status: 1,
-        })
-      );
-      const res = unwrapResult(actionResult);
-    } catch (error) {
-      notification.error({
-        message: "không tải được danh sach danh mục",
-      });
-    }
-  };
+  // useEffect(() => {
+  //   loadCategorys();
+  // }, []);
 
-  useEffect(() => {
-    loadCategorys();
-  }, []);
+  // const loadCategorys = async () => {
+  //   try {
+  //     const actionResult = await dispatch(
+  //       requestLoadCategorys({
+  //         status: 1,
+  //       })
+  //     );
+  //     const res = unwrapResult(actionResult);
+  //   } catch (error) {
+  //     notification.error({
+  //       message: "không tải được danh sach danh mục",
+  //     });
+  //   }
+  // };
 
   const PrevArrowCarousel = (props: any) => {
     const { className, style, onClick } = props;

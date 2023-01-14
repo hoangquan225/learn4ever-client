@@ -25,7 +25,7 @@ const CategoryDetail = () => {
   const [courseList, setCourseList] = useState<any[]>([]);
 
   useEffect(() => {
-    loadCategoryDetail(params.slug || "");
+    loadCategory(params.slug || "");
   }, [params.slug]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const CategoryDetail = () => {
     setCourseList(coursePublic);
   }, [courses]);
 
-  const loadCategoryDetail = async (slug: string) => {
+  const loadCategory = async (slug: string) => {
     try {
       const result = await dispatch(
         requestLoadCategoryBySlug({
@@ -71,7 +71,7 @@ const CategoryDetail = () => {
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={`/${categoryInfo?.slug}`}
                       className={cx("category__breadcumb--link", "active")}
                     >
                       {categoryInfo?.name}
@@ -94,11 +94,11 @@ const CategoryDetail = () => {
 
               <Row style={{ width: "100%" }} gutter={16}>
                 {courseList.length ? (
-                  courseList.map((course, index) => (
+                  courseList?.map((course, index) => (
                     <Col xl={6} lg={6} md={8} sm={12} xs={12}>
                       <Link
                         key={index}
-                        to={"/learning"}
+                        to={course?.slug}
                         className={cx("category__link")}
                       >
                         <div className={cx("category__item")}>
