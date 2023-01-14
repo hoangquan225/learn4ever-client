@@ -1,5 +1,6 @@
 import CategoryDetail from "../pages/categoryDetail";
 import ContactPages from "../pages/contact";
+import ExamPage from "../pages/exam";
 import HomePages from "../pages/home";
 import IntroducePages from "../pages/introduce";
 import LearningPages from "../pages/learning";
@@ -27,4 +28,5 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: "/profile", component: ProfilePages },
   { path: "/learning", component: LearningPages },
+  { path: "/exam", component: ExamPage },
 ];
