@@ -50,13 +50,12 @@ export const courseSlice = createSlice({
       (
         state,
         action: PayloadAction<{
-          data: {
-            course: Course;
-          };
+          data: Course;
           status: number;
         }>
       ) => {
-        state.course = action.payload.data.course;
+        // console.log(action.payload.data);
+        state.course = new Course(action.payload.data);
         state.loading = false;
       }
     );

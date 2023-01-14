@@ -1,10 +1,7 @@
-import { useEffect } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { Breadcrumb, Col, notification, Row } from "antd";
 import classNames from "classnames/bind";
-import styles from "./courseDetail.module.scss";
-import Header from "../../components/header";
-import Footer from "../../components/footer";
-import { Breadcrumb, Col, Row } from "antd";
+import { useEffect } from "react";
 import {
   FaBatteryFull,
   FaCheck,
@@ -12,22 +9,46 @@ import {
   FaFilm,
   FaLightbulb,
 } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { NavLink, useParams } from "react-router-dom";
+import Footer from "../../components/footer";
+import Header from "../../components/header";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { categoryState } from "../../redux/slices/categorySlice";
-import { useAppSelector } from "../../redux/hook";
+import {
+  courseState,
+  requestLoadCourseBySlug,
+} from "../../redux/slices/courseSlice";
+import styles from "./courseDetail.module.scss";
 
 const cx = classNames.bind(styles);
 
 const CourseDetail = () => {
   const params = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const courseReducer = useAppSelector(courseState);
+  const course = courseReducer.course;
   const categoryReducer = useAppSelector(categoryState);
-  // const
+  const { categoryInfo } = categoryReducer;
 
   useEffect(() => {
-    console.log(params || "");
-    // loadCategory(params.slugChild || "");
+    loadCourse(params.slugChild || "");
   }, [params.slugChild]);
+
+  const loadCourse = async (slugChild: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadCourseBySlug({
+          slug: slugChild,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
 
   return (
     <>
@@ -46,10 +67,10 @@ const CourseDetail = () => {
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={`/${categoryInfo?.slug}`}
                       className={cx("detail__breadcumb--link")}
                     >
-                      Lop
+                      {categoryInfo?.name}
                     </NavLink>
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
@@ -57,7 +78,7 @@ const CourseDetail = () => {
                       to={"/introduce"}
                       className={cx("detail__breadcumb--link", "active")}
                     >
-                      Mon
+                      {course?.courseName}
                     </NavLink>
                   </Breadcrumb.Item>
                 </Breadcrumb>
@@ -69,9 +90,14 @@ const CourseDetail = () => {
                 className={cx("detail__row")}
               >
                 <Col xl={16} lg={16} md={24} sm={24} xs={24}>
-                  <h1 className={cx("detail__name")}>Ten se o day</h1>
+                  <h1 className={cx("detail__name")}>{course?.courseName}</h1>
 
-                  <div className={cx("detail__des")}>mo ta se o day</div>
+                  <div
+                    className={cx("detail__des")}
+                    dangerouslySetInnerHTML={{
+                      __html: course?.des ?? "",
+                    }}
+                  ></div>
 
                   <div className={cx("detail__topic")}>
                     <h2 className={cx("detail__topic--heading")}>
@@ -156,7 +182,7 @@ const CourseDetail = () => {
                   <div className={cx("detail__badge")}>
                     <div className={cx("detail__image")}>
                       <img
-                        src="https://i.picsum.photos/id/667/300/200.jpg?hmac=zePsf4ntoIYuhdLR2XAXfkwSgy0pxWfIJY1mvwT3Trs"
+                        src={course?.avatar || ""}
                         alt="course-avatar"
                         className={cx("detail__avatar")}
                       />

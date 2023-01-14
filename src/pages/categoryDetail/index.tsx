@@ -95,12 +95,8 @@ const CategoryDetail = () => {
               <Row style={{ width: "100%" }} gutter={16}>
                 {courseList.length ? (
                   courseList?.map((course, index) => (
-                    <Col xl={6} lg={6} md={8} sm={12} xs={12}>
-                      <Link
-                        key={index}
-                        to={course?.slug}
-                        className={cx("category__link")}
-                      >
+                    <Col xl={6} lg={6} md={8} sm={12} xs={12} key={index}>
+                      <Link to={course?.slug} className={cx("category__link")}>
                         <div className={cx("category__item")}>
                           <div className={cx("category__img")}>
                             <img
