@@ -1,7 +1,7 @@
 import CategoryDetail from "../pages/categoryDetail";
 import CourseDetail from "../pages/courseDetail";
 import ContactPages from "../pages/contact";
-import ExamPage from "../pages/exam";
+import PracticePages from "../pages/practice";
 import HomePages from "../pages/home";
 import IntroducePages from "../pages/introduce";
 import LearningPages from "../pages/learning";
@@ -11,6 +11,7 @@ import PolicyPages from "../pages/policy";
 import PrivacyPages from "../pages/privacy";
 import ProfilePages from "../pages/profile";
 import RegisterPages from "../pages/register";
+import ExamPages from "../pages/exam";
 
 // Public routers
 export const publicRoutes = [
@@ -30,5 +31,6 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: "/profile", component: ProfilePages },
   { path: "/learning", component: LearningPages },
-  { path: "/exam", component: ExamPage },
+  { path: "/practice", component: PracticePages },
+  { path: "/exam", component: ExamPages },
 ];
