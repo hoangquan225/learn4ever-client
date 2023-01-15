@@ -18,6 +18,7 @@ import {
   courseState,
   requestLoadCourseBySlug,
 } from "../../redux/slices/courseSlice";
+import TTCSconfig from "../../submodule/common/config";
 import styles from "./courseDetail.module.scss";
 
 const cx = classNames.bind(styles);
@@ -27,8 +28,6 @@ const CourseDetail = () => {
   const dispatch = useAppDispatch();
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
-  const categoryReducer = useAppSelector(categoryState);
-  const { categoryInfo } = categoryReducer;
 
   useEffect(() => {
     loadCourse(params.slugChild || "");
@@ -39,6 +38,7 @@ const CourseDetail = () => {
       const result = await dispatch(
         requestLoadCourseBySlug({
           slug: slugChild,
+          status: TTCSconfig.STATUS_PUBLIC,
         })
       );
       unwrapResult(result);
@@ -67,15 +67,15 @@ const CourseDetail = () => {
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={`/${categoryInfo?.slug}`}
+                      to={`/${course?.category?.slug}`}
                       className={cx("detail__breadcumb--link")}
                     >
-                      {categoryInfo?.name}
+                      {course?.category?.name}
                     </NavLink>
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={`/${course?.category?.slug}/${course?.slug}`}
                       className={cx("detail__breadcumb--link", "active")}
                     >
                       {course?.courseName}
@@ -155,7 +155,7 @@ const CourseDetail = () => {
                     <Row>
                       <Col xl={12} lg={12} md={12} sm={24} xs={24}>
                         <NavLink
-                          to={"/learning"}
+                          to={`learning/${course?.id}-1`}
                           className={cx("detail__btn--link")}
                         >
                           <button className={cx("detail__button", "btn1")}>
@@ -166,7 +166,7 @@ const CourseDetail = () => {
 
                       <Col xl={12} lg={12} md={12} sm={24} xs={24}>
                         <NavLink
-                          to={"/exam"}
+                          to={`exam/${course?.id}-2`}
                           className={cx("detail__btn--link")}
                         >
                           <button className={cx("detail__button", "btn2")}>

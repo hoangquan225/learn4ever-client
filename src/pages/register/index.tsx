@@ -33,6 +33,8 @@ const RegisterPages = () => {
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
+
+  const loading = useAppSelector((state: RootState) => state.authState.loading);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // lay token tu cookie
@@ -435,6 +437,7 @@ const RegisterPages = () => {
                     type="primary"
                     htmlType="submit"
                     className={cx("register-form-button")}
+                    loading={loading}
                   >
                     Đăng ký
                   </Button>

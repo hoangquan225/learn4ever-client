@@ -1,29 +1,86 @@
-import { Breadcrumb, Col, Row } from "antd";
+import { Breadcrumb, Col, notification, Row } from "antd";
 import classNames from "classnames/bind";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { categoryState } from "../../redux/slices/categorySlice";
-import { courseState } from "../../redux/slices/courseSlice";
+import {
+  courseState,
+  requestLoadCourseBySlug,
+} from "../../redux/slices/courseSlice";
 import styles from "./exam.module.scss";
 import { FaChevronDown, FaRegClock, FaRegQuestionCircle } from "react-icons/fa";
 import { BiChevronRight } from "react-icons/bi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import TTCSconfig from "../../submodule/common/config";
+import { unwrapResult } from "@reduxjs/toolkit";
+import {
+  requestLoadTopicByCourse,
+  topicState,
+} from "../../redux/slices/topicSlice";
 
 const cx = classNames.bind(styles);
 
 const ExamPages = () => {
   const dispatch = useAppDispatch();
+  const params = useParams();
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
-  const categoryReducer = useAppSelector(categoryState);
-  const { categoryInfo } = categoryReducer;
+  const topicStates = useAppSelector(topicState);
+  const topics = topicStates.topics;
+
   const [isOpen, setIsOpen] = useState(true);
+
+  console.log(topics);
+
+  useEffect(() => {
+    if (params.id) {
+      const arg = params.id.split("-");
+      loadTopicByCourse(arg[0], Number(arg[1]));
+    }
+    loadCourse(params.slugChild || "");
+  }, [params.slugChild, params.id]);
 
   const handleShowExam = () => {
     setIsOpen(!isOpen);
   };
+
+  const loadCourse = async (slugChild: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadCourseBySlug({
+          slug: slugChild,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
+  const loadTopicByCourse = async (
+    idCourse: string,
+    type: number,
+    parentId?: string
+  ) => {
+    try {
+      const result = await dispatch(
+        requestLoadTopicByCourse({ idCourse, type, parentId })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
   return (
     <div>
       <Header />
@@ -40,15 +97,15 @@ const ExamPages = () => {
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={`/${categoryInfo?.slug}`}
+                      to={`/${course?.category?.slug}`}
                       className={cx("exam__breadcumb--link")}
                     >
-                      {categoryInfo?.name}
+                      {course?.category?.name}
                     </NavLink>
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={`/${course?.category?.slug}/${course?.slug}`}
                       className={cx("exam__breadcumb--link", "active")}
                     >
                       {course?.courseName}
@@ -57,10 +114,10 @@ const ExamPages = () => {
 
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={"#"}
                       className={cx("exam__breadcumb--link", "active")}
                     >
-                      exam
+                      Đề kiểm tra
                     </NavLink>
                   </Breadcrumb.Item>
                 </Breadcrumb>
@@ -109,34 +166,7 @@ const ExamPages = () => {
                             </div>
                             <div className={cx("exam__join")}>
                               <button className={cx("exam__panel--btn")}>
-                                <span>Làm ngay</span>
-                                <BiChevronRight
-                                  className={cx("exam__panel--icon")}
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </Col>
-                      <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                        <div className={cx("exam__panel--content")}>
-                          <span>
-                            Đề kiểm tra giữa học kì 1 môn Vật Lý 12 - Đề số 1
-                          </span>
-                          <div className={cx("exam__panel--action")}>
-                            <div className={cx("panel--action-item")}>
-                              <div>
-                                <FaRegQuestionCircle />
-                                <span>40 câu</span>
-                              </div>
-                              <div>
-                                <FaRegClock />
-                                <span>50 phút</span>
-                              </div>
-                            </div>
-                            <div className={cx("exam__join")}>
-                              <button className={cx("exam__panel--btn")}>
-                                <span>Làm ngay</span>
+                                <span>Làm bài</span>
                                 <BiChevronRight
                                   className={cx("exam__panel--icon")}
                                 />
@@ -148,6 +178,58 @@ const ExamPages = () => {
                     </Row>
                   </div>
                 </div>
+
+                {topics.length ? (
+                  topics?.map((data, i) => (
+                    <div className={cx("exam__panel")} key={data.id}>
+                      <div className={cx("exam__panel--item")}>
+                        <div
+                          className={cx("exam__panel--title")}
+                          onClick={handleShowExam}
+                        >
+                          <FaChevronDown className={cx("panel__icon")} />
+                          <h3 className={cx("panel__text")}>{data?.name}</h3>
+                        </div>
+                        <Row
+                          gutter={[12, 12]}
+                          className={
+                            isOpen
+                              ? cx("exam__appear")
+                              : cx("exam__appear", "hide")
+                          }
+                        >
+                          <Col xl={12} lg={12} md={12} sm={24} xs={24}>
+                            <div className={cx("exam__panel--content")}>
+                              <span>topic con</span>
+                              <div className={cx("exam__panel--action")}>
+                                <div className={cx("panel--action-item")}>
+                                  <div>
+                                    <FaRegQuestionCircle />
+                                    <span>40 câu</span>
+                                  </div>
+                                  <div>
+                                    <FaRegClock />
+                                    <span>50 phút</span>
+                                  </div>
+                                </div>
+                                <div className={cx("exam__join")}>
+                                  <button className={cx("exam__panel--btn")}>
+                                    <span>Làm bài</span>
+                                    <BiChevronRight
+                                      className={cx("exam__panel--icon")}
+                                    />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </div>

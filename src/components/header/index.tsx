@@ -260,7 +260,7 @@ const Header = () => {
                             <div
                               onClick={() => {
                                 navigate(`/${data.slug}`);
-                                setShowNavbar(!showNavbar);
+                                handleNavbar();
                               }}
                               className={cx("navbar__link--mobile")}
                             >

@@ -18,6 +18,7 @@ const LoginPages = () => {
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
+  const loading = useAppSelector((state: RootState) => state.authState.loading);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // lay token tu cookie
@@ -148,6 +149,7 @@ const LoginPages = () => {
                 type="primary"
                 htmlType="submit"
                 className={cx("login-form-button")}
+                loading={loading}
               >
                 Đăng nhập
               </Button>

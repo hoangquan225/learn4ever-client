@@ -159,12 +159,19 @@
   flex-direction: column;
   cursor: pointer;
   background-color: #fff;
+  transition: all 0.4s ease-in-out;
+
   & > span {
     font-size: 1.5rem;
     font-weight: 500;
     font-family: var(--font-family);
     color: #000;
     margin-bottom: 2.4rem;
+  }
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 4px 10px rgb(192 210 235 / 50%);
   }
 }
 
@@ -185,12 +192,32 @@
       color: black;
     }
   }
+
+  @include responsive(sm) {
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+  }
+
+  @include responsive(xs) {
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+  }
 }
 
 .exam__panel--action {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @include responsive(sm) {
+    align-items: initial;
+    flex-direction: column;
+  }
+
+  @include responsive(xs) {
+    align-items: initial;
+    flex-direction: column;
+  }
 }
 
 .exam__join {
