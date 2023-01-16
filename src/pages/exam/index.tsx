@@ -128,56 +128,7 @@ const ExamPages = () => {
               </div>
 
               <div className={cx("exam__view")}>
-                {/* <div className={cx("exam__panel")}>
-                  <div className={cx("exam__panel--item")}>
-                    <div
-                      className={cx("exam__panel--title")}
-                      onClick={handleShowExam}
-                    >
-                      <FaChevronDown className={cx("panel__icon")} />
-                      <h3 className={cx("panel__text")}>
-                        Đề kiểm tra giữa học kì 1 môn Vật Lý 12
-                      </h3>
-                    </div>
-
-                    <Row
-                      gutter={[12, 12]}
-                      className={
-                        isOpen ? cx("exam__appear") : cx("exam__appear", "hide")
-                      }
-                    >
-                      <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                        <div className={cx("exam__panel--content")}>
-                          <span>
-                            Đề kiểm tra giữa học kì 1 môn Vật Lý 12 - Đề số 1
-                          </span>
-                          <div className={cx("exam__panel--action")}>
-                            <div className={cx("panel--action-item")}>
-                              <div>
-                                <FaRegQuestionCircle />
-                                <span>40 câu</span>
-                              </div>
-                              <div>
-                                <FaRegClock />
-                                <span>50 phút</span>
-                              </div>
-                            </div>
-                            <div className={cx("exam__join")}>
-                              <button className={cx("exam__panel--btn")}>
-                                <span>Làm bài</span>
-                                <BiChevronRight
-                                  className={cx("exam__panel--icon")}
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </Col>
-                    </Row>
-                  </div>
-                </div> */}
-
-                {topics.length ? (
+                {topics.length > 0 &&
                   topics?.map((data, i) => {
                     const dataChild = data.topicChildData;
                     return (
@@ -229,11 +180,13 @@ const ExamPages = () => {
                                     <div className={cx("panel--action-item")}>
                                       <div>
                                         <FaRegQuestionCircle />
-                                        <span>40 câu</span>
+                                        <span>
+                                          {dataChild?.numQuestion} câu
+                                        </span>
                                       </div>
                                       <div>
                                         <FaRegClock />
-                                        <span>50 phút</span>
+                                        <span>{dataChild?.timeExam} phút</span>
                                       </div>
                                     </div>
                                     <div className={cx("exam__join")}>
@@ -250,40 +203,11 @@ const ExamPages = () => {
                                 </div>
                               </Col>
                             ))}
-
-                            {/* <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                              <div className={cx("exam__panel--content")}>
-                                <span>topic con</span>
-                                <div className={cx("exam__panel--action")}>
-                                  <div className={cx("panel--action-item")}>
-                                    <div>
-                                      <FaRegQuestionCircle />
-                                      <span>40 câu</span>
-                                    </div>
-                                    <div>
-                                      <FaRegClock />
-                                      <span>50 phút</span>
-                                    </div>
-                                  </div>
-                                  <div className={cx("exam__join")}>
-                                    <button className={cx("exam__panel--btn")}>
-                                      <span>Làm bài</span>
-                                      <BiChevronRight
-                                        className={cx("exam__panel--icon")}
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </Col> */}
                           </Row>
                         </div>
                       </div>
                     );
-                  })
-                ) : (
-                  <></>
-                )}
+                  })}
               </div>
             </div>
           </div>
