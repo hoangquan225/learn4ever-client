@@ -141,7 +141,6 @@ const ExamPages = () => {
                                 const indexPrev = indexOpenTopic.filter(
                                   (o) => o !== i + 1
                                 );
-                                console.log(indexPrev);
                                 setIndexOpenTopic(indexPrev);
                               }}
                             >
@@ -172,37 +171,47 @@ const ExamPages = () => {
                                 : cx("exam__appear", "hide")
                             }
                           >
-                            {dataChild?.map((dataChild, iChild) => (
-                              <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                                <div className={cx("exam__panel--content")}>
-                                  <span>{dataChild.name}</span>
-                                  <div className={cx("exam__panel--action")}>
-                                    <div className={cx("panel--action-item")}>
-                                      <div>
-                                        <FaRegQuestionCircle />
-                                        <span>
-                                          {dataChild?.numQuestion} câu
-                                        </span>
+                            {dataChild[0] &&
+                              dataChild?.map((dataChild, iChild) => (
+                                <Col
+                                  xl={12}
+                                  lg={12}
+                                  md={12}
+                                  sm={24}
+                                  xs={24}
+                                  key={iChild}
+                                >
+                                  <div className={cx("exam__panel--content")}>
+                                    <span>{dataChild.name}</span>
+                                    <div className={cx("exam__panel--action")}>
+                                      <div className={cx("panel--action-item")}>
+                                        <div>
+                                          <FaRegQuestionCircle />
+                                          <span>
+                                            {dataChild?.numQuestion} câu
+                                          </span>
+                                        </div>
+                                        <div>
+                                          <FaRegClock />
+                                          <span>
+                                            {dataChild?.timeExam} phút
+                                          </span>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <FaRegClock />
-                                        <span>{dataChild?.timeExam} phút</span>
+                                      <div className={cx("exam__join")}>
+                                        <button
+                                          className={cx("exam__panel--btn")}
+                                        >
+                                          <span>Làm bài</span>
+                                          <BiChevronRight
+                                            className={cx("exam__panel--icon")}
+                                          />
+                                        </button>
                                       </div>
-                                    </div>
-                                    <div className={cx("exam__join")}>
-                                      <button
-                                        className={cx("exam__panel--btn")}
-                                      >
-                                        <span>Làm bài</span>
-                                        <BiChevronRight
-                                          className={cx("exam__panel--icon")}
-                                        />
-                                      </button>
                                     </div>
                                   </div>
-                                </div>
-                              </Col>
-                            ))}
+                                </Col>
+                              ))}
                           </Row>
                         </div>
                       </div>

@@ -11,6 +11,7 @@ interface TopicState {
   loading: boolean;
   error: string;
   topics: Topic[];
+  total: number;
 }
 
 // Define the initial state using that type
@@ -18,6 +19,7 @@ const initialState: TopicState = {
   loading: false,
   error: "",
   topics: [],
+  total: 0,
 };
 
 export const requestLoadTopicByCourse = createAsyncThunk(
@@ -59,6 +61,7 @@ export const topicSlice = createSlice({
       ) => {
         console.log(action.payload);
         state.topics = action.payload.data;
+        state.total = action.payload.total;
         state.loading = false;
       }
     );

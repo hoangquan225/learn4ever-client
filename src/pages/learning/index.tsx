@@ -1,27 +1,96 @@
-import { Layout, Progress } from "antd";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { Layout, notification, Progress } from "antd";
+import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   FaArrowRight,
   FaBars,
   FaCheckCircle,
   FaChevronLeft,
   FaChevronRight,
+  FaFileAlt,
   FaHeart,
   FaPlayCircle,
+  FaQuestionCircle,
   FaTimes,
 } from "react-icons/fa";
-import { IoChevronBackOutline, IoChevronDownOutline } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  IoChevronBackOutline,
+  IoChevronDownOutline,
+  IoChevronUpOutline,
+} from "react-icons/io5";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import logo from "../../assets/img/learn4ever-icon.png";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import {
+  courseState,
+  requestLoadCourseBySlug,
+} from "../../redux/slices/courseSlice";
+import {
+  requestLoadTopicByCourse,
+  topicState,
+} from "../../redux/slices/topicSlice";
+import TTCSconfig from "../../submodule/common/config";
 import styles from "./learning.module.scss";
 
 const cx = classNames.bind(styles);
 
 const LearningPages = () => {
-  const [isShowSider, setIsShowSider] = useState(false);
+  const dispatch = useAppDispatch();
+  const params = useParams();
+  const courseReducer = useAppSelector(courseState);
+  const course = courseReducer.course;
+  const topicStates = useAppSelector(topicState);
+  const topics = topicStates.topics;
+  const topicsTotal = topicStates.total;
+  const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const navigate = useNavigate();
+  const [isShowSider, setIsShowSider] = useState(false);
+
+  useEffect(() => {
+    if (params.id) {
+      const arg = params.id.split("-");
+      loadTopicByCourse(arg[0], Number(arg[1]));
+    }
+    loadCourse(params.slugChild || "");
+  }, [params.slugChild, params.id]);
+
+  const loadCourse = async (slugChild: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadCourseBySlug({
+          slug: slugChild,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
+  const loadTopicByCourse = async (
+    idCourse: string,
+    type: number,
+    parentId?: string
+  ) => {
+    try {
+      const result = await dispatch(
+        requestLoadTopicByCourse({ idCourse, type, parentId })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
 
   const handleShowSider = () => {
     setIsShowSider(!isShowSider);
@@ -48,7 +117,9 @@ const LearningPages = () => {
               />
             </Link>
 
-            <div className={cx("learning__header--title")}>Title</div>
+            <div className={cx("learning__header--title")}>
+              {course?.courseName}
+            </div>
 
             <div className={cx("learning__header--progress")}>
               <Progress
@@ -56,20 +127,20 @@ const LearningPages = () => {
                 className={cx("learning__header--progress-pie")}
                 width={36}
                 strokeColor={"#ffa800"}
-                percent={80}
+                percent={50}
                 format={(successPercent) => `${successPercent}%`}
               />
               <div className={cx("learning__header--progress-msg")}>
                 <strong>
                   <span className={cx("learning__header--progress-num")}>
-                    8
+                    2
                   </span>
                   /
                   <span className={cx("learning__header--progress-num")}>
-                    10&nbsp;
+                    {topicsTotal}
                   </span>
                 </strong>
-                <p>bài học</p>
+                <p>&nbsp;bài học</p>
               </div>
             </div>
           </div>
@@ -100,70 +171,126 @@ const LearningPages = () => {
               </div>
 
               <div className={cx("learning__track--body")}>
-                <div className={cx("learning__track--item")}>
-                  <div className={cx("learning__track--item-title")}>
-                    I. Mệnh đề toán học và tập hợp
-                  </div>
-                  <span className={cx("learning__track--item-desc")}>
-                    8/10 | 24:30
-                  </span>
-                  <span className={cx("learning__track--item-icon")}>
-                    <IoChevronDownOutline className={cx("track-icon")} />
-                  </span>
-                </div>
+                {topics?.length > 0 &&
+                  topics?.map((topic, index) => {
+                    return (
+                      <Fragment key={index}>
+                        {indexOpenTopic.find((o) => o === index + 1) ? (
+                          <div
+                            className={cx("learning__track--item")}
+                            onClick={() => {
+                              const indexPrev = indexOpenTopic.filter(
+                                (o) => o !== index + 1
+                              );
+                              setIndexOpenTopic(indexPrev);
+                            }}
+                          >
+                            <div className={cx("learning__track--item-title")}>
+                              {topic?.name}
+                            </div>
+                            <span className={cx("learning__track--item-desc")}>
+                              0/{topic?.topicChildData.length} | 24:30
+                            </span>
+                            <span className={cx("learning__track--item-icon")}>
+                              <IoChevronDownOutline
+                                className={cx("track-icon")}
+                              />
+                            </span>
+                          </div>
+                        ) : (
+                          <div
+                            className={cx("learning__track--item")}
+                            onClick={() => {
+                              setIndexOpenTopic([...indexOpenTopic, index + 1]);
+                            }}
+                          >
+                            <div className={cx("learning__track--item-title")}>
+                              {topic?.name}
+                            </div>
+                            <span className={cx("learning__track--item-desc")}>
+                              0/{topic?.topicChildData.length} | 24:30
+                            </span>
+                            <span className={cx("learning__track--item-icon")}>
+                              <IoChevronUpOutline
+                                className={cx("track-icon")}
+                              />
+                            </span>
+                          </div>
+                        )}
 
-                <div className={cx("learning__track--steps")}>
-                  <div className={cx("learning__track--steps-item", "active")}>
-                    <div className={cx("learning__track--steps-info")}>
-                      <h3 className={cx("learning__track--steps-title")}>
-                        1. Mệnh đề
-                      </h3>
-                      <p className={cx("learning__track--steps-desc")}>
-                        <FaPlayCircle className={cx("desc-icon")} />
-                        <span className={cx("learning__track--steps-time")}>
-                          01:35
-                        </span>
-                      </p>
-                    </div>
-                    <div className={cx("learning__track--steps-status")}>
-                      <FaCheckCircle className={cx("status-icon")} />
-                    </div>
-                  </div>
-
-                  <div className={cx("learning__track--steps-item")}>
-                    <div className={cx("learning__track--steps-info")}>
-                      <h3 className={cx("learning__track--steps-title")}>
-                        2. Tập hợp
-                      </h3>
-                      <p className={cx("learning__track--steps-desc")}>
-                        <FaPlayCircle className={cx("desc-icon")} />
-                        <span className={cx("learning__track--steps-time")}>
-                          02:35
-                        </span>
-                      </p>
-                    </div>
-                    <div className={cx("learning__track--steps-status")}>
-                      <FaCheckCircle className={cx("status-icon")} />
-                    </div>
-                  </div>
-
-                  <div className={cx("learning__track--steps-item")}>
-                    <div className={cx("learning__track--steps-info")}>
-                      <h3 className={cx("learning__track--steps-title")}>
-                        3. Xác suất
-                      </h3>
-                      <p className={cx("learning__track--steps-desc")}>
-                        <FaPlayCircle className={cx("desc-icon")} />
-                        <span className={cx("learning__track--steps-time")}>
-                          03:30
-                        </span>
-                      </p>
-                    </div>
-                    <div className={cx("learning__track--steps-status")}>
-                      <FaCheckCircle className={cx("status-icon")} />
-                    </div>
-                  </div>
-                </div>
+                        {indexOpenTopic.find((o) => o === index + 1) &&
+                          topic?.topicChildData[0] &&
+                          topic?.topicChildData.map(
+                            (topicChild, indexChild) => {
+                              return (
+                                <div
+                                  className={cx("learning__track--steps")}
+                                  key={indexChild}
+                                >
+                                  <div
+                                    className={cx(
+                                      "learning__track--steps-item"
+                                      // "active"
+                                    )}
+                                  >
+                                    <div
+                                      className={cx(
+                                        "learning__track--steps-info"
+                                      )}
+                                    >
+                                      <h3
+                                        className={cx(
+                                          "learning__track--steps-title"
+                                        )}
+                                      >
+                                        {topicChild?.name}
+                                      </h3>
+                                      <p
+                                        className={cx(
+                                          "learning__track--steps-desc"
+                                        )}
+                                      >
+                                        {topicChild?.topicType === 4 ? (
+                                          <FaPlayCircle
+                                            className={cx("desc-icon")}
+                                          />
+                                        ) : topicChild?.topicType === 5 ? (
+                                          <FaFileAlt
+                                            className={cx("desc-icon")}
+                                          />
+                                        ) : topicChild?.topicType === 2 ? (
+                                          <FaQuestionCircle
+                                            className={cx("desc-icon")}
+                                          />
+                                        ) : (
+                                          <></>
+                                        )}
+                                        <span
+                                          className={cx(
+                                            "learning__track--steps-time"
+                                          )}
+                                        >
+                                          01:35
+                                        </span>
+                                      </p>
+                                    </div>
+                                    <div
+                                      className={cx(
+                                        "learning__track--steps-status"
+                                      )}
+                                    >
+                                      <FaCheckCircle
+                                        className={cx("status-icon")}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+                          )}
+                      </Fragment>
+                    );
+                  })}
               </div>
             </div>
           </Sider>
@@ -173,7 +300,7 @@ const LearningPages = () => {
             }
             onClick={handleShowSider}
           ></div>
-          <div
+          <Content
             className={
               isShowSider
                 ? cx("learning__track--content")
@@ -220,7 +347,7 @@ const LearningPages = () => {
             </div>
 
             <div className={cx("content__space")}></div>
-          </div>
+          </Content>
         </Layout>
 
         {/* FOOTER */}
