@@ -8,3 +8,14 @@ export const apiLoadTopicByCourse = async (params: {
 }) => {
   return ApiConfig(EndPoint.GET_TOPIC_BY_COURSE, { params });
 };
+
+export const apiLoadQuestionsByTopic = async (params: {
+  idTopic: string;
+  status: number;
+}) => {
+  return ApiConfig(EndPoint.GET_QUESTIONS_BY_TOPIC, { params });
+};
+
+export const apiLoadTopicById = async (params: { id: string }) => {
+  return ApiConfig(EndPoint.GET_TOPIC_BY_ID, { params });
+};

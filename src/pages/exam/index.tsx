@@ -1,6 +1,6 @@
-import { Breadcrumb, Col, notification, Row } from "antd";
+import { Breadcrumb, Col, notification, Popconfirm, Row } from "antd";
 import classNames from "classnames/bind";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -34,7 +34,8 @@ const ExamPages = () => {
   const course = courseReducer.course;
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
-  const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
+  const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([1]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (params.id) {
@@ -198,7 +199,15 @@ const ExamPages = () => {
                                           </span>
                                         </div>
                                       </div>
-                                      <div className={cx("exam__join")}>
+                                      <Popconfirm
+                                        placement="top"
+                                        title="Bạn muốn làm đề này sao?"
+                                        onConfirm={() =>
+                                          navigate(`${dataChild.id}`)
+                                        }
+                                        okText="Yes"
+                                        cancelText="No"
+                                      >
                                         <button
                                           className={cx("exam__panel--btn")}
                                         >
@@ -207,7 +216,7 @@ const ExamPages = () => {
                                             className={cx("exam__panel--icon")}
                                           />
                                         </button>
-                                      </div>
+                                      </Popconfirm>
                                     </div>
                                   </div>
                                 </Col>

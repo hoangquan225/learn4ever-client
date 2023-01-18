@@ -1,15 +1,19 @@
+import { unwrapResult } from "@reduxjs/toolkit";
 import {
+  Anchor,
   Breadcrumb,
   Button,
   Col,
   Drawer,
   Modal,
+  notification,
   Progress,
   Radio,
   Row,
   Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import Countdown from "antd/es/statistic/Countdown";
 import classNames from "classnames/bind";
 import { useEffect, useState } from "react";
 import {
@@ -19,18 +23,30 @@ import {
   FaRegPauseCircle,
   FaRegQuestionCircle,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import { apiLoadQuestionsByTopic, apiLoadTopicById } from "../../api/topic";
 import Header from "../../components/header";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import {
+  requestLoadTopicById,
+  topicState,
+} from "../../redux/slices/topicSlice";
+import { Question } from "../../submodule/models/question";
 import styles from "./practice.module.scss";
 
 const cx = classNames.bind(styles);
-
 const PracticePages = () => {
+  const params = useParams();
+  const dispatch = useAppDispatch();
+  const topicStates = useAppSelector(topicState);
+  const topic = topicStates.topicInfo;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
   const [isOpenModelPause, setIsOpenModelPause] = useState(false);
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
+
+  const [datasQuestion, setDatasQuestion] = useState<Question[]>([]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
@@ -39,6 +55,10 @@ const PracticePages = () => {
       window.removeEventListener("scroll", handleClockStick);
     };
   }, []);
+  useEffect(() => {
+    loadQuestionByTopic(params.idChild || "", 1);
+    loadTopicById(params.idChild || "");
+  }, [params.idChild]);
 
   const handleClockStick = () => {
     if (window !== undefined) {
@@ -46,6 +66,30 @@ const PracticePages = () => {
       windowHeight > 180
         ? setClockStick(!clockStick)
         : setClockStick(clockStick);
+    }
+  };
+
+  const loadQuestionByTopic = async (idTopic: string, status: number) => {
+    try {
+      const res = await apiLoadQuestionsByTopic({ idTopic, status });
+      setDatasQuestion(res.data.data?.map((o: any) => new Question(o)));
+    } catch (error) {
+      notification.error({
+        message: "lỗi server, không tải được câu hỏi",
+        duration: 1.5,
+      });
+    }
+  };
+
+  const loadTopicById = async (id: string) => {
+    try {
+      const result = await dispatch(requestLoadTopicById({ id }));
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "lỗi server, không tải được câu hỏi",
+        duration: 1.5,
+      });
     }
   };
 
@@ -81,6 +125,10 @@ const PracticePages = () => {
     setIsOpenModelFeedback(false);
   };
 
+  const onFinish = () => {
+    console.log("finished!");
+  };
+
   return (
     <>
       <Header />
@@ -109,9 +157,7 @@ const PracticePages = () => {
                 </Breadcrumb>
               </div>
 
-              <h1 className={cx("practice__heading")}>
-                Đề kiểm tra cuối học kì 2 môn Vật Lý 12 - Đề số 1
-              </h1>
+              <h1 className={cx("practice__heading")}>{topic?.name}</h1>
 
               <Row gutter={10} className={cx("practice__view")}>
                 <Col xl={16} lg={16} md={24} sm={24} xs={24}>
@@ -125,155 +171,68 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      00:47:43
+                      <Countdown
+                        // value={Date.now() + topic?.timeExam * 1000 * 60}
+                        value={Date.now() + 20 * 1000 * 60}
+                        onFinish={onFinish}
+                      />
                     </span>
                   </Row>
 
                   <div>
-                    <Row className={cx("practice__practice")}>
-                      <div className={cx("practice__practice--item")}>
-                        <div className={cx("feedback-icon--wrapper")}>
-                          <FaMarker
-                            className={cx("feedback-icon")}
-                            onClick={handleOpenModelFeedback}
-                          />
-                        </div>
-                        <div className={cx("game__view")}>
-                          <div className={cx("game__view--question")}>
-                            <div className={cx("game__view--question-index")}>
-                              <span>1.</span>
-                            </div>
-                            <div className={cx("game__view--question-text")}>
-                              Trong thí nghiệm Y-âng về giao thoa ánh sáng, khe
-                              hẹp S phát ra đồng thời 2 bức xạ đơn sắc có bước
-                              sóng λ<sub>1</sub> &nbsp;= 4410A <sub>o</sub>
-                              &nbsp;và λ<sub>2</sub>. Trên màn trong khoảng giữa
-                              2 vân sáng liên tiếp có màu giống màu của vân
-                              trung tâm còn có 9 vân sáng khác. Biết rằng 0,38
-                              μm ≤ λ ≤ 0,76 μm. Giá trị của λ<sub>2</sub>{" "}
-                              &nbsp;bằng:
-                            </div>
-                          </div>
+                    {datasQuestion.length > 0 &&
+                      datasQuestion?.map((qs, i) => {
+                        const listAnswer = [...qs.result, ...qs.answer].sort(
+                          (a, b) => a.index - b.index
+                        );
 
-                          <div className={cx("game__view--quiz-choices")}>
-                            <div className={cx("quiz-choices__item")}>
-                              <Radio.Group name="radiogroup">
-                                <Space direction="vertical">
-                                  <Radio value={1}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={2}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={3}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={4}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                </Space>
-                              </Radio.Group>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Row>
-                    <Row className={cx("practice__practice")}>
-                      <div className={cx("practice__practice--item")}>
-                        <div className={cx("feedback-icon--wrapper")}>
-                          <FaMarker
-                            className={cx("feedback-icon")}
-                            onClick={handleOpenModelFeedback}
-                          />
-                        </div>
-                        <div className={cx("game__view")}>
-                          <div className={cx("game__view--question")}>
-                            <div className={cx("game__view--question-index")}>
-                              <span>1.</span>
-                            </div>
-                            <div className={cx("game__view--question-text")}>
-                              Trong thí nghiệm Y-âng về giao thoa ánh sáng, khe
-                              hẹp S phát ra đồng thời 2 bức xạ đơn sắc có bước
-                              sóng λ<sub>1</sub> &nbsp;= 4410A <sub>o</sub>
-                              &nbsp;và λ<sub>2</sub>. Trên màn trong khoảng giữa
-                              2 vân sáng liên tiếp có màu giống màu của vân
-                              trung tâm còn có 9 vân sáng khác. Biết rằng 0,38
-                              μm ≤ λ ≤ 0,76 μm. Giá trị của λ<sub>2</sub>{" "}
-                              &nbsp;bằng:
-                            </div>
-                          </div>
+                        return (
+                          <Row id={qs.id} className={cx("practice__practice")}>
+                            <div className={cx("practice__practice--item")}>
+                              <div className={cx("feedback-icon--wrapper")}>
+                                <FaMarker
+                                  className={cx("feedback-icon")}
+                                  onClick={handleOpenModelFeedback}
+                                />
+                              </div>
+                              <div className={cx("game__view")}>
+                                <div className={cx("game__view--question")}>
+                                  <div
+                                    className={cx("game__view--question-index")}
+                                  >
+                                    <span>{i + 1}.</span>
+                                  </div>
+                                  <div
+                                    className={cx("game__view--question-text")}
+                                  >
+                                    {qs.question}
+                                  </div>
+                                </div>
 
-                          <div className={cx("game__view--quiz-choices")}>
-                            <div className={cx("quiz-choices__item")}>
-                              <Radio.Group name="radiogroup">
-                                <Space direction="vertical">
-                                  <Radio value={1}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={2}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={3}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                  <Radio value={4}>
-                                    <div
-                                      className={cx(
-                                        "quiz-choices__item--answer"
-                                      )}
-                                    >
-                                      A. 7717,5 Å
-                                    </div>
-                                  </Radio>
-                                </Space>
-                              </Radio.Group>
+                                <div className={cx("game__view--quiz-choices")}>
+                                  <div className={cx("quiz-choices__item")}>
+                                    <Radio.Group name="radiogroup">
+                                      <Space direction="vertical">
+                                        {listAnswer?.map((item) => (
+                                          <Radio value={item.index}>
+                                            <div
+                                              className={cx(
+                                                "quiz-choices__item--answer"
+                                              )}
+                                            >
+                                              {item.index}. {item.text}
+                                            </div>
+                                          </Radio>
+                                        ))}
+                                      </Space>
+                                    </Radio.Group>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Row>
+                          </Row>
+                        );
+                      })}
                   </div>
                 </Col>
 
@@ -307,96 +266,17 @@ const PracticePages = () => {
                             }}
                             gutter={[0, 16]}
                           >
-                            <Col span={3} className={cx("question-item")}>
-                              <span
-                                className={cx(
-                                  "question-item__bground",
-                                  "active"
-                                )}
-                              >
-                                1
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                2
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                3
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                4
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                5
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                6
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                7
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                8
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                18
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                18
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                18
-                              </span>
-                            </Col>
-                            <Col span={3} className={cx("question-item")}>
-                              <span className={cx("question-item__bground")}>
-                                18
-                              </span>
-                            </Col>
+                            {datasQuestion?.map((o, i) => (
+                              <Col span={3} className={cx("question-item")}>
+                                <a href={`#${o.id}`}>
+                                  <span
+                                    className={cx("question-item__bground")}
+                                  >
+                                    {i + 1}
+                                  </span>
+                                </a>
+                              </Col>
+                            ))}
                           </Row>
                         </div>
                       </div>
@@ -420,6 +300,8 @@ const PracticePages = () => {
                   </div>
                 </Col>
               </Row>
+
+              <div className={cx("practice__palette--question-list")}></div>
               <div className={cx("practice__subnav")}>
                 <div className={cx("practice__subnav--main")}>
                   <div className={cx("practice__subnav--item")}>
@@ -473,93 +355,15 @@ const PracticePages = () => {
                           }}
                           gutter={[0, 16]}
                         >
-                          <Col span={3} className={cx("question-item")}>
-                            <span
-                              className={cx("question-item__bground", "active")}
-                            >
-                              1
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              2
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              3
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              4
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              5
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              6
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              7
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              8
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              18
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              18
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              18
-                            </span>
-                          </Col>
-                          <Col span={3} className={cx("question-item")}>
-                            <span className={cx("question-item__bground")}>
-                              18
-                            </span>
-                          </Col>
+                          {datasQuestion?.map((o, i) => (
+                            <Col span={3} className={cx("question-item")}>
+                              <a href={`#${o.id}`}>
+                                <span className={cx("question-item__bground")}>
+                                  {i + 1}
+                                </span>
+                              </a>
+                            </Col>
+                          ))}
                         </Row>
                       </div>
                     </div>

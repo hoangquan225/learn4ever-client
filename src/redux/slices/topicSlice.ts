@@ -4,13 +4,14 @@ import type { RootState } from "../../redux/store";
 import { Course } from "../../submodule/models/course";
 import { apiLoadCourseBySlug } from "../../api/course";
 import { Topic } from "../../submodule/models/topic";
-import { apiLoadTopicByCourse } from "../../api/topic";
+import { apiLoadTopicByCourse, apiLoadTopicById } from "../../api/topic";
 
 // Define a type for the slice state
 interface TopicState {
   loading: boolean;
   error: string;
   topics: Topic[];
+  topicInfo: Topic | null;
   total: number;
 }
 
@@ -19,6 +20,7 @@ const initialState: TopicState = {
   loading: false,
   error: "",
   topics: [],
+  topicInfo: null,
   total: 0,
 };
 
@@ -30,13 +32,21 @@ export const requestLoadTopicByCourse = createAsyncThunk(
   }
 );
 
+export const requestLoadTopicById = createAsyncThunk(
+  "topic/requestLoadTopicById",
+  async (props: { id: string }) => {
+    const res = await apiLoadTopicById(props);
+    return res.data;
+  }
+);
+
 export const topicSlice = createSlice({
   name: "topic",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const actionList = [requestLoadTopicByCourse];
+    const actionList = [requestLoadTopicByCourse, requestLoadTopicById];
     actionList.forEach((action) => {
       builder.addCase(action.pending, (state) => {
         state.loading = true;
@@ -59,9 +69,17 @@ export const topicSlice = createSlice({
           status: number;
         }>
       ) => {
-        console.log(action.payload);
         state.topics = action.payload.data;
         state.total = action.payload.total;
+        state.loading = false;
+      }
+    );
+
+    // load topic by id
+    builder.addCase(
+      requestLoadTopicById.fulfilled,
+      (state, action: PayloadAction<Topic>) => {
+        state.topicInfo = action.payload;
         state.loading = false;
       }
     );

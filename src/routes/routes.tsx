@@ -30,7 +30,7 @@ export const publicRoutes = [
 // Private routes
 export const privateRoutes = [
   { path: "/profile", component: ProfilePages },
-  { path: "/practice", component: PracticePages },
+  { path: "/:slug/:slugChild/exam/:id/:idChild", component: PracticePages },
   { path: "/:slug/:slugChild/learning/:id", component: LearningPages },
   { path: "/:slug/:slugChild/exam/:id", component: ExamPages },
 ];

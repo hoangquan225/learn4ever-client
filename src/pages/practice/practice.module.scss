@@ -175,7 +175,7 @@
   margin-right: 1.2rem;
 }
 
-.practice__clock--time {
+.practice__clock--time span {
   color: rgb(38, 192, 72);
   font-size: 1.6rem;
   font-weight: bold;
@@ -192,6 +192,7 @@
   border-radius: 1.5rem;
   padding: 3.2rem 0 1rem;
   margin-bottom: 1rem;
+  width: 100%;
   position: relative;
 }
 
