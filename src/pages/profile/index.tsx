@@ -58,7 +58,7 @@ const ProfilePages = () => {
       name: userInfo?.name,
       email: userInfo?.email,
       phoneNumber: userInfo?.phoneNumber,
-      birth: userInfo?.birth ?? dayjs(userInfo?.birth),
+      birth: userInfo?.birth ? dayjs(userInfo?.birth) : null,
       classNumber: userInfo?.classNumber,
       gender: userInfo?.gender,
     });

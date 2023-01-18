@@ -3,6 +3,8 @@ import { Layout, notification, Progress } from "antd";
 import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
+import { log } from "console";
+import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";
 import {
   FaArrowRight,
@@ -22,6 +24,7 @@ import {
   IoChevronUpOutline,
 } from "react-icons/io5";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { apiLoadLessonByIdTopic } from "../../api/topic";
 import logo from "../../assets/img/learn4ever-icon.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
@@ -33,6 +36,7 @@ import {
   topicState,
 } from "../../redux/slices/topicSlice";
 import TTCSconfig from "../../submodule/common/config";
+import { Lesson } from "../../submodule/models/lesson";
 import styles from "./learning.module.scss";
 
 const cx = classNames.bind(styles);
@@ -46,6 +50,7 @@ const LearningPages = () => {
   const topics = topicStates.topics;
   const topicsTotal = topicStates.total;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
+  const [dataLesson, setDataLesson] = useState<Lesson>();
   const navigate = useNavigate();
   const [isShowSider, setIsShowSider] = useState(false);
 
@@ -94,6 +99,19 @@ const LearningPages = () => {
 
   const handleShowSider = () => {
     setIsShowSider(!isShowSider);
+  };
+
+  const handleChangeLesson = async (status: number, idTopic: string) => {
+    try {
+      const result = await apiLoadLessonByIdTopic({ status, idTopic });
+      // console.log(result.data.data);
+      setDataLesson(result.data.data);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
   };
 
   return (
@@ -226,6 +244,12 @@ const LearningPages = () => {
                                 <div
                                   className={cx("learning__track--steps")}
                                   key={indexChild}
+                                  onClick={() =>
+                                    handleChangeLesson(
+                                      topicChild.status,
+                                      topicChild.id || ""
+                                    )
+                                  }
                                 >
                                   <div
                                     className={cx(
@@ -314,30 +338,33 @@ const LearningPages = () => {
                   : cx("content__video", "hide-sider")
               }
             >
-              <div className={cx("content__video--center")}>
-                <div className={cx("content__video--player")}>
-                  <iframe
-                    className={cx("content__video--embed")}
-                    src="https://www.youtube.com/embed/BBJa32lCaaY"
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  ></iframe>
+              {dataLesson?.video && (
+                <div className={cx("content__video--center")}>
+                  <div className={cx("content__video--player")}>
+                    <iframe
+                      className={cx("content__video--embed")}
+                      src={dataLesson?.video}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className={cx("content__desc")}>
               <div className={cx("content__desc--title")}>
-                <h1 className={cx("content__desc--heading")}>Title</h1>
+                <h1 className={cx("content__desc--heading")}>title</h1>
                 <p className={cx("content__desc--updated")}>
-                  Cập nhật tháng 12 năm 2023
+                  {/* Cập nhật ngày {dayjs(dataLesson?.updateDate).format("MM/DD/YYYY")} */}
+                  Cập nhật ngày {dayjs(dataLesson?.updateDate).date()} tháng{" "}
+                  {dayjs(dataLesson?.updateDate).month() + 1} năm{" "}
+                  {dayjs(dataLesson?.updateDate).year()}
                 </p>
               </div>
 
-              <div className={cx("content__desc--text")}>
-                Noi dung bai hoc se o day
-              </div>
+              <div className={cx("content__desc--text")}>{dataLesson?.des}</div>
             </div>
 
             <div className={cx("content__powered")}>
