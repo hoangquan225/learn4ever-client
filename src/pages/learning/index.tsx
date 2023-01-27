@@ -3,7 +3,6 @@ import { Layout, notification, Progress } from "antd";
 import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
-import { log } from "console";
 import dayjs from "dayjs";
 import { Fragment, useEffect, useState } from "react";
 import {
@@ -60,6 +59,10 @@ const LearningPages = () => {
       loadTopicByCourse(arg[0], Number(arg[1]));
     }
     loadCourse(params.slugChild || "");
+
+    if (topics.length) {
+      handleChangeLesson(1, topics[0]?.topicChild[0]);
+    }
   }, [params.slugChild, params.id]);
 
   const loadCourse = async (slugChild: string) => {
@@ -244,18 +247,26 @@ const LearningPages = () => {
                                 <div
                                   className={cx("learning__track--steps")}
                                   key={indexChild}
-                                  onClick={() =>
-                                    handleChangeLesson(
-                                      topicChild.status,
-                                      topicChild.id || ""
-                                    )
-                                  }
                                 >
                                   <div
-                                    className={cx(
-                                      "learning__track--steps-item"
-                                      // "active"
-                                    )}
+                                    // className={cx(
+                                    //   "learning__track--steps-item"
+                                    //   // "active"
+                                    // )}
+                                    className={
+                                      dataLesson?.idTopic === topicChild.id
+                                        ? cx(
+                                            "learning__track--steps-item",
+                                            "active"
+                                          )
+                                        : cx("learning__track--steps-item")
+                                    }
+                                    onClick={() =>
+                                      handleChangeLesson(
+                                        topicChild.status,
+                                        topicChild.id || ""
+                                      )
+                                    }
                                   >
                                     <div
                                       className={cx(
