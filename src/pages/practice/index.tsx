@@ -15,6 +15,7 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import Countdown from "antd/es/statistic/Countdown";
 import classNames from "classnames/bind";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import {
   FaMarker,
@@ -172,8 +173,7 @@ const PracticePages = () => {
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
                       <Countdown
-                        // value={Date.now() + topic?.timeExam * 1000 * 60}
-                        value={Date.now() + 20 * 1000 * 60}
+                        value={Date.now() + Number(topic?.timeExam) * 1000 * 60}
                         onFinish={onFinish}
                       />
                     </span>
@@ -187,7 +187,11 @@ const PracticePages = () => {
                         );
 
                         return (
-                          <Row id={qs.id} className={cx("practice__practice")}>
+                          <Row
+                            id={qs.id}
+                            className={cx("practice__practice")}
+                            key={qs.id}
+                          >
                             <div className={cx("practice__practice--item")}>
                               <div className={cx("feedback-icon--wrapper")}>
                                 <FaMarker
@@ -213,8 +217,8 @@ const PracticePages = () => {
                                   <div className={cx("quiz-choices__item")}>
                                     <Radio.Group name="radiogroup">
                                       <Space direction="vertical">
-                                        {listAnswer?.map((item) => (
-                                          <Radio value={item.index}>
+                                        {listAnswer?.map((item, i) => (
+                                          <Radio value={item.index} key={i}>
                                             <div
                                               className={cx(
                                                 "quiz-choices__item--answer"
@@ -267,12 +271,14 @@ const PracticePages = () => {
                             gutter={[0, 16]}
                           >
                             {datasQuestion?.map((o, i) => (
-                              <Col span={3} className={cx("question-item")}>
+                              <Col
+                                span={3}
+                                className={cx("question-item")}
+                                key={i}
+                              >
                                 <a href={`#${o.id}`}>
-                                  <span
-                                    className={cx("question-item__bground")}
-                                  >
-                                    {i + 1}
+                                  <span className={cx("qustion-item__bground")}>
+                                    e {i + 1}
                                   </span>
                                 </a>
                               </Col>
@@ -356,7 +362,11 @@ const PracticePages = () => {
                           gutter={[0, 16]}
                         >
                           {datasQuestion?.map((o, i) => (
-                            <Col span={3} className={cx("question-item")}>
+                            <Col
+                              span={3}
+                              className={cx("question-item")}
+                              key={i}
+                            >
                               <a href={`#${o.id}`}>
                                 <span className={cx("question-item__bground")}>
                                   {i + 1}

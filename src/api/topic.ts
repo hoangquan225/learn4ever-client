@@ -1,5 +1,6 @@
 import { ApiConfig } from "./config";
 import EndPoint from "../submodule/common/endpoint";
+import { Topic } from "../submodule/models/topic";
 
 export const apiLoadTopicByCourse = async (params: {
   idCourse: string;
@@ -25,4 +26,10 @@ export const apiLoadLessonByIdTopic = async (params: {
   idTopic: string;
 }) => {
   return ApiConfig(EndPoint.GET_LESSONS_BY_IDTOPIC, { params });
+};
+
+export const apiUpdateTopic = async (payload: Topic) => {
+  return ApiConfig(EndPoint.UPDATE_TOPIC, {
+    payload,
+  });
 };

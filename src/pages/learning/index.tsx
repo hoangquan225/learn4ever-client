@@ -23,7 +23,7 @@ import {
   IoChevronUpOutline,
 } from "react-icons/io5";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { apiLoadLessonByIdTopic } from "../../api/topic";
+import { apiLoadTopicById } from "../../api/topic";
 import logo from "../../assets/img/learn4ever-icon.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
@@ -32,10 +32,11 @@ import {
 } from "../../redux/slices/courseSlice";
 import {
   requestLoadTopicByCourse,
+  requestUpdateTopicById,
   topicState,
 } from "../../redux/slices/topicSlice";
 import TTCSconfig from "../../submodule/common/config";
-import { Lesson } from "../../submodule/models/lesson";
+import { Topic } from "../../submodule/models/topic";
 import styles from "./learning.module.scss";
 
 const cx = classNames.bind(styles);
@@ -49,19 +50,22 @@ const LearningPages = () => {
   const topics = topicStates.topics;
   const topicsTotal = topicStates.total;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
-  const [dataLesson, setDataLesson] = useState<Lesson>();
+  const [dataTopicActive, setDataTopicActive] = useState<Topic>();
   const navigate = useNavigate();
   const [isShowSider, setIsShowSider] = useState(false);
+  const [indexTopic, setIndexTopic] = useState<any>();
 
   useEffect(() => {
     if (params.id) {
       const arg = params.id.split("-");
-      loadTopicByCourse(arg[0], Number(arg[1]));
+      if (Number(arg[1]) === 1) {
+        loadTopicByCourse(arg[0], Number(arg[1]));
+      }
     }
     loadCourse(params.slugChild || "");
 
     if (topics.length) {
-      handleChangeLesson(1, topics[0]?.topicChild[0]);
+      handleChangeTopic(topics[0]?.topicChild[0]);
     }
   }, [params.slugChild, params.id]);
 
@@ -104,11 +108,28 @@ const LearningPages = () => {
     setIsShowSider(!isShowSider);
   };
 
-  const handleChangeLesson = async (status: number, idTopic: string) => {
+  const handleChangeTopic = async (id: string) => {
     try {
-      const result = await apiLoadLessonByIdTopic({ status, idTopic });
-      // console.log(result.data.data);
-      setDataLesson(result.data.data);
+      const res = await apiLoadTopicById({ id });
+      setDataTopicActive(new Topic(res.data));
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
+  const handleUpdateLearned = async (value: Topic) => {
+    try {
+      const result = await dispatch(
+        requestUpdateTopicById({
+          ...value,
+          status: TTCSconfig.STATUS_LEARNED,
+        })
+      );
+      unwrapResult(result);
+      // dispatch(requestLoadTopicByCourse({ idCourse, type, parentId }));
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -154,7 +175,12 @@ const LearningPages = () => {
               <div className={cx("learning__header--progress-msg")}>
                 <strong>
                   <span className={cx("learning__header--progress-num")}>
-                    2
+                    {topics.map((topic) => {
+                      var a = 0;
+                      return (a += topic.topicChildData.filter(
+                        (topicChild) => topicChild.status === 2
+                      ).length);
+                    })}
                   </span>
                   /
                   <span className={cx("learning__header--progress-num")}>
@@ -249,24 +275,19 @@ const LearningPages = () => {
                                   key={indexChild}
                                 >
                                   <div
-                                    // className={cx(
-                                    //   "learning__track--steps-item"
-                                    //   // "active"
-                                    // )}
                                     className={
-                                      dataLesson?.idTopic === topicChild.id
+                                      dataTopicActive?.id === topicChild.id
                                         ? cx(
                                             "learning__track--steps-item",
                                             "active"
                                           )
                                         : cx("learning__track--steps-item")
                                     }
-                                    onClick={() =>
-                                      handleChangeLesson(
-                                        topicChild.status,
-                                        topicChild.id || ""
-                                      )
-                                    }
+                                    onClick={() => {
+                                      setIndexTopic(topic.id);
+                                      handleUpdateLearned(topicChild);
+                                      handleChangeTopic(topicChild.id || "");
+                                    }}
                                   >
                                     <div
                                       className={cx(
@@ -314,9 +335,12 @@ const LearningPages = () => {
                                         "learning__track--steps-status"
                                       )}
                                     >
-                                      <FaCheckCircle
-                                        className={cx("status-icon")}
-                                      />
+                                      {topicChild.status ===
+                                        TTCSconfig.STATUS_LEARNED && (
+                                        <FaCheckCircle
+                                          className={cx("status-icon")}
+                                        />
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -349,12 +373,12 @@ const LearningPages = () => {
                   : cx("content__video", "hide-sider")
               }
             >
-              {dataLesson?.video && (
+              {dataTopicActive?.video && (
                 <div className={cx("content__video--center")}>
                   <div className={cx("content__video--player")}>
                     <iframe
                       className={cx("content__video--embed")}
-                      src={dataLesson?.video}
+                      src={dataTopicActive?.video}
                       title="YouTube video player"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -368,14 +392,15 @@ const LearningPages = () => {
               <div className={cx("content__desc--title")}>
                 <h1 className={cx("content__desc--heading")}>title</h1>
                 <p className={cx("content__desc--updated")}>
-                  {/* Cập nhật ngày {dayjs(dataLesson?.updateDate).format("MM/DD/YYYY")} */}
-                  Cập nhật ngày {dayjs(dataLesson?.updateDate).date()} tháng{" "}
-                  {dayjs(dataLesson?.updateDate).month() + 1} năm{" "}
-                  {dayjs(dataLesson?.updateDate).year()}
+                  Cập nhật ngày {dayjs(dataTopicActive?.updateDate).date()}{" "}
+                  tháng {dayjs(dataTopicActive?.updateDate).month() + 1} năm{" "}
+                  {dayjs(dataTopicActive?.updateDate).year()}
                 </p>
               </div>
 
-              <div className={cx("content__desc--text")}>{dataLesson?.des}</div>
+              <div className={cx("content__desc--text")}>
+                {dataTopicActive?.des}
+              </div>
             </div>
 
             <div className={cx("content__powered")}>
@@ -409,7 +434,10 @@ const LearningPages = () => {
               }
             >
               <h3 className={cx("learning__footer--title")}>
-                I. Mệnh đề toán học và tập hợp
+                {/* I. Mệnh đề toán học và tập hợp */}
+                {topics.map(
+                  (topic) => topic.id === indexTopic && <>{topic.name}</>
+                )}
               </h3>
               <button
                 className={cx("learning__footer--btn-toggle")}
