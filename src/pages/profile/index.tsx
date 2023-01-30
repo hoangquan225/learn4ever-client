@@ -121,7 +121,7 @@ const ProfilePages = () => {
               message: "Không thể tìm thấy token!",
               duration: 1.5,
             });
-            window.location.href = "/login";
+            window.location.href = "/dang-nhap";
             break;
         }
       } catch (error) {

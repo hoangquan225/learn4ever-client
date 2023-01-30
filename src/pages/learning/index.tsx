@@ -48,7 +48,8 @@ const LearningPages = () => {
   const course = courseReducer.course;
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
-  const topicsTotal = topicStates.total;
+  const topicTotal = topicStates.total;
+  const topicTotalLearned = topicStates.totalLearned;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
   const navigate = useNavigate();
@@ -57,16 +58,13 @@ const LearningPages = () => {
 
   useEffect(() => {
     if (params.id) {
-      const arg = params.id.split("-");
-      if (Number(arg[1]) === 1) {
-        loadTopicByCourse(arg[0], Number(arg[1]));
-      }
+      loadByParam(params.id);
     }
     loadCourse(params.slugChild || "");
 
-    if (topics.length) {
-      handleChangeTopic(topics[0]?.topicChild[0]);
-    }
+    // if (topics.length) {
+    //   handleChangeTopic(topics[0]?.topicChild[0]);
+    // }
   }, [params.slugChild, params.id]);
 
   const loadCourse = async (slugChild: string) => {
@@ -83,6 +81,13 @@ const LearningPages = () => {
         message: "server error!!",
         duration: 1.5,
       });
+    }
+  };
+
+  const loadByParam = (param: string) => {
+    const arg = param.split("-");
+    if (Number(arg[1]) === 1) {
+      loadTopicByCourse(arg[0], Number(arg[1]));
     }
   };
 
@@ -122,14 +127,16 @@ const LearningPages = () => {
 
   const handleUpdateLearned = async (value: Topic) => {
     try {
-      const result = await dispatch(
-        requestUpdateTopicById({
-          ...value,
-          status: TTCSconfig.STATUS_LEARNED,
-        })
-      );
-      unwrapResult(result);
-      // dispatch(requestLoadTopicByCourse({ idCourse, type, parentId }));
+      if (value.status !== TTCSconfig.STATUS_LEARNED) {
+        const result = await dispatch(
+          requestUpdateTopicById({
+            ...value,
+            status: TTCSconfig.STATUS_LEARNED,
+          })
+        );
+        unwrapResult(result);
+        loadByParam(params.id || "");
+      }
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -169,22 +176,17 @@ const LearningPages = () => {
                 className={cx("learning__header--progress-pie")}
                 width={36}
                 strokeColor={"#ffa800"}
-                percent={50}
+                percent={(topicTotalLearned / topicTotal) * 100}
                 format={(successPercent) => `${successPercent}%`}
               />
               <div className={cx("learning__header--progress-msg")}>
                 <strong>
                   <span className={cx("learning__header--progress-num")}>
-                    {topics.map((topic) => {
-                      var a = 0;
-                      return (a += topic.topicChildData.filter(
-                        (topicChild) => topicChild.status === 2
-                      ).length);
-                    })}
+                    {topicTotalLearned}
                   </span>
                   /
                   <span className={cx("learning__header--progress-num")}>
-                    {topicsTotal}
+                    {topicTotal}
                   </span>
                 </strong>
                 <p>&nbsp;bài học</p>

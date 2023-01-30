@@ -72,7 +72,7 @@ const Header = () => {
 
   const items: MenuProps["items"] = [
     {
-      label: <Link to={"/profile"}>{userInfo?.name}</Link>,
+      label: <Link to={"/thong-tin-ca-nhan"}>{userInfo?.name}</Link>,
       key: "0",
       icon: <ProfileOutlined />,
       style: {
@@ -160,12 +160,12 @@ const Header = () => {
               <div className={cx("header__auth")}>
                 {!userInfo?._id ? (
                   <>
-                    <Link to={"/login"} className={cx("header__btn--link")}>
+                    <Link to={"/dang-nhap"} className={cx("header__btn--link")}>
                       <button className={cx("header__button")}>
                         Đăng nhập
                       </button>
                     </Link>
-                    <Link to={"/register"} className={cx("header__btn--link")}>
+                    <Link to={"/dang-ky"} className={cx("header__btn--link")}>
                       <button className={cx("header__button")}>Đăng ký</button>
                     </Link>
                   </>
@@ -297,11 +297,11 @@ const Header = () => {
             >
               {!userInfo?._id ? (
                 <>
-                  <Link to={"/login"} className={cx("header__btn--link")}>
+                  <Link to={"/dang-nhap"} className={cx("header__btn--link")}>
                     <button className={cx("header__button")}>Đăng nhập</button>
                   </Link>
                   <Link
-                    to={"/register"}
+                    to={"/dang-ky"}
                     className={cx("header__btn--link", "hide")}
                   >
                     <button className={cx("header__button")}>Đăng ký</button>

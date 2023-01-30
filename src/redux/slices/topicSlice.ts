@@ -17,6 +17,7 @@ interface TopicState {
   topics: Topic[];
   topicInfo: Topic | null;
   total: number;
+  totalLearned: number;
 }
 
 // Define the initial state using that type
@@ -26,6 +27,7 @@ const initialState: TopicState = {
   topics: [],
   topicInfo: null,
   total: 0,
+  totalLearned: 0,
 };
 
 export const requestLoadTopicByCourse = createAsyncThunk(
@@ -82,11 +84,12 @@ export const topicSlice = createSlice({
         action: PayloadAction<{
           data: Topic[];
           total: number;
-          status: number;
+          totalLearned: number;
         }>
       ) => {
         state.topics = action.payload.data;
         state.total = action.payload.total;
+        state.totalLearned = action.payload.totalLearned;
         state.loading = false;
       }
     );

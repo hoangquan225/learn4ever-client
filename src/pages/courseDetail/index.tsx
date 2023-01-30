@@ -150,32 +150,6 @@ const CourseDetail = () => {
                       </li>
                     </ul>
                   </div>
-
-                  <div className={cx("detail__group--btn")}>
-                    <Row>
-                      <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                        <NavLink
-                          to={`learning/${course?.id}-1`}
-                          className={cx("detail__btn--link")}
-                        >
-                          <button className={cx("detail__button", "btn1")}>
-                            Chương trình học
-                          </button>
-                        </NavLink>
-                      </Col>
-
-                      <Col xl={12} lg={12} md={12} sm={24} xs={24}>
-                        <NavLink
-                          to={`exam/${course?.id}-2`}
-                          className={cx("detail__btn--link")}
-                        >
-                          <button className={cx("detail__button", "btn2")}>
-                            Đề kiểm tra
-                          </button>
-                        </NavLink>
-                      </Col>
-                    </Row>
-                  </div>
                 </Col>
 
                 <Col xl={8} lg={8} md={24} sm={24} xs={24}>
@@ -188,6 +162,31 @@ const CourseDetail = () => {
                       />
                     </div>
                     <h5 className={cx("detail__price")}>Miễn phí</h5>
+                    <div className={cx("detail__group--btn")}>
+                      <Row>
+                        <Col xl={24} lg={24} md={12} sm={24} xs={24}>
+                          <NavLink
+                            to={`chuong-trinh-hoc/${course?.id}-1`}
+                            className={cx("detail__btn--link")}
+                          >
+                            <button className={cx("detail__button", "btn1")}>
+                              Chương trình học
+                            </button>
+                          </NavLink>
+                        </Col>
+
+                        <Col xl={24} lg={24} md={12} sm={24} xs={24}>
+                          <NavLink
+                            to={`de-kiem-tra/${course?.id}-2`}
+                            className={cx("detail__btn--link")}
+                          >
+                            <button className={cx("detail__button", "btn2")}>
+                              Đề kiểm tra
+                            </button>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                    </div>
                     <ul className={cx("detail__list")}>
                       <li className={cx("detail__item")}>
                         <FaLightbulb className={cx("detail__icon")} />

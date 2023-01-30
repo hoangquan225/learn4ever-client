@@ -158,7 +158,7 @@ const LoginPages = () => {
               </div>
               <div className={cx("login__toregister")}>
                 Bạn chưa có tài khoản?{" "}
-                <Link to="/register" className={cx("login__toregisterlink")}>
+                <Link to="/dang-ky" className={cx("login__toregisterlink")}>
                   Đăng ký ngay!
                 </Link>
               </div>

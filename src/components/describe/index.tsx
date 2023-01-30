@@ -40,7 +40,7 @@ const Describe = () => {
                   </Breadcrumb.Item>
                   <Breadcrumb.Item>
                     <NavLink
-                      to={"/introduce"}
+                      to={"/gioi-thieu"}
                       className={cx("describe__breadcumb--link", "active")}
                     >
                       Giới thiệu

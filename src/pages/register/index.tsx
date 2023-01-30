@@ -446,7 +446,10 @@ const RegisterPages = () => {
                   </div>
                   <div className={cx("register__tologin")}>
                     Bạn đã có tài khoản?{" "}
-                    <Link to="/login" className={cx("register__tologinlink")}>
+                    <Link
+                      to="/dang-nhap"
+                      className={cx("register__tologinlink")}
+                    >
                       Đăng nhập ngay!
                     </Link>
                   </div>

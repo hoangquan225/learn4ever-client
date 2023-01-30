@@ -15,7 +15,6 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import Countdown from "antd/es/statistic/Countdown";
 import classNames from "classnames/bind";
-import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import {
   FaMarker,

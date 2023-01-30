@@ -57,7 +57,7 @@
 
 .detail__wrapper {
   padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 8rem;
 
   & nav {
     font-family: var(--font-family);
@@ -154,8 +154,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  margin-top: 3rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
 }
 
 .detail__button {
@@ -172,7 +171,7 @@
   margin-bottom: 2rem;
 
   &:hover {
-    transform: translateY(-0.4rem);
+    opacity: 0.8;
   }
 
   &.btn1 {
@@ -252,7 +251,7 @@
 .detail__list {
   display: inline-block;
   margin: 0;
-  padding: 2.4rem 0 0 0;
+  padding: 1.2rem 0 0 0;
   text-align: left;
   list-style: none;
 }

@@ -18,19 +18,22 @@ export const publicRoutes = [
   { path: "/", component: HomePages },
   { path: "/:slug", component: CategoryDetail },
   { path: "/:slug/:slugChild", component: CourseDetail },
-  { path: "/introduce", component: IntroducePages },
-  { path: "/contact", component: ContactPages },
-  { path: "/policy", component: PolicyPages },
-  { path: "/privacy", component: PrivacyPages },
-  { path: "/login", component: LoginPages },
-  { path: "/register", component: RegisterPages },
+  { path: "/gioi-thieu", component: IntroducePages },
+  { path: "/lien-he", component: ContactPages },
+  { path: "/dieu-khoan-su-dung", component: PolicyPages },
+  { path: "/chinh-sach-bao-mat", component: PrivacyPages },
+  { path: "/dang-nhap", component: LoginPages },
+  { path: "/dang-ky", component: RegisterPages },
   { path: "*", component: NotFoundPages },
 ];
 
 // Private routes
 export const privateRoutes = [
-  { path: "/profile", component: ProfilePages },
-  { path: "/:slug/:slugChild/exam/:id/:idChild", component: PracticePages },
-  { path: "/:slug/:slugChild/learning/:id", component: LearningPages },
-  { path: "/:slug/:slugChild/exam/:id", component: ExamPages },
+  { path: "/thong-tin-ca-nhan", component: ProfilePages },
+  {
+    path: "/:slug/:slugChild/de-kiem-tra/:id/:idChild",
+    component: PracticePages,
+  },
+  { path: "/:slug/:slugChild/chuong-trinh-hoc/:id", component: LearningPages },
+  { path: "/:slug/:slugChild/de-kiem-tra/:id", component: ExamPages },
 ];

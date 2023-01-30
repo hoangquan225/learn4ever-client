@@ -72,7 +72,7 @@ const Footer = () => {
                     <div className={cx("footer__nav--title")}>Về chúng tôi</div>
                     <div className={cx("footer__nav--item")}>
                       <NavLink
-                        to={"/introduce"}
+                        to={"/gioi-thieu"}
                         className={cx("footer__nav--link")}
                       >
                         Giới thiệu
@@ -80,7 +80,7 @@ const Footer = () => {
                     </div>
                     <div className={cx("footer__nav--item")}>
                       <NavLink
-                        to={"/contact"}
+                        to={"/lien-he"}
                         className={cx("footer__nav--link")}
                       >
                         Liên hệ
@@ -91,7 +91,7 @@ const Footer = () => {
                     <div className={cx("footer__nav--title")}>Chính sách</div>
                     <div className={cx("footer__nav--item")}>
                       <NavLink
-                        to={"/policy"}
+                        to={"/dieu-khoan-su-dung"}
                         className={cx("footer__nav--link")}
                         target="_blank"
                       >
@@ -100,7 +100,7 @@ const Footer = () => {
                     </div>
                     <div className={cx("footer__nav--item")}>
                       <NavLink
-                        to={"/privacy"}
+                        to={"/chinh-sach-bao-mat"}
                         className={cx("footer__nav--link")}
                         target="_blank"
                       >

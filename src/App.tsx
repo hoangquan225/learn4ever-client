@@ -60,7 +60,9 @@ function App() {
               <Route
                 key={index}
                 path={route.path}
-                element={userInfo?._id ? <Page /> : <Navigate to={"/login"} />}
+                element={
+                  userInfo?._id ? <Page /> : <Navigate to={"/dang-nhap"} />
+                }
               />
             );
           })}
