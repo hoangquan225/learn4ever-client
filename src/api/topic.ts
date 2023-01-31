@@ -28,8 +28,9 @@ export const apiLoadLessonByIdTopic = async (params: {
   return ApiConfig(EndPoint.GET_LESSONS_BY_IDTOPIC, { params });
 };
 
-export const apiUpdateTopic = async (payload: Topic) => {
-  return ApiConfig(EndPoint.UPDATE_TOPIC, {
-    payload,
-  });
+export const apiGetTotalLearnedTopic = async (payload: {
+  idCourse: string;
+  idUser: string;
+}) => {
+  return ApiConfig(EndPoint.GET_TOTAL_LEARNED_TOPIC, { payload });
 };

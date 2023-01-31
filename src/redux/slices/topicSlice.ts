@@ -5,9 +5,9 @@ import { Course } from "../../submodule/models/course";
 import { apiLoadCourseBySlug } from "../../api/course";
 import { Topic } from "../../submodule/models/topic";
 import {
+  apiGetTotalLearnedTopic,
   apiLoadTopicByCourse,
   apiLoadTopicById,
-  apiUpdateTopic,
 } from "../../api/topic";
 
 // Define a type for the slice state
@@ -46,10 +46,10 @@ export const requestLoadTopicById = createAsyncThunk(
   }
 );
 
-export const requestUpdateTopicById = createAsyncThunk(
-  "topic/requestUpdateTopicById",
-  async (props: Topic) => {
-    const res = await apiUpdateTopic(props);
+export const requestLoadTotalLearnedTopic = createAsyncThunk(
+  "topic/requestLoadLearnedTopic",
+  async (props: { idCourse: string; idUser: string }) => {
+    const res = await apiGetTotalLearnedTopic(props);
     return res.data;
   }
 );
@@ -60,11 +60,7 @@ export const topicSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const actionList = [
-      requestLoadTopicByCourse,
-      requestLoadTopicById,
-      requestUpdateTopicById,
-    ];
+    const actionList = [requestLoadTopicByCourse, requestLoadTopicById];
     actionList.forEach((action) => {
       builder.addCase(action.pending, (state) => {
         state.loading = true;
@@ -84,12 +80,10 @@ export const topicSlice = createSlice({
         action: PayloadAction<{
           data: Topic[];
           total: number;
-          totalLearned: number;
         }>
       ) => {
         state.topics = action.payload.data;
         state.total = action.payload.total;
-        state.totalLearned = action.payload.totalLearned;
         state.loading = false;
       }
     );
@@ -103,19 +97,16 @@ export const topicSlice = createSlice({
       }
     );
 
+    // load total learned topic
     builder.addCase(
-      requestUpdateTopicById.fulfilled,
+      requestLoadTotalLearnedTopic.fulfilled,
       (
         state,
         action: PayloadAction<{
-          data: Topic;
-          status: number;
+          totalLearned: number;
         }>
       ) => {
-        console.log(action.payload);
-
-        state.loading = false;
-        state.topicInfo = action.payload.data;
+        state.totalLearned = action.payload.totalLearned;
       }
     );
   },

@@ -4,7 +4,7 @@ import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
 import dayjs from "dayjs";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   FaArrowRight,
   FaBars,
@@ -32,6 +32,7 @@ import {
 } from "../../redux/slices/courseSlice";
 import {
   requestLoadTopicByCourse,
+  requestLoadTotalLearnedTopic,
   topicState,
 } from "../../redux/slices/topicSlice";
 import {
@@ -52,6 +53,7 @@ const LearningPages = () => {
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
   const topicTotal = topicStates.total;
+  const topicTotalLearned = topicStates.totalLearned;
   const loading = topicStates.loading;
   const authStates = useAppSelector(authState);
   const userInfo = authStates.userInfo;
@@ -72,6 +74,12 @@ const LearningPages = () => {
     //   handleChangeTopic(topics[0]?.topicChild[0]);
     // }
   }, [params.slugChild, params.id]);
+
+  useEffect(() => {
+    if (course?.id && userInfo?._id) {
+      loadTotalLearnedTopic(course?.id, userInfo?._id);
+    }
+  }, [course?.id, userInfo?._id, userInfo]);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -115,6 +123,20 @@ const LearningPages = () => {
     }
   };
 
+  const loadTotalLearnedTopic = async (idCourse: string, idUser: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadTotalLearnedTopic({ idCourse, idUser })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
   const handleShowSider = () => {
     setIsShowSider(!isShowSider);
   };
@@ -137,15 +159,17 @@ const LearningPages = () => {
     timeStudy: number
   ) => {
     try {
-      const result = await dispatch(
-        requestUpdateStudiedForUser({
-          idTopic,
-          idUser,
-          status: TTCSconfig.STATUS_LEARNED,
-          timeStudy,
-        })
-      );
-      unwrapResult(result);
+      if (!userInfo?.progess?.find((o) => o.idTopic === idTopic)) {
+        const result = await dispatch(
+          requestUpdateStudiedForUser({
+            idTopic,
+            idUser,
+            status: TTCSconfig.STATUS_LEARNED,
+            timeStudy,
+          })
+        );
+        unwrapResult(result);
+      }
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -153,6 +177,13 @@ const LearningPages = () => {
       });
     }
   };
+
+  // const videoplay = useRef(null);
+
+  // const handleLoadMetaData = () => {
+  //   const videoCurrentTime = videoplay.current;
+  //   console.log(videoCurrentTime);
+  // };
 
   return (
     <>
@@ -186,15 +217,13 @@ const LearningPages = () => {
                   className={cx("learning__header--progress-pie")}
                   width={36}
                   strokeColor={"#ffa800"}
-                  percent={
-                    (Number(userInfo?.progess?.length) / topicTotal) * 100
-                  }
+                  percent={Math.round((topicTotalLearned / topicTotal) * 100)}
                   format={(successPercent) => `${successPercent}%`}
                 />
                 <div className={cx("learning__header--progress-msg")}>
                   <strong>
                     <span className={cx("learning__header--progress-num")}>
-                      {userInfo?.progess?.length}
+                      {topicTotalLearned}
                     </span>
                     /
                     <span className={cx("learning__header--progress-num")}>
@@ -251,10 +280,17 @@ const LearningPages = () => {
                               {topic?.name}
                             </div>
                             <span className={cx("learning__track--item-desc")}>
-                              0/{topic?.topicChildData.length} | 24:30
+                              {
+                                topic.topicChildData.filter((o1) =>
+                                  userInfo?.progess?.some(
+                                    (o2) => o2.idTopic === o1.id
+                                  )
+                                ).length
+                              }
+                              /{topic?.topicChildData.length} | 24:30
                             </span>
                             <span className={cx("learning__track--item-icon")}>
-                              <IoChevronDownOutline
+                              <IoChevronUpOutline
                                 className={cx("track-icon")}
                               />
                             </span>
@@ -270,10 +306,17 @@ const LearningPages = () => {
                               {topic?.name}
                             </div>
                             <span className={cx("learning__track--item-desc")}>
-                              0/{topic?.topicChildData.length} | 24:30
+                              {
+                                topic.topicChildData.filter((o1) =>
+                                  userInfo?.progess?.some(
+                                    (o2) => o2.idTopic === o1.id
+                                  )
+                                ).length
+                              }
+                              /{topic?.topicChildData.length} | 24:30
                             </span>
                             <span className={cx("learning__track--item-icon")}>
-                              <IoChevronUpOutline
+                              <IoChevronDownOutline
                                 className={cx("track-icon")}
                               />
                             </span>
@@ -396,13 +439,17 @@ const LearningPages = () => {
               {dataTopicActive?.video && (
                 <div className={cx("content__video--center")}>
                   <div className={cx("content__video--player")}>
-                    <iframe
+                    <video
+                      controls
+                      autoPlay={false}
                       className={cx("content__video--embed")}
                       src={dataTopicActive?.video}
-                      title="YouTube video player"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    ></iframe>
+                      // title="video player"
+                      // ref={videoplay}
+                      // onLoadedMetadata={handleLoadMetaData}
+                      // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      // allowFullScreen
+                    ></video>
                   </div>
                 </div>
               )}
@@ -456,9 +503,9 @@ const LearningPages = () => {
               }
             >
               <h3 className={cx("learning__footer--title")}>
-                {/* I. Mệnh đề toán học và tập hợp */}
                 {topics.map(
-                  (topic) => topic.id === indexTopic && <>{topic.name}</>
+                  (topic, i) =>
+                    topic.id === indexTopic && <div key={i}>{topic.name}</div>
                 )}
               </h3>
               <button
