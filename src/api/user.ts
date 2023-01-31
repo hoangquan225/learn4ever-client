@@ -24,3 +24,12 @@ export const apiChangePassword = async (payload: {
 }) => {
   return ApiConfig(EndPoint.CHANGE_PASSWORD, { payload });
 };
+
+export const apiUpdateStudiedForUser = async (payload: {
+  idTopic: string;
+  idUser: string;
+  status: number;
+  timeStudy: number;
+}) => {
+  return ApiConfig(EndPoint.UPDATE_STUDYED_FOR_USER, { payload });
+};

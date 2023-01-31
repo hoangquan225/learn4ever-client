@@ -32,6 +32,7 @@ const ExamPages = () => {
   const params = useParams();
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
+  const loading = courseReducer.loading;
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([1]);
@@ -94,31 +95,34 @@ const ExamPages = () => {
                       Trang chủ
                     </NavLink>
                   </Breadcrumb.Item>
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={`/${course?.category?.slug}`}
-                      className={cx("exam__breadcumb--link")}
-                    >
-                      {course?.category?.name}
-                    </NavLink>
-                  </Breadcrumb.Item>
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={`/${course?.category?.slug}/${course?.slug}`}
-                      className={cx("exam__breadcumb--link", "active")}
-                    >
-                      {course?.courseName}
-                    </NavLink>
-                  </Breadcrumb.Item>
-
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={"#"}
-                      className={cx("exam__breadcumb--link", "active")}
-                    >
-                      Đề kiểm tra
-                    </NavLink>
-                  </Breadcrumb.Item>
+                  {!loading && (
+                    <>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}`}
+                          className={cx("exam__breadcumb--link")}
+                        >
+                          {course?.category?.name}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}/${course?.slug}`}
+                          className={cx("exam__breadcumb--link", "active")}
+                        >
+                          {course?.courseName}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={"#"}
+                          className={cx("exam__breadcumb--link", "active")}
+                        >
+                          Đề kiểm tra
+                        </NavLink>
+                      </Breadcrumb.Item>
+                    </>
+                  )}
                 </Breadcrumb>
               </div>
 

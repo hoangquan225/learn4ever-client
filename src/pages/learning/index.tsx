@@ -32,9 +32,12 @@ import {
 } from "../../redux/slices/courseSlice";
 import {
   requestLoadTopicByCourse,
-  requestUpdateTopicById,
   topicState,
 } from "../../redux/slices/topicSlice";
+import {
+  authState,
+  requestUpdateStudiedForUser,
+} from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { Topic } from "../../submodule/models/topic";
 import styles from "./learning.module.scss";
@@ -49,7 +52,10 @@ const LearningPages = () => {
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
   const topicTotal = topicStates.total;
-  const topicTotalLearned = topicStates.totalLearned;
+  const loading = topicStates.loading;
+  const authStates = useAppSelector(authState);
+  const userInfo = authStates.userInfo;
+
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
   const navigate = useNavigate();
@@ -125,18 +131,21 @@ const LearningPages = () => {
     }
   };
 
-  const handleUpdateLearned = async (value: Topic) => {
+  const handleUpdateLearned = async (
+    idTopic: string,
+    idUser: string,
+    timeStudy: number
+  ) => {
     try {
-      if (value.status !== TTCSconfig.STATUS_LEARNED) {
-        const result = await dispatch(
-          requestUpdateTopicById({
-            ...value,
-            status: TTCSconfig.STATUS_LEARNED,
-          })
-        );
-        unwrapResult(result);
-        loadByParam(params.id || "");
-      }
+      const result = await dispatch(
+        requestUpdateStudiedForUser({
+          idTopic,
+          idUser,
+          status: TTCSconfig.STATUS_LEARNED,
+          timeStudy,
+        })
+      );
+      unwrapResult(result);
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -170,28 +179,32 @@ const LearningPages = () => {
               {course?.courseName}
             </div>
 
-            <div className={cx("learning__header--progress")}>
-              <Progress
-                type="circle"
-                className={cx("learning__header--progress-pie")}
-                width={36}
-                strokeColor={"#ffa800"}
-                percent={(topicTotalLearned / topicTotal) * 100}
-                format={(successPercent) => `${successPercent}%`}
-              />
-              <div className={cx("learning__header--progress-msg")}>
-                <strong>
-                  <span className={cx("learning__header--progress-num")}>
-                    {topicTotalLearned}
-                  </span>
-                  /
-                  <span className={cx("learning__header--progress-num")}>
-                    {topicTotal}
-                  </span>
-                </strong>
-                <p>&nbsp;bài học</p>
+            {!loading && (
+              <div className={cx("learning__header--progress")}>
+                <Progress
+                  type="circle"
+                  className={cx("learning__header--progress-pie")}
+                  width={36}
+                  strokeColor={"#ffa800"}
+                  percent={
+                    (Number(userInfo?.progess?.length) / topicTotal) * 100
+                  }
+                  format={(successPercent) => `${successPercent}%`}
+                />
+                <div className={cx("learning__header--progress-msg")}>
+                  <strong>
+                    <span className={cx("learning__header--progress-num")}>
+                      {userInfo?.progess?.length}
+                    </span>
+                    /
+                    <span className={cx("learning__header--progress-num")}>
+                      {topicTotal}
+                    </span>
+                  </strong>
+                  <p>&nbsp;bài học</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </header>
 
@@ -287,7 +300,11 @@ const LearningPages = () => {
                                     }
                                     onClick={() => {
                                       setIndexTopic(topic.id);
-                                      handleUpdateLearned(topicChild);
+                                      handleUpdateLearned(
+                                        topicChild.id || "",
+                                        userInfo?._id || "",
+                                        0
+                                      );
                                       handleChangeTopic(topicChild.id || "");
                                     }}
                                   >
@@ -337,8 +354,9 @@ const LearningPages = () => {
                                         "learning__track--steps-status"
                                       )}
                                     >
-                                      {topicChild.status ===
-                                        TTCSconfig.STATUS_LEARNED && (
+                                      {userInfo?.progess?.find(
+                                        (c) => c.idTopic === topicChild.id
+                                      ) && (
                                         <FaCheckCircle
                                           className={cx("status-icon")}
                                         />
@@ -392,7 +410,9 @@ const LearningPages = () => {
 
             <div className={cx("content__desc")}>
               <div className={cx("content__desc--title")}>
-                <h1 className={cx("content__desc--heading")}>title</h1>
+                <h1 className={cx("content__desc--heading")}>
+                  {dataTopicActive?.name}
+                </h1>
                 <p className={cx("content__desc--updated")}>
                   Cập nhật ngày {dayjs(dataTopicActive?.updateDate).date()}{" "}
                   tháng {dayjs(dataTopicActive?.updateDate).month() + 1} năm{" "}

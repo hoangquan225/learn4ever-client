@@ -28,6 +28,7 @@ const CourseDetail = () => {
   const dispatch = useAppDispatch();
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
+  const loading = courseReducer.loading;
 
   useEffect(() => {
     loadCourse(params.slugChild || "");
@@ -65,22 +66,26 @@ const CourseDetail = () => {
                       Trang chủ
                     </NavLink>
                   </Breadcrumb.Item>
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={`/${course?.category?.slug}`}
-                      className={cx("detail__breadcumb--link")}
-                    >
-                      {course?.category?.name}
-                    </NavLink>
-                  </Breadcrumb.Item>
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={`/${course?.category?.slug}/${course?.slug}`}
-                      className={cx("detail__breadcumb--link", "active")}
-                    >
-                      {course?.courseName}
-                    </NavLink>
-                  </Breadcrumb.Item>
+                  {!loading && (
+                    <>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}`}
+                          className={cx("detail__breadcumb--link")}
+                        >
+                          {course?.category?.name}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}/${course?.slug}`}
+                          className={cx("detail__breadcumb--link", "active")}
+                        >
+                          {course?.courseName}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                    </>
+                  )}
                 </Breadcrumb>
               </div>
 

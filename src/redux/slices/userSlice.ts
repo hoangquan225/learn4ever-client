@@ -5,6 +5,7 @@ import { apiLogin, apiRegister } from "../../api/auth";
 import {
   apiChangePassword,
   apiGetUserFromToken,
+  apiUpdateStudiedForUser,
   apiUpdateUser,
 } from "../../api/user";
 import TTCSconfig from "../../submodule/common/config";
@@ -58,6 +59,19 @@ export const requestChangePassword = createAsyncThunk(
   "user/changePassword",
   async (props: { token: any; password: string; newPassword: string }) => {
     const res = await apiChangePassword(props);
+    return res.data;
+  }
+);
+
+export const requestUpdateStudiedForUser = createAsyncThunk(
+  "user/updateStudiedForUser",
+  async (props: {
+    idTopic: string;
+    idUser: string;
+    status: number;
+    timeStudy: number;
+  }) => {
+    const res = await apiUpdateStudiedForUser(props);
     return res.data;
   }
 );
@@ -150,15 +164,22 @@ export const authSlice = createSlice({
       (state, action: PayloadAction<any>) => {
         state.loading = false;
         if (action.payload.loginCode === TTCSconfig.STATUS_SUCCESS)
-          state.userInfo = new UserInfo(action.payload.userInfo);
+          state.userInfo = new UserInfo(action.payload.UserInfo);
       }
     );
-    // builder.addCase(
-    //   requestChangePassword.rejected,
-    //   (state, action: PayloadAction<any>) => {
-    //     state.loading = false;
-    //   }
-    // );
+
+    /**
+     * updateStudiedUser
+     */
+    builder.addCase(requestUpdateStudiedForUser.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      requestUpdateStudiedForUser.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.userInfo = new UserInfo(action.payload.data);
+      }
+    );
   },
 });
 

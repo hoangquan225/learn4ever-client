@@ -36,9 +36,7 @@ import {
 } from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
-import moment from "moment";
 import dayjs from "dayjs";
-import { apiChangePassword } from "../../api/user";
 
 const cx = classNames.bind(styles);
 
@@ -77,21 +75,17 @@ const ProfilePages = () => {
       const newPassEncode = encrypt(newPassword);
 
       try {
-        // const actionResult = await dispatch(
-        //   requestChangePassword({
-        //     token: cookie,
-        //     password: passEncode,
-        //     newPassword: newPassEncode,
-        //   })
-        // );
-        // const res = unwrapResult(actionResult);
-        const res: any = await apiChangePassword({
-          token: cookie,
-          password: passEncode,
-          newPassword: newPassEncode,
-        });
+        const actionResult = await dispatch(
+          requestChangePassword({
+            token: cookie,
+            password: passEncode,
+            newPassword: newPassEncode,
+          })
+        );
+        const res = unwrapResult(actionResult);
+        console.log(res);
 
-        switch (res.data.loginCode) {
+        switch (res.loginCode) {
           case TTCSconfig.LOGIN_SUCCESS:
             handleCancelModal();
             return notification.success({

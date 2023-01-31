@@ -1,8 +1,3 @@
-import {
-  BarChartOutlined,
-  LogoutOutlined,
-  ProfileOutlined,
-} from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./header.module.scss";
@@ -15,7 +10,13 @@ import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
 import { requestGetUserFromToken } from "../../redux/slices/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { FaBars } from "react-icons/fa";
+import {
+  FaBars,
+  FaChartBar,
+  FaRegIdCard,
+  FaSignOutAlt,
+  FaUser,
+} from "react-icons/fa";
 import { GrClose } from "react-icons/gr";
 import {
   categoryState,
@@ -74,7 +75,7 @@ const Header = () => {
     {
       label: <Link to={"/thong-tin-ca-nhan"}>{userInfo?.name}</Link>,
       key: "0",
-      icon: <ProfileOutlined />,
+      icon: <FaRegIdCard />,
       style: {
         fontSize: "1.4rem",
         fontFamily: "var(--font-family)",
@@ -99,7 +100,7 @@ const Header = () => {
     {
       label: <Link to={"/achievement"}>Kết Quả Học Tập</Link>,
       key: "1",
-      icon: <BarChartOutlined />,
+      icon: <FaChartBar />,
       style: {
         fontSize: "1.4rem",
         fontFamily: "var(--font-family)",
@@ -109,7 +110,7 @@ const Header = () => {
     {
       label: "Đăng xuất",
       key: "3",
-      icon: <LogoutOutlined />,
+      icon: <FaSignOutAlt />,
       onClick: handleLogout,
       style: {
         fontSize: "1.4rem",
@@ -176,7 +177,7 @@ const Header = () => {
                     placement={"bottomRight"}
                   >
                     <button className={cx("header__button")}>
-                      <AiOutlineUser />
+                      <FaUser />
                     </button>
                   </Dropdown>
                 )}

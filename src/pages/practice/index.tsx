@@ -28,18 +28,28 @@ import { apiLoadQuestionsByTopic, apiLoadTopicById } from "../../api/topic";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
+  courseState,
+  requestLoadCourseBySlug,
+} from "../../redux/slices/courseSlice";
+import {
   requestLoadTopicById,
   topicState,
 } from "../../redux/slices/topicSlice";
+import TTCSconfig from "../../submodule/common/config";
 import { Question } from "../../submodule/models/question";
+import { answers } from "../../utils/contants";
 import styles from "./practice.module.scss";
 
 const cx = classNames.bind(styles);
+
 const PracticePages = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const topicStates = useAppSelector(topicState);
   const topic = topicStates.topicInfo;
+  const courseReducer = useAppSelector(courseState);
+  const course = courseReducer.course;
+  const loading = courseReducer.loading;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
   const [isOpenModelPause, setIsOpenModelPause] = useState(false);
@@ -55,10 +65,29 @@ const PracticePages = () => {
       window.removeEventListener("scroll", handleClockStick);
     };
   }, []);
+
   useEffect(() => {
     loadQuestionByTopic(params.idChild || "", 1);
+    loadCourse(params.slugChild || "");
     loadTopicById(params.idChild || "");
-  }, [params.idChild]);
+  }, [params.idChild, params.slugChild]);
+
+  const loadCourse = async (slugChild: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadCourseBySlug({
+          slug: slugChild,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
 
   const handleClockStick = () => {
     if (window !== undefined) {
@@ -146,14 +175,42 @@ const PracticePages = () => {
                       Trang chủ
                     </NavLink>
                   </Breadcrumb.Item>
-                  <Breadcrumb.Item>
-                    <NavLink
-                      to={"/introduce"}
-                      className={cx("practice__breadcumb--link", "active")}
-                    >
-                      practice
-                    </NavLink>
-                  </Breadcrumb.Item>
+                  {!loading && (
+                    <>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}`}
+                          className={cx("detail__breadcumb--link")}
+                        >
+                          {course?.category?.name}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={`/${course?.category?.slug}/${course?.slug}`}
+                          className={cx("detail__breadcumb--link")}
+                        >
+                          {course?.courseName}
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={"#"}
+                          className={cx("exam__breadcumb--link")}
+                        >
+                          Đề kiểm tra
+                        </NavLink>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <NavLink
+                          to={"/gioi-thieu"}
+                          className={cx("practice__breadcumb--link", "active")}
+                        >
+                          practice
+                        </NavLink>
+                      </Breadcrumb.Item>
+                    </>
+                  )}
                 </Breadcrumb>
               </div>
 
@@ -223,7 +280,7 @@ const PracticePages = () => {
                                                 "quiz-choices__item--answer"
                                               )}
                                             >
-                                              {item.index}. {item.text}
+                                              {answers[item.index]}. {item.text}
                                             </div>
                                           </Radio>
                                         ))}
@@ -276,8 +333,10 @@ const PracticePages = () => {
                                 key={i}
                               >
                                 <a href={`#${o.id}`}>
-                                  <span className={cx("qustion-item__bground")}>
-                                    e {i + 1}
+                                  <span
+                                    className={cx("question-item__bground")}
+                                  >
+                                    {i + 1}
                                   </span>
                                 </a>
                               </Col>
@@ -306,10 +365,12 @@ const PracticePages = () => {
                 </Col>
               </Row>
 
-              <div className={cx("practice__palette--question-list")}></div>
               <div className={cx("practice__subnav")}>
                 <div className={cx("practice__subnav--main")}>
-                  <div className={cx("practice__subnav--item")}>
+                  <div
+                    className={cx("practice__subnav--item")}
+                    onClick={handleOpenModelPause}
+                  >
                     <FaRegPauseCircle
                       className={cx("practice__subnav--item-icon")}
                     />
@@ -377,7 +438,10 @@ const PracticePages = () => {
                       </div>
                     </div>
                   </Drawer>
-                  <div className={cx("practice__subnav--item")}>
+                  <div
+                    className={cx("practice__subnav--item")}
+                    onClick={handleOpenModelSubmit}
+                  >
                     <FaRegCheckCircle
                       className={cx("practice__subnav--item-icon")}
                     />
