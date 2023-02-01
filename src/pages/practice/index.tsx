@@ -1,3 +1,4 @@
+import { RestFilled } from "@ant-design/icons";
 import { unwrapResult } from "@reduxjs/toolkit";
 import {
   Anchor,
@@ -55,6 +56,8 @@ const PracticePages = () => {
   const [isOpenModelPause, setIsOpenModelPause] = useState(false);
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
+  const [score, setScore] = useState(0);
+  const [selectedQuestions, setSelectedQuestions] = useState<String[]>([]);
 
   const [datasQuestion, setDatasQuestion] = useState<Question[]>([]);
 
@@ -158,6 +161,18 @@ const PracticePages = () => {
     console.log("finished!");
   };
 
+  const handleMark = (isCheck: boolean, idQs: string) => {
+    if (isCheck) {
+      setSelectedQuestions((o) => [...o, idQs]);
+      setScore(score + 1);
+    } else if (selectedQuestions.find((o) => o === idQs)) {
+      setScore(score - 1);
+      setSelectedQuestions(selectedQuestions.filter((o) => o !== idQs));
+    }
+  };
+
+  console.log(score);
+
   return (
     <>
       <Header />
@@ -238,7 +253,7 @@ const PracticePages = () => {
                   <div>
                     {datasQuestion.length > 0 &&
                       datasQuestion?.map((qs, i) => {
-                        const listAnswer = [...qs.result, ...qs.answer].sort(
+                        const listAnswer = [...qs.answer].sort(
                           (a, b) => a.index - b.index
                         );
 
@@ -271,10 +286,18 @@ const PracticePages = () => {
 
                                 <div className={cx("game__view--quiz-choices")}>
                                   <div className={cx("quiz-choices__item")}>
-                                    <Radio.Group name="radiogroup">
+                                    <Radio.Group
+                                      name="radiogroup"
+                                      onChange={(e) => {
+                                        handleMark(
+                                          e.target.value.isResult,
+                                          qs?.id || ""
+                                        );
+                                      }}
+                                    >
                                       <Space direction="vertical">
                                         {listAnswer?.map((item, i) => (
-                                          <Radio value={item.index} key={i}>
+                                          <Radio value={item} key={i}>
                                             <div
                                               className={cx(
                                                 "quiz-choices__item--answer"
