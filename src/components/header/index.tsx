@@ -197,27 +197,23 @@ const Header = () => {
               {/* DESKTOP */}
 
               <div className={cx("navbar__list--desktop")}>
-                {categoryList.length
-                  ? categoryList
-                      .sort((a, b) => a.index - b.index)
-                      .map((data, index) => (
+                {categorys.length > 0 &&
+                  [...categorys]
+                    .sort((a, b) => a.index - b.index)
+                    .map((data, index) => (
+                      <div key={index} className={cx("navbar__item--desktop")}>
                         <div
-                          key={index}
-                          className={cx("navbar__item--desktop")}
+                          onClick={async () => {
+                            navigate(`/${data.slug}`);
+                          }}
+                          className={cx("navbar__link--desktop")}
                         >
-                          <div
-                            onClick={async () => {
-                              navigate(`/${data.slug}`);
-                            }}
-                            className={cx("navbar__link--desktop")}
-                          >
-                            <div className={cx("navbar__title")}>
-                              <span>{data.name}</span>
-                            </div>
+                          <div className={cx("navbar__title")}>
+                            <span>{data.name}</span>
                           </div>
                         </div>
-                      ))
-                  : ""}
+                      </div>
+                    ))}
               </div>
 
               {/* MOBILE */}
@@ -250,28 +246,24 @@ const Header = () => {
                     </button>
                   </div>
 
-                  {categoryList.length
-                    ? categoryList
-                        .sort((a, b) => a.index - b.index)
-                        .map((data, index) => (
+                  {categorys.length > 0 &&
+                    [...categorys]
+                      .sort((a, b) => a.index - b.index)
+                      .map((data, index) => (
+                        <div key={index} className={cx("navbar__item--mobile")}>
                           <div
-                            key={index}
-                            className={cx("navbar__item--mobile")}
+                            onClick={() => {
+                              navigate(`/${data.slug}`);
+                              handleNavbar();
+                            }}
+                            className={cx("navbar__link--mobile")}
                           >
-                            <div
-                              onClick={() => {
-                                navigate(`/${data.slug}`);
-                                handleNavbar();
-                              }}
-                              className={cx("navbar__link--mobile")}
-                            >
-                              <div className={cx("navbar__title")}>
-                                <span>{data.name}</span>
-                              </div>
+                            <div className={cx("navbar__title")}>
+                              <span>{data.name}</span>
                             </div>
                           </div>
-                        ))
-                    : ""}
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>
