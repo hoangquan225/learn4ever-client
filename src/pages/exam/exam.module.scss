@@ -180,9 +180,6 @@
   & > div {
     display: flex;
     align-items: center;
-    & > :first-child {
-      font-size: 1.6rem;
-    }
     & > span {
       padding: 0 1rem;
       margin-top: 0.4rem;
@@ -201,6 +198,20 @@
   @include responsive(xs) {
     justify-content: space-between;
     margin-bottom: 0.8rem;
+  }
+}
+
+.exam__panel--score {
+  margin-left: 2.4rem;
+  padding: 0.6rem 0;
+  color: #76b257;
+  border: 0.15rem solid #76b257;
+  border-radius: 1rem;
+  & > span {
+    font-size: 1.2rem !important;
+    color: #76b257 !important;
+    font-weight: 700 !important;
+    margin-top: unset !important;
   }
 }
 
@@ -232,7 +243,6 @@
   display: flex;
   align-items: center;
   margin-left: auto;
-  margin-top: 0.5rem;
   cursor: pointer;
   transition: 0.4s ease-in-out;
 }

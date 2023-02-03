@@ -200,7 +200,7 @@ const Header = () => {
                 {categorys.length > 0 &&
                   [...categorys]
                     .sort((a, b) => a.index - b.index)
-                    .map((data, index) => (
+                    ?.map((data, index) => (
                       <div key={index} className={cx("navbar__item--desktop")}>
                         <div
                           onClick={async () => {
@@ -249,7 +249,7 @@ const Header = () => {
                   {categorys.length > 0 &&
                     [...categorys]
                       .sort((a, b) => a.index - b.index)
-                      .map((data, index) => (
+                      ?.map((data, index) => (
                         <div key={index} className={cx("navbar__item--mobile")}>
                           <div
                             onClick={() => {

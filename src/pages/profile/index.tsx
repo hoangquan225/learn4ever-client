@@ -325,7 +325,7 @@ const ProfilePages = () => {
                               listHeight={128}
                               value={userInfo?.classNumber}
                             >
-                              {classes.map((data) => (
+                              {classes?.map((data) => (
                                 <Select.Option
                                   value={data.value}
                                   key={data.value}
@@ -375,7 +375,7 @@ const ProfilePages = () => {
                               listHeight={128}
                               value={userInfo?.gender}
                             >
-                              {genders.map((data) => (
+                              {genders?.map((data) => (
                                 <Select.Option
                                   value={data.value}
                                   key={data.value}

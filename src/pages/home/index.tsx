@@ -149,7 +149,7 @@ const HomePages = () => {
                 {categoryList.length
                   ? categoryList
                       .sort((a, b) => a.index - b.index)
-                      .map((data, index) => (
+                      ?.map((data, index) => (
                         <Link
                           key={index}
                           to={data.slug}

@@ -65,3 +65,30 @@ export const genders = [
 ];
 
 export const answers = ["A", "B", "C", "D"];
+
+export const feedbackChild = [
+  {
+    type: 1,
+    text: "Câu hỏi sai",
+  },
+  {
+    type: 2,
+    text: "Câu trả lời chưa chính xác",
+  },
+  {
+    type: 3,
+    text: "Không thể sử dụng",
+  },
+  {
+    type: 4,
+    text: "Theo dõi tiến độ kém",
+  },
+  {
+    type: 5,
+    text: "Giao diện kém",
+  },
+  {
+    type: 6,
+    text: "Nội dung không phù hợp",
+  },
+];

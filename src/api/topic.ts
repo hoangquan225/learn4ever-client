@@ -34,3 +34,9 @@ export const apiGetTotalLearnedTopic = async (payload: {
 }) => {
   return ApiConfig(EndPoint.GET_TOTAL_LEARNED_TOPIC, { payload });
 };
+
+export const apiUpdateTopic = async (payload: Topic) => {
+  return ApiConfig(EndPoint.UPDATE_TOPIC, {
+    payload,
+  });
+};

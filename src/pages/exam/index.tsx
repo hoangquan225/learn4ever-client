@@ -202,6 +202,13 @@ const ExamPages = () => {
                                             {dataChild?.timeExam} phút
                                           </span>
                                         </div>
+                                        {true && (
+                                          <div
+                                            className={cx("exam__panel--score")}
+                                          >
+                                            <span>9 điểm</span>
+                                          </div>
+                                        )}
                                       </div>
                                       <Popconfirm
                                         placement="top"

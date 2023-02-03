@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../redux/store";
-import { Course } from "../../submodule/models/course";
-import { apiLoadCourseBySlug } from "../../api/course";
 import { Topic } from "../../submodule/models/topic";
 import {
   apiGetTotalLearnedTopic,
   apiLoadTopicByCourse,
   apiLoadTopicById,
+  apiUpdateTopic,
 } from "../../api/topic";
 
 // Define a type for the slice state
@@ -54,13 +53,25 @@ export const requestLoadTotalLearnedTopic = createAsyncThunk(
   }
 );
 
+export const requestUpdateTopicById = createAsyncThunk(
+  "topic/requestUpdateTopicById",
+  async (props: any) => {
+    const res = await apiUpdateTopic(props);
+    return res.data;
+  }
+);
+
 export const topicSlice = createSlice({
   name: "topic",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const actionList = [requestLoadTopicByCourse, requestLoadTopicById];
+    const actionList = [
+      requestLoadTopicByCourse,
+      requestLoadTopicById,
+      requestUpdateTopicById,
+    ];
     actionList.forEach((action) => {
       builder.addCase(action.pending, (state) => {
         state.loading = true;
@@ -107,6 +118,19 @@ export const topicSlice = createSlice({
         }>
       ) => {
         state.totalLearned = action.payload.totalLearned;
+      }
+    );
+
+    // update topic
+    builder.addCase(
+      requestUpdateTopicById.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          data: Topic;
+        }>
+      ) => {
+        state.topicInfo = new Topic(action.payload.data);
       }
     );
   },

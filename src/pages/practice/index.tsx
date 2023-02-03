@@ -1,7 +1,5 @@
-import { RestFilled } from "@ant-design/icons";
 import { unwrapResult } from "@reduxjs/toolkit";
 import {
-  Anchor,
   Breadcrumb,
   Button,
   Col,
@@ -14,10 +12,10 @@ import {
   Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
-// import Countdown from "antd/es/statistic/Countdown";
 import classNames from "classnames/bind";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import Countdown from "react-countdown";
+import { useEffect, useRef, useState } from "react";
+import CountDownRender from "../../components/FCCountdown";
+// import Countdown from "react-countdown";
 import {
   FaMarker,
   FaRegCheckCircle,
@@ -26,7 +24,7 @@ import {
   FaRegQuestionCircle,
 } from "react-icons/fa";
 import { NavLink, useParams } from "react-router-dom";
-import { apiLoadQuestionsByTopic, apiLoadTopicById } from "../../api/topic";
+import { apiCreateFeedback } from "../../api/feedback";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
@@ -41,9 +39,9 @@ import {
   requestLoadTopicById,
   topicState,
 } from "../../redux/slices/topicSlice";
+import { authState } from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
-import { Question } from "../../submodule/models/question";
-import { answers } from "../../utils/contants";
+import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
 
 const cx = classNames.bind(styles);
@@ -59,6 +57,7 @@ const PracticePages = () => {
   const questionStates = useAppSelector(QuestionState);
   const questions = questionStates.questions;
   const totalQuestion = questionStates.total;
+  const userInfo = useAppSelector(authState).userInfo;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
   const [isOpenModelPause, setIsOpenModelPause] = useState(false);
@@ -66,12 +65,10 @@ const PracticePages = () => {
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [correctQuestions, setCorrectQuestions] = useState<String[]>([]);
-  // const [selectedQuestions, setSelectedQuestions] = useState<String[]>([]);
-
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
-
-  console.log(selectedQuestions);
-
+  const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
+  const [textFeedback, setTextFeedback] = useState<string>("");
+  const [idQuestion, setIdQuestion] = useState<string>();
   const clockRef = useRef<any>();
 
   useEffect(() => {
@@ -183,14 +180,45 @@ const PracticePages = () => {
     clockRef.current.pause();
   };
 
-  const handleSubmitOk = () => {};
+  const handleSubmitOk = async () => {
+    try {
+      console.log(Math.round((score / totalQuestion) * 100) / 10);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+    setIsOpenModelSubmit(false);
+  };
 
-  const handleFeedbackOk = () => {};
+  const handleFeedbackOk = async () => {
+    try {
+      if (textFeedback.trim() !== "") {
+        const res = await apiCreateFeedback({
+          content: textFeedback.trim(),
+          idQuestion: idQuestion,
+          idCourse: course?.id,
+          type: selectedFeedback,
+          idUser: userInfo?._id,
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: "cập nhật không được",
+        duration: 1.5,
+      });
+    }
+    setTextFeedback("");
+    handleCancel();
+  };
 
   const handleCancel = () => {
     setIsOpenModelPause(false);
     setIsOpenModelSubmit(false);
     setIsOpenModelFeedback(false);
+    setSelectFeedback([]);
+    setTextFeedback("");
   };
 
   const onFinish = () => {
@@ -199,7 +227,7 @@ const PracticePages = () => {
 
   const handleMark = (isCheck: boolean, idQs: string) => {
     if (isCheck) {
-      setCorrectQuestions((o) => [...o, idQs]);
+      setCorrectQuestions([...correctQuestions, idQs]);
       setScore(score + 1);
     } else if (correctQuestions.find((o) => o === idQs)) {
       setScore(score - 1);
@@ -225,6 +253,10 @@ const PracticePages = () => {
         },
       ]);
     }
+  };
+
+  const handleFinish = () => {
+    console.log("finished!");
   };
 
   return (
@@ -301,11 +333,14 @@ const PracticePages = () => {
                         value={Date.now() + Number(topic?.timeExam) * 1000 * 60}
                         onFinish={onFinish}
                       /> */}
-                      <Countdown
+
+                      <CountDownRender count={Number(topic?.timeExam)} />
+
+                      {/* <Countdown
                         // date={Date.now() + Number(topic?.timeExam) * 1000 * 60}
                         date={Date.now() + 5000}
                         ref={clockRef}
-                      />
+                      /> */}
                     </span>
                   </Row>
 
@@ -326,7 +361,10 @@ const PracticePages = () => {
                               <div className={cx("feedback-icon--wrapper")}>
                                 <FaMarker
                                   className={cx("feedback-icon")}
-                                  onClick={handleOpenModelFeedback}
+                                  onClick={() => {
+                                    handleOpenModelFeedback();
+                                    setIdQuestion(qs?.id);
+                                  }}
                                 />
                               </div>
                               <div className={cx("game__view")}>
@@ -590,76 +628,67 @@ const PracticePages = () => {
                 open={isOpenModelFeedback}
                 onOk={handleFeedbackOk}
                 onCancel={handleCancel}
+                okText="Gửi phản hồi"
                 footer={
-                  <Button className={cx("btn__feedback")}>Gửi phản hồi</Button>
+                  textFeedback.trim() !== "" || selectedFeedback.length ? (
+                    <Button
+                      className={cx("btn__feedback")}
+                      onClick={handleFeedbackOk}
+                    >
+                      Gửi phản hồi
+                    </Button>
+                  ) : (
+                    <Button className={cx("btn__feedback")} disabled>
+                      Gửi phản hồi
+                    </Button>
+                  )
                 }
               >
                 <Row gutter={[16, 16]} className={cx("modal__feedback--list")}>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span className={cx("selected")}>Câu hỏi sai</span>
-                  </Col>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span>Câu trả lời chưa chính xác</span>
-                  </Col>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span>Nội dung không phù hợp</span>
-                  </Col>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span>Không thể sử dụng</span>
-                  </Col>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span>Theo dõi tiến độ kém</span>
-                  </Col>
-                  <Col
-                    xl={8}
-                    lg={8}
-                    md={8}
-                    sm={12}
-                    xs={12}
-                    className={cx("modal__feedback--item")}
-                  >
-                    <span>Giao diện kém</span>
-                  </Col>
+                  {feedbackChild?.map((o, i) => (
+                    <Col
+                      key={i}
+                      xl={8}
+                      lg={8}
+                      md={8}
+                      sm={12}
+                      xs={12}
+                      className={cx("modal__feedback--item")}
+                      onClick={() => {
+                        if (!selectedFeedback.find((c) => c === o?.type)) {
+                          setSelectFeedback([...selectedFeedback, o?.type]);
+                        } else {
+                          setSelectFeedback(
+                            selectedFeedback.filter((c) => c !== o?.type)
+                          );
+                        }
+                      }}
+                    >
+                      <span
+                        className={
+                          selectedFeedback.find((c) => c === o?.type) &&
+                          cx("selected")
+                        }
+                      >
+                        {o.text}
+                      </span>
+                    </Col>
+                  ))}
                 </Row>
-
                 <TextArea
-                  rows={4}
+                  name="feedbackText"
+                  autoSize={{
+                    minRows: 4,
+                    maxRows: 10,
+                  }}
                   placeholder="Nhập vấn đề bạn đang mắc phải..."
+                  style={{ minWidth: "100%" }}
+                  onChange={(e) => {
+                    setTextFeedback(e.target.value);
+                  }}
+                  value={textFeedback}
+                  showCount
+                  maxLength={500}
                 />
                 <div className={cx("modal__feedback--note")}>
                   Phản hồi của bạn sẽ được ghi nhận!

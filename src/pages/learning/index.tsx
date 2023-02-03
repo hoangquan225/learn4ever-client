@@ -272,7 +272,7 @@ const LearningPages = () => {
                 {topics?.length > 0 &&
                   [...topics]
                     ?.sort((a, b) => a.index - b.index)
-                    .map((topic, index) => {
+                    ?.map((topic, index) => {
                       return (
                         <Fragment key={index}>
                           {indexOpenTopic.find((o) => o === index + 1) ? (
@@ -351,7 +351,7 @@ const LearningPages = () => {
                             topic?.topicChildData.length > 0 &&
                             [...topic?.topicChildData]
                               .sort((a, b) => a.index - b.index)
-                              .map((topicChild, indexChild) => {
+                              ?.map((topicChild, indexChild) => {
                                 return (
                                   <div
                                     className={cx("learning__track--steps")}
@@ -530,7 +530,7 @@ const LearningPages = () => {
               }
             >
               <h3 className={cx("learning__footer--title")}>
-                {topics.map(
+                {topics?.map(
                   (topic, i) =>
                     topic.id === indexTopic && <div key={i}>{topic.name}</div>
                 )}
