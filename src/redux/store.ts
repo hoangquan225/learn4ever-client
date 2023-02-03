@@ -3,6 +3,7 @@ import authReducer from "./slices/userSlice";
 import categoryReducer from "./slices/categorySlice";
 import courseReducer from "./slices/courseSlice";
 import topicReducer from "./slices/topicSlice";
+import questionReducer from "./slices/questionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     category: categoryReducer,
     course: courseReducer,
     topic: topicReducer,
+    question: questionReducer,
   },
   middleware: (getDefaultMiddle) =>
     getDefaultMiddle({ serializableCheck: false }),

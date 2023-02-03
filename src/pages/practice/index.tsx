@@ -14,9 +14,10 @@ import {
   Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import Countdown from "antd/es/statistic/Countdown";
+// import Countdown from "antd/es/statistic/Countdown";
 import classNames from "classnames/bind";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import Countdown from "react-countdown";
 import {
   FaMarker,
   FaRegCheckCircle,
@@ -32,6 +33,10 @@ import {
   courseState,
   requestLoadCourseBySlug,
 } from "../../redux/slices/courseSlice";
+import {
+  QuestionState,
+  requestLoadQuestionsByIdTopic,
+} from "../../redux/slices/questionSlice";
 import {
   requestLoadTopicById,
   topicState,
@@ -51,15 +56,23 @@ const PracticePages = () => {
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
   const loading = courseReducer.loading;
+  const questionStates = useAppSelector(QuestionState);
+  const questions = questionStates.questions;
+  const totalQuestion = questionStates.total;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
   const [isOpenModelPause, setIsOpenModelPause] = useState(false);
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
   const [score, setScore] = useState(0);
-  const [selectedQuestions, setSelectedQuestions] = useState<String[]>([]);
+  const [correctQuestions, setCorrectQuestions] = useState<String[]>([]);
+  // const [selectedQuestions, setSelectedQuestions] = useState<String[]>([]);
 
-  const [datasQuestion, setDatasQuestion] = useState<Question[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
+
+  console.log(selectedQuestions);
+
+  const clockRef = useRef<any>();
 
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
@@ -74,6 +87,24 @@ const PracticePages = () => {
     loadCourse(params.slugChild || "");
     loadTopicById(params.idChild || "");
   }, [params.idChild, params.slugChild]);
+
+  useEffect(() => {
+    if (selectedQuestions[0]) {
+      localStorage.setItem(
+        "listSelectedQuestions",
+        JSON.stringify(selectedQuestions)
+      );
+    }
+  }, [selectedQuestions]);
+
+  // useEffect(() => {
+  //   const items = JSON.parse(
+  //     localStorage.getItem("listSelectedQuestions") || ""
+  //   );
+  //   if (items) {
+  //     setSelectedQuestions(items);
+  //   }
+  // }, []);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -103,8 +134,10 @@ const PracticePages = () => {
 
   const loadQuestionByTopic = async (idTopic: string, status: number) => {
     try {
-      const res = await apiLoadQuestionsByTopic({ idTopic, status });
-      setDatasQuestion(res.data.data?.map((o: any) => new Question(o)));
+      const result = await dispatch(
+        requestLoadQuestionsByIdTopic({ idTopic, status })
+      );
+      unwrapResult(result);
     } catch (error) {
       notification.error({
         message: "lỗi server, không tải được câu hỏi",
@@ -145,7 +178,10 @@ const PracticePages = () => {
     setIsOpenModelFeedback(true);
   };
 
-  const handlePauseOk = () => {};
+  const handlePauseOk = () => {
+    setIsOpenModelPause(false);
+    clockRef.current.pause();
+  };
 
   const handleSubmitOk = () => {};
 
@@ -163,15 +199,33 @@ const PracticePages = () => {
 
   const handleMark = (isCheck: boolean, idQs: string) => {
     if (isCheck) {
-      setSelectedQuestions((o) => [...o, idQs]);
+      setCorrectQuestions((o) => [...o, idQs]);
       setScore(score + 1);
-    } else if (selectedQuestions.find((o) => o === idQs)) {
+    } else if (correctQuestions.find((o) => o === idQs)) {
       setScore(score - 1);
-      setSelectedQuestions(selectedQuestions.filter((o) => o !== idQs));
+      setCorrectQuestions(correctQuestions.filter((o) => o !== idQs));
     }
   };
 
-  console.log(score);
+  const handlSaveStorage = (idQs: string, idAnswer: string) => {
+    if (selectedQuestions.find((o) => o.idQs === idQs)) {
+      setSelectedQuestions([
+        ...selectedQuestions.filter((c) => c.idQs !== idQs),
+        {
+          idQs: idQs,
+          idAnswer: idAnswer,
+        },
+      ]);
+    } else {
+      setSelectedQuestions((o) => [
+        ...o,
+        {
+          idQs: idQs,
+          idAnswer: idAnswer,
+        },
+      ]);
+    }
+  };
 
   return (
     <>
@@ -210,7 +264,7 @@ const PracticePages = () => {
                       </Breadcrumb.Item>
                       <Breadcrumb.Item>
                         <NavLink
-                          to={"#"}
+                          to={`/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`}
                           className={cx("exam__breadcumb--link")}
                         >
                           Đề kiểm tra
@@ -218,10 +272,10 @@ const PracticePages = () => {
                       </Breadcrumb.Item>
                       <Breadcrumb.Item>
                         <NavLink
-                          to={"/gioi-thieu"}
+                          to={`/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`}
                           className={cx("practice__breadcumb--link", "active")}
                         >
-                          practice
+                          {topic?.name}
                         </NavLink>
                       </Breadcrumb.Item>
                     </>
@@ -243,16 +297,21 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      <Countdown
+                      {/* <Countdown
                         value={Date.now() + Number(topic?.timeExam) * 1000 * 60}
                         onFinish={onFinish}
+                      /> */}
+                      <Countdown
+                        // date={Date.now() + Number(topic?.timeExam) * 1000 * 60}
+                        date={Date.now() + 5000}
+                        ref={clockRef}
                       />
                     </span>
                   </Row>
 
                   <div>
-                    {datasQuestion.length > 0 &&
-                      datasQuestion?.map((qs, i) => {
+                    {questions.length > 0 &&
+                      questions?.map((qs, i) => {
                         const listAnswer = [...qs.answer].sort(
                           (a, b) => a.index - b.index
                         );
@@ -289,6 +348,11 @@ const PracticePages = () => {
                                     <Radio.Group
                                       name="radiogroup"
                                       onChange={(e) => {
+                                        handlSaveStorage(
+                                          qs?.id || "",
+                                          e.target.value._id
+                                        );
+
                                         handleMark(
                                           e.target.value.isResult,
                                           qs?.id || ""
@@ -330,7 +394,9 @@ const PracticePages = () => {
                       <div className={cx("practice__palette--body")}>
                         <div className={cx("practice__palette--progress")}>
                           <Progress
-                            percent={50}
+                            percent={
+                              (selectedQuestions.length / totalQuestion) * 100
+                            }
                             status="active"
                             strokeColor={"#009d9d"}
                             showInfo={false}
@@ -338,7 +404,7 @@ const PracticePages = () => {
                           <div
                             className={cx("practice__palette--progress-title")}
                           >
-                            20/40
+                            {selectedQuestions.length}/{totalQuestion}
                           </div>
                         </div>
 
@@ -349,7 +415,7 @@ const PracticePages = () => {
                             }}
                             gutter={[0, 16]}
                           >
-                            {datasQuestion?.map((o, i) => (
+                            {questions?.map((o, i) => (
                               <Col
                                 span={3}
                                 className={cx("question-item")}
@@ -357,7 +423,13 @@ const PracticePages = () => {
                               >
                                 <a href={`#${o.id}`}>
                                   <span
-                                    className={cx("question-item__bground")}
+                                    className={
+                                      selectedQuestions.find(
+                                        (c) => c.idQs === o.id
+                                      )
+                                        ? cx("question-item__bground", "active")
+                                        : cx("question-item__bground")
+                                    }
                                   >
                                     {i + 1}
                                   </span>
@@ -425,7 +497,9 @@ const PracticePages = () => {
                     <div className={cx("practice__palette--body")}>
                       <div className={cx("practice__palette--progress")}>
                         <Progress
-                          percent={50}
+                          percent={
+                            (selectedQuestions.length / totalQuestion) * 100
+                          }
                           status="active"
                           strokeColor={"#009d9d"}
                           showInfo={false}
@@ -433,7 +507,7 @@ const PracticePages = () => {
                         <div
                           className={cx("practice__palette--progress-title")}
                         >
-                          20/40
+                          {selectedQuestions.length}/{totalQuestion}
                         </div>
                       </div>
 
@@ -444,14 +518,22 @@ const PracticePages = () => {
                           }}
                           gutter={[0, 16]}
                         >
-                          {datasQuestion?.map((o, i) => (
+                          {questions?.map((o, i) => (
                             <Col
                               span={3}
                               className={cx("question-item")}
                               key={i}
                             >
                               <a href={`#${o.id}`}>
-                                <span className={cx("question-item__bground")}>
+                                <span
+                                  className={
+                                    selectedQuestions.find(
+                                      (c) => c.idQs === o.id
+                                    )
+                                      ? cx("question-item__bground", "active")
+                                      : cx("question-item__bground")
+                                  }
+                                >
                                   {i + 1}
                                 </span>
                               </a>
