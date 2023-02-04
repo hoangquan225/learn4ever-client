@@ -269,7 +269,7 @@ const RegisterPages = () => {
                     }
                     size={"large"}
                   >
-                    {genders.map((data) => (
+                    {genders?.map((data) => (
                       <Select.Option
                         value={data.value}
                         key={data.value}
@@ -331,7 +331,7 @@ const RegisterPages = () => {
                     size={"large"}
                     listHeight={128}
                   >
-                    {classes.map((data) => (
+                    {classes?.map((data) => (
                       <Select.Option
                         value={data.value}
                         key={data.value}

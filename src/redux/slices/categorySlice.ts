@@ -4,6 +4,7 @@ import type { RootState } from "../../redux/store";
 import { Category } from "../../submodule/models/category";
 import { apiLoadCategoryBySlug, apiLoadCategorys } from "../../api/category";
 import { Course } from "../../submodule/models/course";
+import _ from "lodash";
 
 // Define a type for the slice state
 interface CategoryState {
@@ -68,7 +69,7 @@ export const categorySlice = createSlice({
         }>
       ) => {
         state.loading = false;
-        state.categorys = action.payload.data;
+        state.categorys = _.orderBy(action.payload.data, ["index"], ["asc"]);
       }
     );
 

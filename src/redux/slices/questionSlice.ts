@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../redux/store";
 import { Question } from "../../submodule/models/question";
 import { apiLoadQuestionsByTopic } from "../../api/topic";
+import _ from "lodash";
 
 // Define a type for the slice state
 interface QuestionState {
@@ -56,7 +57,21 @@ export const questionSlice = createSlice({
           total: number;
         }>
       ) => {
-        state.questions = action.payload.data;
+        state.questions = _.orderBy(
+          action.payload.data,
+          ["index"],
+          ["asc"]
+        ).map((question) => {
+          return {
+            ...question,
+            answer: _.orderBy(question.answer, ["index"], ["asc"]).map(
+              (answer, index) => ({
+                ...answer,
+                index,
+              })
+            ),
+          };
+        });
         state.total = action.payload.total;
         state.loading = false;
       }

@@ -64,7 +64,7 @@ export const genders = [
   },
 ];
 
-export const answers = ["A", "B", "C", "D"];
+export const answers = "abcdefghijklmnopqrstuvwxyz".toUpperCase().split("");
 
 export const feedbackChild = [
   {

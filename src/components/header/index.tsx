@@ -40,13 +40,6 @@ const Header = () => {
   const categorys = categoryStates.categorys;
   const loading = categoryStates.loading;
 
-  const categoryList: Category[] = [];
-  for (var key in categorys) {
-    if (categorys.hasOwnProperty(key)) {
-      categoryList.push(categorys[key]);
-    }
-  }
-
   const handleLogout = useCallback(() => {
     Cookies.remove("token");
     window.location.href = "/";
@@ -198,22 +191,20 @@ const Header = () => {
 
               <div className={cx("navbar__list--desktop")}>
                 {categorys.length > 0 &&
-                  [...categorys]
-                    .sort((a, b) => a.index - b.index)
-                    ?.map((data, index) => (
-                      <div key={index} className={cx("navbar__item--desktop")}>
-                        <div
-                          onClick={async () => {
-                            navigate(`/${data.slug}`);
-                          }}
-                          className={cx("navbar__link--desktop")}
-                        >
-                          <div className={cx("navbar__title")}>
-                            <span>{data.name}</span>
-                          </div>
+                  categorys?.map((data, index) => (
+                    <div key={index} className={cx("navbar__item--desktop")}>
+                      <div
+                        onClick={async () => {
+                          navigate(`/${data.slug}`);
+                        }}
+                        className={cx("navbar__link--desktop")}
+                      >
+                        <div className={cx("navbar__title")}>
+                          <span>{data.name}</span>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
               </div>
 
               {/* MOBILE */}
@@ -247,23 +238,21 @@ const Header = () => {
                   </div>
 
                   {categorys.length > 0 &&
-                    [...categorys]
-                      .sort((a, b) => a.index - b.index)
-                      ?.map((data, index) => (
-                        <div key={index} className={cx("navbar__item--mobile")}>
-                          <div
-                            onClick={() => {
-                              navigate(`/${data.slug}`);
-                              handleNavbar();
-                            }}
-                            className={cx("navbar__link--mobile")}
-                          >
-                            <div className={cx("navbar__title")}>
-                              <span>{data.name}</span>
-                            </div>
+                    categorys?.map((data, index) => (
+                      <div key={index} className={cx("navbar__item--mobile")}>
+                        <div
+                          onClick={() => {
+                            navigate(`/${data.slug}`);
+                            handleNavbar();
+                          }}
+                          className={cx("navbar__link--mobile")}
+                        >
+                          <div className={cx("navbar__title")}>
+                            <span>{data.name}</span>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>

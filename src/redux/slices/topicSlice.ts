@@ -8,6 +8,7 @@ import {
   apiLoadTopicById,
   apiUpdateTopic,
 } from "../../api/topic";
+import _ from "lodash";
 
 // Define a type for the slice state
 interface TopicState {
@@ -93,7 +94,18 @@ export const topicSlice = createSlice({
           total: number;
         }>
       ) => {
-        state.topics = action.payload.data;
+        state.topics = _.orderBy(action.payload.data, ["index"], ["asc"]).map(
+          (topic) => {
+            return {
+              ...topic,
+              topicChildData: _.orderBy(
+                topic.topicChildData,
+                ["index"],
+                ["asc"]
+              ),
+            };
+          }
+        );
         state.total = action.payload.total;
         state.loading = false;
       }

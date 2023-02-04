@@ -146,46 +146,43 @@ const HomePages = () => {
                   },
                 ]}
               >
-                {categoryList.length
-                  ? categoryList
-                      .sort((a, b) => a.index - b.index)
-                      ?.map((data, index) => (
-                        <Link
-                          key={index}
-                          to={data.slug}
-                          className={cx("category__link")}
-                        >
-                          <div className={cx("category__item")}>
-                            <div className={cx("category__img")}>
-                              <img
-                                className={cx("category-image")}
-                                src={data.avatar ?? ""}
-                                alt={data.name}
-                              />
-                            </div>
-                            <div className={cx("category__info")}>
-                              <div className={cx("categoty__name")}>
-                                {data.name}
-                              </div>
-                              <div
-                                className={cx("category__des")}
-                                dangerouslySetInnerHTML={{
-                                  __html: data.des ?? "",
-                                }}
-                              />
-                              <div className={cx("category__join")}>
-                                <button className={cx("category__btn")}>
-                                  <span>Làm ngay</span>
-                                  <BiChevronRight
-                                    className={cx("category__icon")}
-                                  />
-                                </button>
-                              </div>
-                            </div>
+                {categorys[0] &&
+                  categorys?.map((data, index) => (
+                    <Link
+                      key={index}
+                      to={data.slug}
+                      className={cx("category__link")}
+                    >
+                      <div className={cx("category__item")}>
+                        <div className={cx("category__img")}>
+                          <img
+                            className={cx("category-image")}
+                            src={data.avatar ?? ""}
+                            alt={data.name}
+                          />
+                        </div>
+                        <div className={cx("category__info")}>
+                          <div className={cx("categoty__name")}>
+                            {data.name}
                           </div>
-                        </Link>
-                      ))
-                  : ""}
+                          <div
+                            className={cx("category__des")}
+                            dangerouslySetInnerHTML={{
+                              __html: data.des ?? "",
+                            }}
+                          />
+                          <div className={cx("category__join")}>
+                            <button className={cx("category__btn")}>
+                              <span>Làm ngay</span>
+                              <BiChevronRight
+                                className={cx("category__icon")}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
               </Carousel>
             </div>
           </div>

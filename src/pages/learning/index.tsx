@@ -270,173 +270,156 @@ const LearningPages = () => {
 
               <div className={cx("learning__track--body")}>
                 {topics?.length > 0 &&
-                  [...topics]
-                    ?.sort((a, b) => a.index - b.index)
-                    ?.map((topic, index) => {
-                      return (
-                        <Fragment key={index}>
-                          {indexOpenTopic.find((o) => o === index + 1) ? (
-                            <div
-                              className={cx("learning__track--item")}
-                              onClick={() => {
-                                const indexPrev = indexOpenTopic.filter(
-                                  (o) => o !== index + 1
-                                );
-                                setIndexOpenTopic(indexPrev);
-                              }}
-                            >
-                              <div
-                                className={cx("learning__track--item-title")}
-                              >
-                                {topic?.name}
-                              </div>
-                              <span
-                                className={cx("learning__track--item-desc")}
-                              >
-                                {
-                                  topic.topicChildData.filter((o1) =>
-                                    userInfo?.progess?.some(
-                                      (o2) => o2.idTopic === o1.id
-                                    )
-                                  ).length
-                                }
-                                /{topic?.topicChildData.length} | 24:30
-                              </span>
-                              <span
-                                className={cx("learning__track--item-icon")}
-                              >
-                                <IoChevronUpOutline
-                                  className={cx("track-icon")}
-                                />
-                              </span>
+                  topics?.map((topic, index) => {
+                    return (
+                      <Fragment key={index}>
+                        {indexOpenTopic.find((o) => o === index + 1) ? (
+                          <div
+                            className={cx("learning__track--item")}
+                            onClick={() => {
+                              const indexPrev = indexOpenTopic.filter(
+                                (o) => o !== index + 1
+                              );
+                              setIndexOpenTopic(indexPrev);
+                            }}
+                          >
+                            <div className={cx("learning__track--item-title")}>
+                              {topic?.name}
                             </div>
-                          ) : (
-                            <div
-                              className={cx("learning__track--item")}
-                              onClick={() => {
-                                setIndexOpenTopic([
-                                  ...indexOpenTopic,
-                                  index + 1,
-                                ]);
-                              }}
-                            >
-                              <div
-                                className={cx("learning__track--item-title")}
-                              >
-                                {topic?.name}
-                              </div>
-                              <span
-                                className={cx("learning__track--item-desc")}
-                              >
-                                {
-                                  topic.topicChildData.filter((o1) =>
-                                    userInfo?.progess?.some(
-                                      (o2) => o2.idTopic === o1.id
-                                    )
-                                  ).length
-                                }
-                                /{topic?.topicChildData.length} | 24:30
-                              </span>
-                              <span
-                                className={cx("learning__track--item-icon")}
-                              >
-                                <IoChevronDownOutline
-                                  className={cx("track-icon")}
-                                />
-                              </span>
+                            <span className={cx("learning__track--item-desc")}>
+                              {
+                                topic.topicChildData.filter((o1) =>
+                                  userInfo?.progess?.some(
+                                    (o2) => o2.idTopic === o1.id
+                                  )
+                                ).length
+                              }
+                              /{topic?.topicChildData.length} | 24:30
+                            </span>
+                            <span className={cx("learning__track--item-icon")}>
+                              <IoChevronUpOutline
+                                className={cx("track-icon")}
+                              />
+                            </span>
+                          </div>
+                        ) : (
+                          <div
+                            className={cx("learning__track--item")}
+                            onClick={() => {
+                              setIndexOpenTopic([...indexOpenTopic, index + 1]);
+                            }}
+                          >
+                            <div className={cx("learning__track--item-title")}>
+                              {topic?.name}
                             </div>
-                          )}
+                            <span className={cx("learning__track--item-desc")}>
+                              {
+                                topic.topicChildData.filter((o1) =>
+                                  userInfo?.progess?.some(
+                                    (o2) => o2.idTopic === o1.id
+                                  )
+                                ).length
+                              }
+                              /{topic?.topicChildData.length} | 24:30
+                            </span>
+                            <span className={cx("learning__track--item-icon")}>
+                              <IoChevronDownOutline
+                                className={cx("track-icon")}
+                              />
+                            </span>
+                          </div>
+                        )}
 
-                          {indexOpenTopic.find((o) => o === index + 1) &&
-                            topic?.topicChildData.length > 0 &&
-                            [...topic?.topicChildData]
-                              .sort((a, b) => a.index - b.index)
-                              ?.map((topicChild, indexChild) => {
-                                return (
+                        {indexOpenTopic.find((o) => o === index + 1) &&
+                          topic?.topicChildData.length > 0 &&
+                          [...topic?.topicChildData]?.map(
+                            (topicChild, indexChild) => {
+                              return (
+                                <div
+                                  className={cx("learning__track--steps")}
+                                  key={indexChild}
+                                >
                                   <div
-                                    className={cx("learning__track--steps")}
-                                    key={indexChild}
+                                    className={
+                                      dataTopicActive?.id === topicChild.id
+                                        ? cx(
+                                            "learning__track--steps-item",
+                                            "active"
+                                          )
+                                        : cx("learning__track--steps-item")
+                                    }
+                                    onClick={() => {
+                                      setIndexTopic(topic.id);
+                                      handleUpdateLearned(
+                                        topicChild.id || "",
+                                        userInfo?._id || "",
+                                        0
+                                      );
+                                      handleChangeTopic(topicChild.id || "");
+                                    }}
                                   >
                                     <div
-                                      className={
-                                        dataTopicActive?.id === topicChild.id
-                                          ? cx(
-                                              "learning__track--steps-item",
-                                              "active"
-                                            )
-                                          : cx("learning__track--steps-item")
-                                      }
-                                      onClick={() => {
-                                        setIndexTopic(topic.id);
-                                        handleUpdateLearned(
-                                          topicChild.id || "",
-                                          userInfo?._id || "",
-                                          0
-                                        );
-                                        handleChangeTopic(topicChild.id || "");
-                                      }}
+                                      className={cx(
+                                        "learning__track--steps-info"
+                                      )}
                                     >
-                                      <div
+                                      <h3
                                         className={cx(
-                                          "learning__track--steps-info"
+                                          "learning__track--steps-title"
                                         )}
                                       >
-                                        <h3
-                                          className={cx(
-                                            "learning__track--steps-title"
-                                          )}
-                                        >
-                                          {topicChild?.name}
-                                        </h3>
-                                        <p
-                                          className={cx(
-                                            "learning__track--steps-desc"
-                                          )}
-                                        >
-                                          {topicChild?.topicType === 4 ? (
-                                            <FaPlayCircle
-                                              className={cx("desc-icon")}
-                                            />
-                                          ) : topicChild?.topicType === 5 ? (
-                                            <FaFileAlt
-                                              className={cx("desc-icon")}
-                                            />
-                                          ) : topicChild?.topicType === 2 ? (
-                                            <FaQuestionCircle
-                                              className={cx("desc-icon")}
-                                            />
-                                          ) : (
-                                            <></>
-                                          )}
-                                          <span
-                                            className={cx(
-                                              "learning__track--steps-time"
-                                            )}
-                                          >
-                                            01:35
-                                          </span>
-                                        </p>
-                                      </div>
-                                      <div
+                                        {topicChild?.name}
+                                      </h3>
+                                      <p
                                         className={cx(
-                                          "learning__track--steps-status"
+                                          "learning__track--steps-desc"
                                         )}
                                       >
-                                        {userInfo?.progess?.find(
-                                          (c) => c.idTopic === topicChild.id
-                                        ) && (
-                                          <FaCheckCircle
-                                            className={cx("status-icon")}
+                                        {topicChild?.topicType === 4 ? (
+                                          <FaPlayCircle
+                                            className={cx("desc-icon")}
                                           />
+                                        ) : topicChild?.topicType === 5 ? (
+                                          <FaFileAlt
+                                            className={cx("desc-icon")}
+                                          />
+                                        ) : topicChild?.topicType === 2 ? (
+                                          <FaQuestionCircle
+                                            className={cx("desc-icon")}
+                                          />
+                                        ) : (
+                                          <></>
                                         )}
-                                      </div>
+                                        <span
+                                          className={cx(
+                                            "learning__track--steps-time"
+                                          )}
+                                        >
+                                          01:35
+                                        </span>
+                                      </p>
+                                    </div>
+                                    <div
+                                      className={cx(
+                                        "learning__track--steps-status"
+                                      )}
+                                    >
+                                      {userInfo?.progess?.find(
+                                        (c) => c.idTopic === topicChild.id
+                                      ) && (
+                                        <FaCheckCircle
+                                          className={cx("status-icon")}
+                                        />
+                                      )}
                                     </div>
                                   </div>
-                                );
-                              })}
-                        </Fragment>
-                      );
-                    })}
+                                </div>
+                              );
+                            }
+                          )}
+                      </Fragment>
+                    );
+                  })}
               </div>
             </div>
           </Sider>

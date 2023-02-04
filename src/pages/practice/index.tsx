@@ -13,7 +13,7 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CountDownRender from "../../components/FCCountdown";
 // import Countdown from "react-countdown";
 import {
@@ -221,10 +221,6 @@ const PracticePages = () => {
     setTextFeedback("");
   };
 
-  const onFinish = () => {
-    console.log("finished!");
-  };
-
   const handleMark = (isCheck: boolean, idQs: string) => {
     if (isCheck) {
       setCorrectQuestions([...correctQuestions, idQs]);
@@ -255,9 +251,9 @@ const PracticePages = () => {
     }
   };
 
-  const handleFinish = () => {
+  const handleFinish = useCallback(() => {
     console.log("finished!");
-  };
+  }, []);
 
   return (
     <>
@@ -329,28 +325,16 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      {/* <Countdown
-                        value={Date.now() + Number(topic?.timeExam) * 1000 * 60}
-                        onFinish={onFinish}
-                      /> */}
-
-                      <CountDownRender count={Number(topic?.timeExam)} />
-
-                      {/* <Countdown
-                        // date={Date.now() + Number(topic?.timeExam) * 1000 * 60}
-                        date={Date.now() + 5000}
-                        ref={clockRef}
-                      /> */}
+                      <CountDownRender
+                        count={Number(topic?.timeExam)}
+                        onFinish={handleFinish}
+                      />
                     </span>
                   </Row>
 
                   <div>
                     {questions.length > 0 &&
                       questions?.map((qs, i) => {
-                        const listAnswer = [...qs.answer].sort(
-                          (a, b) => a.index - b.index
-                        );
-
                         return (
                           <Row
                             id={qs.id}
@@ -398,7 +382,7 @@ const PracticePages = () => {
                                       }}
                                     >
                                       <Space direction="vertical">
-                                        {listAnswer?.map((item, i) => (
+                                        {qs.answer?.map((item, i) => (
                                           <Radio value={item} key={i}>
                                             <div
                                               className={cx(
