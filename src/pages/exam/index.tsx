@@ -4,7 +4,6 @@ import { NavLink, useNavigate, useParams } from "react-router-dom";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { categoryState } from "../../redux/slices/categorySlice";
 import {
   courseState,
   requestLoadCourseBySlug,
@@ -24,6 +23,7 @@ import {
   requestLoadTopicByCourse,
   topicState,
 } from "../../redux/slices/topicSlice";
+import { authState } from "../../redux/slices/userSlice";
 
 const cx = classNames.bind(styles);
 
@@ -35,6 +35,7 @@ const ExamPages = () => {
   const loading = courseReducer.loading;
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
+  const userInfo = useAppSelector(authState).userInfo;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([1]);
   const navigate = useNavigate();
 
@@ -202,12 +203,18 @@ const ExamPages = () => {
                                             {dataChild?.timeExam} phút
                                           </span>
                                         </div>
-                                        {true && (
-                                          <div
-                                            className={cx("exam__panel--score")}
-                                          >
-                                            <span>9 điểm</span>
-                                          </div>
+                                        {userInfo?.progess?.map(
+                                          (o) =>
+                                            o.idTopic === dataChild.id && (
+                                              <div
+                                                className={cx(
+                                                  "exam__panel--score"
+                                                )}
+                                                key={o.idTopic}
+                                              >
+                                                <span>{o.score} điểm</span>
+                                              </div>
+                                            )
                                         )}
                                       </div>
                                       <Popconfirm

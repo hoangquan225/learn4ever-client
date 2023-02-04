@@ -70,6 +70,12 @@ export const requestUpdateStudiedForUser = createAsyncThunk(
     idUser: string;
     status: number;
     timeStudy: number;
+    score?: number;
+    correctQuestion?: number;
+    answers?: Array<{
+      idQuestion: string;
+      idAnswer: string;
+    }>;
   }) => {
     const res = await apiUpdateStudiedForUser(props);
     return res.data;

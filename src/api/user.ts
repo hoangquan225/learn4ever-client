@@ -30,6 +30,12 @@ export const apiUpdateStudiedForUser = async (payload: {
   idUser: string;
   status: number;
   timeStudy: number;
+  score?: number;
+  correctQuestion?: number;
+  answers?: Array<{
+    idQuestion: string;
+    idAnswer: string;
+  }>;
 }) => {
   return ApiConfig(EndPoint.UPDATE_STUDYED_FOR_USER, { payload });
 };

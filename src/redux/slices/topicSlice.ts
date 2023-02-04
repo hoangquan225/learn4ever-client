@@ -115,7 +115,7 @@ export const topicSlice = createSlice({
     builder.addCase(
       requestLoadTopicById.fulfilled,
       (state, action: PayloadAction<Topic>) => {
-        state.topicInfo = action.payload;
+        state.topicInfo = new Topic(action.payload);
         state.loading = false;
       }
     );

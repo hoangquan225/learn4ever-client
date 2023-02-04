@@ -378,7 +378,7 @@ html {
 .practice__palette--question-list {
   margin-top: 1.6rem;
   width: 100%;
-  height: 48vh !important;
+  height: 55vh !important;
   padding: 0 0.5rem;
 
   @include responsive(xs) {
@@ -470,8 +470,8 @@ html {
 }
 
 .practice__subnav--main {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: space-around;
   padding: 0.8rem 0;
   background: #fff;
   border-radius: 2rem 2rem 0 0;

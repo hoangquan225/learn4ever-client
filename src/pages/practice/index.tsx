@@ -13,15 +13,15 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CountDownRender from "../../components/FCCountdown";
-// import Countdown from "react-countdown";
 import {
   FaMarker,
   FaRegCheckCircle,
   FaRegClock,
-  FaRegPauseCircle,
+  FaRegPlayCircle,
   FaRegQuestionCircle,
+  FaUndoAlt,
 } from "react-icons/fa";
 import { NavLink, useParams } from "react-router-dom";
 import { apiCreateFeedback } from "../../api/feedback";
@@ -39,7 +39,10 @@ import {
   requestLoadTopicById,
   topicState,
 } from "../../redux/slices/topicSlice";
-import { authState } from "../../redux/slices/userSlice";
+import {
+  authState,
+  requestUpdateStudiedForUser,
+} from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
@@ -60,48 +63,43 @@ const PracticePages = () => {
   const userInfo = useAppSelector(authState).userInfo;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
-  const [isOpenModelPause, setIsOpenModelPause] = useState(false);
+  const [isRemake, setIsRemake] = useState(false);
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
+  const [isOpenRemakeExam, setIsOpenRemakeExam] = useState(false);
   const [score, setScore] = useState(0);
   const [correctQuestions, setCorrectQuestions] = useState<String[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
   const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
-  const clockRef = useRef<any>();
 
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
-
     return () => {
       window.removeEventListener("scroll", handleClockStick);
     };
   }, []);
 
   useEffect(() => {
+    if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
+      userInfo?.progess?.find(
+        (o) =>
+          o.idTopic === topic?.id &&
+          setSelectedQuestions(o.answers.map((c) => c))
+      );
+      setIsRemake(true);
+    } else {
+      setSelectedQuestions([]);
+      setIsRemake(false);
+    }
+  }, [topic?.id]);
+
+  useEffect(() => {
     loadQuestionByTopic(params.idChild || "", 1);
     loadCourse(params.slugChild || "");
     loadTopicById(params.idChild || "");
   }, [params.idChild, params.slugChild]);
-
-  useEffect(() => {
-    if (selectedQuestions[0]) {
-      localStorage.setItem(
-        "listSelectedQuestions",
-        JSON.stringify(selectedQuestions)
-      );
-    }
-  }, [selectedQuestions]);
-
-  // useEffect(() => {
-  //   const items = JSON.parse(
-  //     localStorage.getItem("listSelectedQuestions") || ""
-  //   );
-  //   if (items) {
-  //     setSelectedQuestions(items);
-  //   }
-  // }, []);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -163,10 +161,6 @@ const PracticePages = () => {
     setOpenQuestionList(!openQuestionList);
   };
 
-  const handleOpenModelPause = () => {
-    setIsOpenModelPause(true);
-  };
-
   const handleOpenModelSubmit = () => {
     setIsOpenModelSubmit(true);
   };
@@ -175,14 +169,20 @@ const PracticePages = () => {
     setIsOpenModelFeedback(true);
   };
 
-  const handlePauseOk = () => {
-    setIsOpenModelPause(false);
-    clockRef.current.pause();
-  };
-
   const handleSubmitOk = async () => {
     try {
-      console.log(Math.round((score / totalQuestion) * 100) / 10);
+      const result = await dispatch(
+        requestUpdateStudiedForUser({
+          idTopic: topic?.id || "",
+          idUser: userInfo?._id || "",
+          status: TTCSconfig.STATUS_LEARNED,
+          timeStudy: 0,
+          score: Math.round((score / totalQuestion) * 100) / 10,
+          correctQuestion: score,
+          answers: selectedQuestions,
+        })
+      );
+      unwrapResult(result);
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -214,46 +214,52 @@ const PracticePages = () => {
   };
 
   const handleCancel = () => {
-    setIsOpenModelPause(false);
     setIsOpenModelSubmit(false);
     setIsOpenModelFeedback(false);
+    setIsOpenRemakeExam(false);
     setSelectFeedback([]);
     setTextFeedback("");
   };
 
-  const handleMark = (isCheck: boolean, idQs: string) => {
+  const handleMark = (idQuestion: string, isCheck: boolean) => {
     if (isCheck) {
-      setCorrectQuestions([...correctQuestions, idQs]);
+      setCorrectQuestions([...correctQuestions, idQuestion]);
       setScore(score + 1);
-    } else if (correctQuestions.find((o) => o === idQs)) {
+    } else if (correctQuestions.find((o) => o === idQuestion)) {
       setScore(score - 1);
-      setCorrectQuestions(correctQuestions.filter((o) => o !== idQs));
+      setCorrectQuestions(correctQuestions.filter((o) => o !== idQuestion));
     }
   };
 
-  const handlSaveStorage = (idQs: string, idAnswer: string) => {
-    if (selectedQuestions.find((o) => o.idQs === idQs)) {
+  const handlSaveSelected = (idQuestion: string, idAnswer: string) => {
+    if (selectedQuestions.find((o) => o.idQuestion === idQuestion)) {
       setSelectedQuestions([
-        ...selectedQuestions.filter((c) => c.idQs !== idQs),
+        ...selectedQuestions.filter((c) => c.idQuestion !== idQuestion),
         {
-          idQs: idQs,
-          idAnswer: idAnswer,
+          idQuestion,
+          idAnswer,
         },
       ]);
     } else {
       setSelectedQuestions((o) => [
         ...o,
         {
-          idQs: idQs,
-          idAnswer: idAnswer,
+          idQuestion,
+          idAnswer,
         },
       ]);
     }
   };
 
   const handleFinish = useCallback(() => {
-    console.log("finished!");
+    handleSubmitOk();
   }, []);
+
+  const handleRemakeExam = () => {
+    setSelectedQuestions([]);
+    setIsOpenRemakeExam(false);
+    setIsRemake(false);
+  };
 
   return (
     <>
@@ -370,20 +376,28 @@ const PracticePages = () => {
                                     <Radio.Group
                                       name="radiogroup"
                                       onChange={(e) => {
-                                        handlSaveStorage(
+                                        handlSaveSelected(
                                           qs?.id || "",
                                           e.target.value._id
                                         );
-
                                         handleMark(
-                                          e.target.value.isResult,
-                                          qs?.id || ""
+                                          qs?.id || "",
+                                          e.target.value.isResult
                                         );
                                       }}
                                     >
                                       <Space direction="vertical">
                                         {qs.answer?.map((item, i) => (
-                                          <Radio value={item} key={i}>
+                                          <Radio
+                                            value={item}
+                                            key={i}
+                                            // checked={
+                                            //   isRemake &&
+                                            //   !!selectedQuestions.find(
+                                            //     (o) => o.idAnswer === item._id
+                                            //   )
+                                            // }
+                                          >
                                             <div
                                               className={cx(
                                                 "quiz-choices__item--answer"
@@ -447,7 +461,7 @@ const PracticePages = () => {
                                   <span
                                     className={
                                       selectedQuestions.find(
-                                        (c) => c.idQs === o.id
+                                        (c) => c.idQuestion === o.id
                                       )
                                         ? cx("question-item__bground", "active")
                                         : cx("question-item__bground")
@@ -462,20 +476,28 @@ const PracticePages = () => {
                         </div>
                       </div>
                       <div className={cx("practice__palette--footer")}>
-                        <div className={cx("btn-group")}>
-                          <button
-                            className={cx("btn")}
-                            onClick={handleOpenModelPause}
-                          >
-                            Tạm dừng
-                          </button>
-                          <button
-                            className={cx("btn", "btn__submit")}
-                            onClick={handleOpenModelSubmit}
-                          >
-                            Nộp bài
-                          </button>
-                        </div>
+                        {isRemake ? (
+                          <div className={cx("btn-group")}>
+                            {/* <button className={cx("btn", "btn__submit")}>
+                              Tiếp tục
+                            </button> */}
+                            <button
+                              className={cx("btn", "btn__submit")}
+                              onClick={() => setIsOpenRemakeExam(true)}
+                            >
+                              Làm lại
+                            </button>
+                          </div>
+                        ) : (
+                          <div className={cx("btn-group")}>
+                            <button
+                              className={cx("btn", "btn__submit")}
+                              onClick={handleOpenModelSubmit}
+                            >
+                              Nộp bài
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -484,17 +506,42 @@ const PracticePages = () => {
 
               <div className={cx("practice__subnav")}>
                 <div className={cx("practice__subnav--main")}>
-                  <div
-                    className={cx("practice__subnav--item")}
-                    onClick={handleOpenModelPause}
-                  >
-                    <FaRegPauseCircle
-                      className={cx("practice__subnav--item-icon")}
-                    />
-                    <div className={cx("practice__subnav--item-label")}>
-                      Tạm dừng
+                  {isRemake ? (
+                    <>
+                      {/* <div className={cx("practice__subnav--item")}>
+                        <FaRegPlayCircle
+                          className={cx("practice__subnav--item-icon")}
+                        />
+                        <div className={cx("practice__subnav--item-label")}>
+                          Tiếp tục
+                        </div>
+                      </div> */}
+                      <div
+                        className={cx("practice__subnav--item")}
+                        onClick={() => setIsOpenRemakeExam(true)}
+                      >
+                        <FaUndoAlt
+                          className={cx("practice__subnav--item-icon")}
+                        />
+                        <div className={cx("practice__subnav--item-label")}>
+                          Làm lại
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      className={cx("practice__subnav--item")}
+                      onClick={handleOpenModelSubmit}
+                    >
+                      <FaRegCheckCircle
+                        className={cx("practice__subnav--item-icon")}
+                      />
+                      <div className={cx("practice__subnav--item-label")}>
+                        Nộp bài
+                      </div>
                     </div>
-                  </div>
+                  )}
+
                   <div
                     className={
                       openQuestionList
@@ -550,7 +597,7 @@ const PracticePages = () => {
                                 <span
                                   className={
                                     selectedQuestions.find(
-                                      (c) => c.idQs === o.id
+                                      (c) => c.idQuestion === o.id
                                     )
                                       ? cx("question-item__bground", "active")
                                       : cx("question-item__bground")
@@ -565,31 +612,8 @@ const PracticePages = () => {
                       </div>
                     </div>
                   </Drawer>
-                  <div
-                    className={cx("practice__subnav--item")}
-                    onClick={handleOpenModelSubmit}
-                  >
-                    <FaRegCheckCircle
-                      className={cx("practice__subnav--item-icon")}
-                    />
-                    <div className={cx("practice__subnav--item-label")}>
-                      Nộp bài
-                    </div>
-                  </div>
                 </div>
               </div>
-
-              <Modal
-                className={cx("modal", "modal__pause")}
-                title="Tạm dừng"
-                open={isOpenModelPause}
-                onOk={handlePauseOk}
-                onCancel={handleCancel}
-                okText={"Đồng ý"}
-                cancelText={"Hủy"}
-              >
-                <p>Bạn có muốn tạm dừng không?</p>
-              </Modal>
 
               <Modal
                 className={cx("modal", "modal__submit")}
@@ -600,10 +624,19 @@ const PracticePages = () => {
                 okText={"Nộp bài"}
                 cancelText={"Hủy"}
               >
-                <p>
-                  Bạn vẫn còn câu hỏi chưa trả lời. Bạn có chắc chắn muốn nộp
-                  bài làm của mình không?
-                </p>
+                <p>Bạn có chắc chắn muốn nộp bài làm của mình không?</p>
+              </Modal>
+
+              <Modal
+                className={cx("modal", "modal__submit")}
+                title="Làm lại"
+                open={isOpenRemakeExam}
+                onOk={handleRemakeExam}
+                onCancel={handleCancel}
+                okText={"Làm lại"}
+                cancelText={"Hủy"}
+              >
+                <p>Bạn có chắc chắn muốn làm lại không?</p>
               </Modal>
 
               <Modal

@@ -199,6 +199,16 @@
     justify-content: space-between;
     margin-bottom: 0.8rem;
   }
+
+  @include responsive(md) {
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    & > div > span {
+      padding: 0 0.5rem;
+      margin-top: 0.2rem;
+      font-size: 1.2rem;
+    }
+  }
 }
 
 .exam__panel--score {
@@ -212,6 +222,17 @@
     color: #76b257 !important;
     font-weight: 700 !important;
     margin-top: unset !important;
+  }
+  @include responsive(xs) {
+    margin-left: unset;
+  }
+
+  @include responsive(sm) {
+    margin-left: unset;
+  }
+
+  @include responsive(md) {
+    margin-left: unset;
   }
 }
 
