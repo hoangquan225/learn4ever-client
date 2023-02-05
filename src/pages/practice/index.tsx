@@ -15,15 +15,20 @@ import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
 import { useCallback, useEffect, useState } from "react";
 import CountDownRender from "../../components/FCCountdown";
+import Countdown from "antd/es/statistic/Countdown";
 import {
+  FaCheckCircle,
+  FaClock,
   FaMarker,
   FaRegCheckCircle,
   FaRegClock,
-  FaRegPlayCircle,
   FaRegQuestionCircle,
+  FaSignOutAlt,
+  FaStar,
+  FaTimesCircle,
   FaUndoAlt,
 } from "react-icons/fa";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { apiCreateFeedback } from "../../api/feedback";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -46,6 +51,7 @@ import {
 import TTCSconfig from "../../submodule/common/config";
 import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
+import moment from "moment";
 
 const cx = classNames.bind(styles);
 
@@ -60,6 +66,7 @@ const PracticePages = () => {
   const questionStates = useAppSelector(QuestionState);
   const questions = questionStates.questions;
   const totalQuestion = questionStates.total;
+  const navigate = useNavigate();
   const userInfo = useAppSelector(authState).userInfo;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
@@ -67,19 +74,20 @@ const PracticePages = () => {
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
   const [isOpenRemakeExam, setIsOpenRemakeExam] = useState(false);
-  const [score, setScore] = useState(0);
+  const [correct, setCorrect] = useState(0);
   const [correctQuestions, setCorrectQuestions] = useState<String[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
   const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
+  const [timeCoundown, settimeCoundown] = useState<number>(moment().valueOf());
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleClockStick);
-    return () => {
-      window.removeEventListener("scroll", handleClockStick);
-    };
-  }, []);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleClockStick);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleClockStick);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
@@ -87,7 +95,10 @@ const PracticePages = () => {
         (o) => o.idTopic === topic?.id && setSelectedQuestions(o.answers)
       );
       setIsRemake(true);
+      setCorrect(0);
+      setCorrectQuestions([]);
     } else {
+      console.log("render else ");
       setSelectedQuestions([]);
       setIsRemake(false);
     }
@@ -175,8 +186,8 @@ const PracticePages = () => {
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNED,
           timeStudy: 0,
-          score: Math.round((score / totalQuestion) * 100) / 10,
-          correctQuestion: score,
+          score: Math.round((correct / totalQuestion) * 100) / 10,
+          correctQuestion: correct,
           answers: selectedQuestions,
         })
       );
@@ -217,14 +228,16 @@ const PracticePages = () => {
     setIsOpenRemakeExam(false);
     setSelectFeedback([]);
     setTextFeedback("");
+    setCorrect(0);
+    setCorrectQuestions([]);
   };
 
   const handleMark = (idQuestion: string, isCheck: boolean) => {
     if (isCheck) {
       setCorrectQuestions([...correctQuestions, idQuestion]);
-      setScore(score + 1);
+      setCorrect(correct + 1);
     } else if (correctQuestions.find((o) => o === idQuestion)) {
-      setScore(score - 1);
+      setCorrect(correct - 1);
       setCorrectQuestions(correctQuestions.filter((o) => o !== idQuestion));
     }
   };
@@ -249,14 +262,13 @@ const PracticePages = () => {
     }
   };
 
-  const handleFinish = useCallback(() => {
-    handleSubmitOk();
-  }, []);
+  const handleFinish = useCallback(handleSubmitOk, []);
 
   const handleRemakeExam = () => {
     setSelectedQuestions([]);
     setIsOpenRemakeExam(false);
     setIsRemake(false);
+    settimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
   };
 
   return (
@@ -329,9 +341,16 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      <CountDownRender
-                        count={!isRemake ? Number(topic?.timeExam) : 0}
+                      {/* <CountDownRender
+                        count={!isRemake ? 0.2 : 0}
                         onFinish={handleFinish}
+                      /> */}
+                      <Countdown
+                        // value={moment().valueOf() + count * 1000 * 60}
+                        value={!isRemake ? timeCoundown : 0}
+                        onFinish={async () => {
+                          // await handleSubmitOk();
+                        }}
                       />
                     </span>
                   </Row>
@@ -374,27 +393,34 @@ const PracticePages = () => {
                                     <Space direction="vertical">
                                       {qs.answer?.map((item, i) => {
                                         return (
-                                          <Radio value={item} key={i} checked={!!selectedQuestions.find(
-                                            (o) =>
-                                              o.idAnswer.toString() ===
-                                              item?._id?.toString()
-                                          )} onClick={(e) => {
-                                            handlSaveSelected(
-                                              qs?.id || "",
-                                              item?._id || ''
-                                            );
-                                            handleMark(
-                                              qs?.id || "",
-                                              item?.isResult
-                                            );
-                                          }}>
+                                          <Radio
+                                            value={item}
+                                            key={i}
+                                            checked={
+                                              !!selectedQuestions.find(
+                                                (o) =>
+                                                  o.idAnswer.toString() ===
+                                                  item?._id?.toString()
+                                              )
+                                            }
+                                            onClick={(e) => {
+                                              handlSaveSelected(
+                                                qs?.id || "",
+                                                item?._id || ""
+                                              );
+                                              handleMark(
+                                                qs?.id || "",
+                                                item?.isResult
+                                              );
+                                            }}
+                                            disabled={isRemake}
+                                          >
                                             <div
                                               className={cx(
                                                 "quiz-choices__item--answer"
                                               )}
                                             >
-                                              {answers[item.index]}.{" "}
-                                              {item.text}
+                                              {answers[item.index]}. {item.text}
                                             </div>
                                           </Radio>
                                         );
@@ -418,6 +444,7 @@ const PracticePages = () => {
                           Bảng câu hỏi
                         </div>
                       </div>
+
                       <div className={cx("practice__palette--body")}>
                         <div className={cx("practice__palette--progress")}>
                           <Progress
@@ -466,17 +493,67 @@ const PracticePages = () => {
                           </Row>
                         </div>
                       </div>
+
+                      {isRemake && (
+                        <div className={cx("practice__palette--review")}>
+                          {userInfo?.progess?.map(
+                            (o) =>
+                              o.idTopic === topic?.id && (
+                                <>
+                                  <div className={cx("exam__panel--score")}>
+                                    <FaStar
+                                      style={{
+                                        color: "#ffe644",
+                                        fontSize: "8rem",
+                                      }}
+                                    />
+                                    <span>{o.score}</span>
+                                  </div>
+                                  <div className={cx("exam__panel--body")}>
+                                    <div className={cx("exam__panel--correct")}>
+                                      <FaCheckCircle
+                                        style={{ color: "#33cd99" }}
+                                      />
+                                      <span>{o.correctQuestion}</span>
+                                    </div>
+                                    <div
+                                      className={cx("exam__panel--inCorrect")}
+                                    >
+                                      <FaTimesCircle
+                                        style={{ color: "#ff4747" }}
+                                      />
+                                      <span>
+                                        {totalQuestion - o.correctQuestion}
+                                      </span>
+                                    </div>
+                                    <div className={cx("exam__panel--time")}>
+                                      <FaClock style={{ color: "#ffba34" }} />
+                                      <span>
+                                        {moment(o.timeStudy).format("mm:ss")}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </>
+                              )
+                          )}
+                        </div>
+                      )}
                       <div className={cx("practice__palette--footer")}>
                         {isRemake ? (
                           <div className={cx("btn-group")}>
-                            {/* <button className={cx("btn", "btn__submit")}>
-                              Tiếp tục
-                            </button> */}
                             <button
                               className={cx("btn", "btn__submit")}
                               onClick={() => setIsOpenRemakeExam(true)}
                             >
                               Làm lại
+                            </button>
+                            <button
+                              className={cx("btn")}
+                              onClick={() => {
+                                navigate(-1);
+                              }}
+                            >
+                              Thoát
                             </button>
                           </div>
                         ) : (
@@ -499,14 +576,19 @@ const PracticePages = () => {
                 <div className={cx("practice__subnav--main")}>
                   {isRemake ? (
                     <>
-                      {/* <div className={cx("practice__subnav--item")}>
-                        <FaRegPlayCircle
+                      <div
+                        className={cx("practice__subnav--item")}
+                        onClick={() => {
+                          navigate(-1);
+                        }}
+                      >
+                        <FaSignOutAlt
                           className={cx("practice__subnav--item-icon")}
                         />
                         <div className={cx("practice__subnav--item-label")}>
-                          Tiếp tục
+                          Thoát
                         </div>
-                      </div> */}
+                      </div>
                       <div
                         className={cx("practice__subnav--item")}
                         onClick={() => setIsOpenRemakeExam(true)}
