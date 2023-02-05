@@ -81,12 +81,12 @@ const PracticePages = () => {
     };
   }, []);
 
+  console.log({ selectedQuestions });
+
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
-      userInfo?.progess?.find(
-        (o) =>
-          o.idTopic === topic?.id &&
-          setSelectedQuestions(o.answers.map((c) => c))
+      userInfo?.progess?.forEach(
+        (o) => o.idTopic === topic?.id && setSelectedQuestions(o.answers)
       );
       setIsRemake(true);
     } else {
@@ -332,7 +332,7 @@ const PracticePages = () => {
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
                       <CountDownRender
-                        count={Number(topic?.timeExam)}
+                        count={!isRemake ? Number(topic?.timeExam) : 0}
                         onFinish={handleFinish}
                       />
                     </span>
@@ -385,28 +385,33 @@ const PracticePages = () => {
                                           e.target.value.isResult
                                         );
                                       }}
+                                      // value={}
                                     >
                                       <Space direction="vertical">
-                                        {qs.answer?.map((item, i) => (
-                                          <Radio
-                                            value={item}
-                                            key={i}
-                                            // checked={
-                                            //   isRemake &&
-                                            //   !!selectedQuestions.find(
-                                            //     (o) => o.idAnswer === item._id
-                                            //   )
-                                            // }
-                                          >
-                                            <div
-                                              className={cx(
-                                                "quiz-choices__item--answer"
-                                              )}
-                                            >
-                                              {answers[item.index]}. {item.text}
-                                            </div>
-                                          </Radio>
-                                        ))}
+                                        {qs.answer?.map((item, i) => {
+                                          console.log(item._id);
+                                          console.log({
+                                            idAnswer: selectedQuestions,
+                                            find: selectedQuestions.find(
+                                              (o) =>
+                                                o.idAnswer.toString() ===
+                                                item?._id?.toString()
+                                            ),
+                                          });
+
+                                          return (
+                                            <Radio value={item} key={i}>
+                                              <div
+                                                className={cx(
+                                                  "quiz-choices__item--answer"
+                                                )}
+                                              >
+                                                {answers[item.index]}.{" "}
+                                                {item.text}
+                                              </div>
+                                            </Radio>
+                                          );
+                                        })}
                                       </Space>
                                     </Radio.Group>
                                   </div>
