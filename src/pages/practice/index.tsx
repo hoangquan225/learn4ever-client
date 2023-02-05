@@ -81,8 +81,6 @@ const PracticePages = () => {
     };
   }, []);
 
-  console.log({ selectedQuestions });
-
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
       userInfo?.progess?.forEach(
@@ -93,7 +91,7 @@ const PracticePages = () => {
       setSelectedQuestions([]);
       setIsRemake(false);
     }
-  }, [topic?.id]);
+  }, [topic?.id, userInfo]);
 
   useEffect(() => {
     loadQuestionByTopic(params.idChild || "", 1);
@@ -373,47 +371,35 @@ const PracticePages = () => {
 
                                 <div className={cx("game__view--quiz-choices")}>
                                   <div className={cx("quiz-choices__item")}>
-                                    <Radio.Group
-                                      name="radiogroup"
-                                      onChange={(e) => {
-                                        handlSaveSelected(
-                                          qs?.id || "",
-                                          e.target.value._id
+                                    <Space direction="vertical">
+                                      {qs.answer?.map((item, i) => {
+                                        return (
+                                          <Radio value={item} key={i} checked={!!selectedQuestions.find(
+                                            (o) =>
+                                              o.idAnswer.toString() ===
+                                              item?._id?.toString()
+                                          )} onClick={(e) => {
+                                            handlSaveSelected(
+                                              qs?.id || "",
+                                              item?._id || ''
+                                            );
+                                            handleMark(
+                                              qs?.id || "",
+                                              item?.isResult
+                                            );
+                                          }}>
+                                            <div
+                                              className={cx(
+                                                "quiz-choices__item--answer"
+                                              )}
+                                            >
+                                              {answers[item.index]}.{" "}
+                                              {item.text}
+                                            </div>
+                                          </Radio>
                                         );
-                                        handleMark(
-                                          qs?.id || "",
-                                          e.target.value.isResult
-                                        );
-                                      }}
-                                      // value={}
-                                    >
-                                      <Space direction="vertical">
-                                        {qs.answer?.map((item, i) => {
-                                          console.log(item._id);
-                                          console.log({
-                                            idAnswer: selectedQuestions,
-                                            find: selectedQuestions.find(
-                                              (o) =>
-                                                o.idAnswer.toString() ===
-                                                item?._id?.toString()
-                                            ),
-                                          });
-
-                                          return (
-                                            <Radio value={item} key={i}>
-                                              <div
-                                                className={cx(
-                                                  "quiz-choices__item--answer"
-                                                )}
-                                              >
-                                                {answers[item.index]}.{" "}
-                                                {item.text}
-                                              </div>
-                                            </Radio>
-                                          );
-                                        })}
-                                      </Space>
-                                    </Radio.Group>
+                                      })}
+                                    </Space>
                                   </div>
                                 </div>
                               </div>
