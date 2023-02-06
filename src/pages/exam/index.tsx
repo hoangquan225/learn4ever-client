@@ -71,7 +71,12 @@ const ExamPages = () => {
   ) => {
     try {
       const result = await dispatch(
-        requestLoadTopicByCourse({ idCourse, type, parentId })
+        requestLoadTopicByCourse({
+          idCourse,
+          type,
+          parentId,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
       );
       unwrapResult(result);
     } catch (error) {
@@ -109,7 +114,7 @@ const ExamPages = () => {
                       <Breadcrumb.Item>
                         <NavLink
                           to={`/${course?.category?.slug}/${course?.slug}`}
-                          className={cx("exam__breadcumb--link", "active")}
+                          className={cx("exam__breadcumb--link")}
                         >
                           {course?.courseName}
                         </NavLink>
@@ -178,67 +183,79 @@ const ExamPages = () => {
                             }
                           >
                             {dataChild[0] &&
-                              dataChild?.map((dataChild, iChild) => (
-                                <Col
-                                  xl={12}
-                                  lg={12}
-                                  md={12}
-                                  sm={24}
-                                  xs={24}
-                                  key={iChild}
-                                >
-                                  <div className={cx("exam__panel--content")}>
-                                    <span>{dataChild.name}</span>
-                                    <div className={cx("exam__panel--action")}>
-                                      <div className={cx("panel--action-item")}>
-                                        <div>
-                                          <FaRegQuestionCircle />
-                                          <span>
-                                            {dataChild?.numQuestion} câu
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <FaRegClock />
-                                          <span>
-                                            {dataChild?.timeExam} phút
-                                          </span>
-                                        </div>
-                                        {userInfo?.progess?.map(
-                                          (o) =>
-                                            o.idTopic === dataChild.id && (
-                                              <div
-                                                className={cx(
-                                                  "exam__panel--score"
-                                                )}
-                                                key={o.idTopic}
-                                              >
-                                                <span>{o.score} điểm</span>
-                                              </div>
-                                            )
-                                        )}
-                                      </div>
-                                      <Popconfirm
-                                        placement="top"
-                                        title="Bạn muốn làm đề này sao?"
-                                        onConfirm={() =>
-                                          navigate(`${dataChild.id}`)
-                                        }
-                                        okText="Yes"
-                                        cancelText="No"
+                              dataChild?.map(
+                                (dataChild, iChild) =>
+                                  dataChild.status ===
+                                    TTCSconfig.STATUS_PUBLIC && (
+                                    <Col
+                                      xl={12}
+                                      lg={12}
+                                      md={12}
+                                      sm={24}
+                                      xs={24}
+                                      key={iChild}
+                                    >
+                                      <div
+                                        className={cx("exam__panel--content")}
                                       >
-                                        <button
-                                          className={cx("exam__panel--btn")}
+                                        <span>{dataChild.name}</span>
+                                        <div
+                                          className={cx("exam__panel--action")}
                                         >
-                                          <span>Làm bài</span>
-                                          <BiChevronRight
-                                            className={cx("exam__panel--icon")}
-                                          />
-                                        </button>
-                                      </Popconfirm>
-                                    </div>
-                                  </div>
-                                </Col>
-                              ))}
+                                          <div
+                                            className={cx("panel--action-item")}
+                                          >
+                                            <div>
+                                              <FaRegQuestionCircle />
+                                              <span>
+                                                {dataChild?.numQuestion} câu
+                                              </span>
+                                            </div>
+                                            <div>
+                                              <FaRegClock />
+                                              <span>
+                                                {dataChild?.timeExam} phút
+                                              </span>
+                                            </div>
+                                            {userInfo?.progess?.map(
+                                              (o) =>
+                                                o.idTopic === dataChild.id && (
+                                                  <div
+                                                    className={cx(
+                                                      "exam__panel--score"
+                                                    )}
+                                                    key={o.idTopic}
+                                                  >
+                                                    <span>{o.score} điểm</span>
+                                                  </div>
+                                                )
+                                            )}
+                                          </div>
+                                          <Popconfirm
+                                            placement="top"
+                                            title="Bạn muốn làm đề này sao?"
+                                            onConfirm={() =>
+                                              navigate(`${dataChild.id}`)
+                                            }
+                                            okText="Yes"
+                                            cancelText="No"
+                                          >
+                                            <button
+                                              className={cx("exam__panel--btn")}
+                                            >
+                                              <span>Làm bài</span>
+                                              <BiChevronRight
+                                                className={cx(
+                                                  "exam__panel--icon"
+                                                )}
+                                              />
+                                            </button>
+                                          </Popconfirm>
+                                        </div>
+                                      </div>
+                                    </Col>
+                                  )
+                              )}
                           </Row>
                         </div>
                       </div>

@@ -112,7 +112,12 @@ const LearningPages = () => {
   ) => {
     try {
       const result = await dispatch(
-        requestLoadTopicByCourse({ idCourse, type, parentId })
+        requestLoadTopicByCourse({
+          idCourse,
+          type,
+          parentId,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
       );
       unwrapResult(result);
     } catch (error) {
@@ -290,11 +295,19 @@ const LearningPages = () => {
                               {
                                 topic.topicChildData.filter((o1) =>
                                   userInfo?.progess?.some(
-                                    (o2) => o2.idTopic === o1.id
+                                    (o2) =>
+                                      o2.idTopic === o1.id &&
+                                      o1.status === TTCSconfig.STATUS_PUBLIC
                                   )
                                 ).length
                               }
-                              /{topic?.topicChildData.length} | 24:30
+                              /
+                              {
+                                topic?.topicChildData.filter(
+                                  (o) => o.status === TTCSconfig.STATUS_PUBLIC
+                                ).length
+                              }{" "}
+                              | 24:30
                             </span>
                             <span className={cx("learning__track--item-icon")}>
                               <IoChevronUpOutline
@@ -316,11 +329,19 @@ const LearningPages = () => {
                               {
                                 topic.topicChildData.filter((o1) =>
                                   userInfo?.progess?.some(
-                                    (o2) => o2.idTopic === o1.id
+                                    (o2) =>
+                                      o2.idTopic === o1.id &&
+                                      o1.status === TTCSconfig.STATUS_PUBLIC
                                   )
                                 ).length
                               }
-                              /{topic?.topicChildData.length} | 24:30
+                              /
+                              {
+                                topic?.topicChildData.filter(
+                                  (o) => o.status === TTCSconfig.STATUS_PUBLIC
+                                ).length
+                              }{" "}
+                              | 24:30
                             </span>
                             <span className={cx("learning__track--item-icon")}>
                               <IoChevronDownOutline
@@ -335,85 +356,88 @@ const LearningPages = () => {
                           [...topic?.topicChildData]?.map(
                             (topicChild, indexChild) => {
                               return (
-                                <div
-                                  className={cx("learning__track--steps")}
-                                  key={indexChild}
-                                >
+                                topicChild.status ===
+                                  TTCSconfig.STATUS_PUBLIC && (
                                   <div
-                                    className={
-                                      dataTopicActive?.id === topicChild.id
-                                        ? cx(
-                                            "learning__track--steps-item",
-                                            "active"
-                                          )
-                                        : cx("learning__track--steps-item")
-                                    }
-                                    onClick={() => {
-                                      setIndexTopic(topic.id);
-                                      handleUpdateLearned(
-                                        topicChild.id || "",
-                                        userInfo?._id || "",
-                                        0
-                                      );
-                                      handleChangeTopic(topicChild.id || "");
-                                    }}
+                                    className={cx("learning__track--steps")}
+                                    key={indexChild}
                                   >
                                     <div
-                                      className={cx(
-                                        "learning__track--steps-info"
-                                      )}
+                                      className={
+                                        dataTopicActive?.id === topicChild.id
+                                          ? cx(
+                                              "learning__track--steps-item",
+                                              "active"
+                                            )
+                                          : cx("learning__track--steps-item")
+                                      }
+                                      onClick={() => {
+                                        setIndexTopic(topic.id);
+                                        handleUpdateLearned(
+                                          topicChild.id || "",
+                                          userInfo?._id || "",
+                                          0
+                                        );
+                                        handleChangeTopic(topicChild.id || "");
+                                      }}
                                     >
-                                      <h3
+                                      <div
                                         className={cx(
-                                          "learning__track--steps-title"
+                                          "learning__track--steps-info"
                                         )}
                                       >
-                                        {topicChild?.name}
-                                      </h3>
-                                      <p
-                                        className={cx(
-                                          "learning__track--steps-desc"
-                                        )}
-                                      >
-                                        {topicChild?.topicType === 4 ? (
-                                          <FaPlayCircle
-                                            className={cx("desc-icon")}
-                                          />
-                                        ) : topicChild?.topicType === 5 ? (
-                                          <FaFileAlt
-                                            className={cx("desc-icon")}
-                                          />
-                                        ) : topicChild?.topicType === 2 ? (
-                                          <FaQuestionCircle
-                                            className={cx("desc-icon")}
-                                          />
-                                        ) : (
-                                          <></>
-                                        )}
-                                        <span
+                                        <h3
                                           className={cx(
-                                            "learning__track--steps-time"
+                                            "learning__track--steps-title"
                                           )}
                                         >
-                                          01:35
-                                        </span>
-                                      </p>
-                                    </div>
-                                    <div
-                                      className={cx(
-                                        "learning__track--steps-status"
-                                      )}
-                                    >
-                                      {userInfo?.progess?.find(
-                                        (c) => c.idTopic === topicChild.id
-                                      ) && (
-                                        <FaCheckCircle
-                                          className={cx("status-icon")}
-                                        />
-                                      )}
+                                          {topicChild?.name}
+                                        </h3>
+                                        <p
+                                          className={cx(
+                                            "learning__track--steps-desc"
+                                          )}
+                                        >
+                                          {topicChild?.topicType === 4 ? (
+                                            <FaPlayCircle
+                                              className={cx("desc-icon")}
+                                            />
+                                          ) : topicChild?.topicType === 5 ? (
+                                            <FaFileAlt
+                                              className={cx("desc-icon")}
+                                            />
+                                          ) : topicChild?.topicType === 2 ? (
+                                            <FaQuestionCircle
+                                              className={cx("desc-icon")}
+                                            />
+                                          ) : (
+                                            <></>
+                                          )}
+                                          <span
+                                            className={cx(
+                                              "learning__track--steps-time"
+                                            )}
+                                          >
+                                            01:35
+                                          </span>
+                                        </p>
+                                      </div>
+                                      <div
+                                        className={cx(
+                                          "learning__track--steps-status"
+                                        )}
+                                      >
+                                        {userInfo?.progess?.find(
+                                          (c) => c.idTopic === topicChild.id
+                                        ) && (
+                                          <FaCheckCircle
+                                            className={cx("status-icon")}
+                                          />
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                )
                               );
                             }
                           )}

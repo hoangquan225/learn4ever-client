@@ -1,14 +1,24 @@
 import { memo } from "react";
 import Countdown from "antd/es/statistic/Countdown";
 import moment from "moment";
+import TTCSconfig from "../submodule/common/config";
+import { requestUpdateStudiedForUser } from "../redux/slices/userSlice";
+import { useAppDispatch } from "../redux/hook";
+import { unwrapResult } from "@reduxjs/toolkit";
 
-const CountDownRender = ({ count, onFinish }: any) => {
-  console.log("re-render");
+const CountDownRender = (props: {
+  count: number;
+  onFinish: (time: any) => void;
+}) => {
+  const { count, onFinish } = props;
 
   return (
     <Countdown
-      value={moment().valueOf() + count * 1000 * 60}
-      onFinish={onFinish}
+      value={count}
+      onFinish={() => {
+        onFinish(0);
+      }}
+      onChange={onFinish}
     />
   );
 };

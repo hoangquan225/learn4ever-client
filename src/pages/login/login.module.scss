@@ -31,13 +31,16 @@
 }
 
 .login__over {
-  height: 100%;
   outline: 0px;
   display: flex;
   -webkit-box-pack: center;
   justify-content: space-around;
   -webkit-box-align: center;
   align-items: center;
+  background-image: url(../../assets/img/authBackground.jpg);
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .login__wrapper {

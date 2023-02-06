@@ -38,6 +38,10 @@
   justify-content: space-around;
   -webkit-box-align: center;
   align-items: center;
+  background-image: url(../../assets/img/authBackground.jpg);
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .register__wrapper {

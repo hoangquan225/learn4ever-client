@@ -32,7 +32,12 @@ export const requestLoadCourseBySlug = createAsyncThunk(
 
 export const requestLoadTopicByCourse = createAsyncThunk(
   "topic/requestLoadTopicByCourse",
-  async (props: { idCourse: string; type: number; parentId?: string }) => {
+  async (props: {
+    idCourse: string;
+    type: number;
+    parentId?: string;
+    status: number;
+  }) => {
     const res = await apiLoadTopicByCourse(props);
     return res.data;
   }

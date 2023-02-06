@@ -10,10 +10,11 @@ import {
   Radio,
   Row,
   Space,
+  StatisticProps,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CountDownRender from "../../components/FCCountdown";
 import Countdown from "antd/es/statistic/Countdown";
 import {
@@ -81,13 +82,16 @@ const PracticePages = () => {
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
   const [timeCoundown, settimeCoundown] = useState<number>(moment().valueOf());
+  const timePratice = useRef<any>();
 
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleClockStick);
-  //   return () => {
-  //     window.removeEventListener("scroll", handleClockStick);
-  //   };
-  // }, []);
+  console.log("render");
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleClockStick);
+    return () => {
+      window.removeEventListener("scroll", handleClockStick);
+    };
+  }, []);
 
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
@@ -185,7 +189,7 @@ const PracticePages = () => {
           idTopic: topic?.id || "",
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNED,
-          timeStudy: 0,
+          timeStudy: timePratice.current,
           score: Math.round((correct / totalQuestion) * 100) / 10,
           correctQuestion: correct,
           answers: selectedQuestions,
@@ -262,7 +266,11 @@ const PracticePages = () => {
     }
   };
 
-  const handleFinish = useCallback(handleSubmitOk, []);
+  // const handleFinish = useCallback(handleSubmitOk, [
+  //   correct,
+  //   selectedQuestions,
+  //   topic?.id,
+  // ]);
 
   const handleRemakeExam = () => {
     setSelectedQuestions([]);
@@ -341,15 +349,11 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      {/* <CountDownRender
-                        count={!isRemake ? 0.2 : 0}
-                        onFinish={handleFinish}
-                      /> */}
                       <Countdown
-                        // value={moment().valueOf() + count * 1000 * 60}
                         value={!isRemake ? timeCoundown : 0}
-                        onFinish={async () => {
-                          // await handleSubmitOk();
+                        onFinish={async () => await handleSubmitOk()}
+                        onChange={(val: StatisticProps["value"]) => {
+                          timePratice.current = val;
                         }}
                       />
                     </span>
@@ -394,6 +398,26 @@ const PracticePages = () => {
                                       {qs.answer?.map((item, i) => {
                                         return (
                                           <Radio
+                                            className={
+                                              isRemake
+                                                ? item?.isResult
+                                                  ? cx(
+                                                      "quiz-choices__item--radio",
+                                                      "correct"
+                                                    )
+                                                  : selectedQuestions.find(
+                                                      (o) =>
+                                                        o.idAnswer.toString() ===
+                                                        item?._id?.toString()
+                                                    ) &&
+                                                    cx(
+                                                      "quiz-choices__item--radio",
+                                                      "inCorrect"
+                                                    )
+                                                : cx(
+                                                    "quiz-choices__item--radio"
+                                                  )
+                                            }
                                             value={item}
                                             key={i}
                                             checked={
@@ -425,6 +449,28 @@ const PracticePages = () => {
                                           </Radio>
                                         );
                                       })}
+
+                                      {isRemake && (
+                                        <div className={cx("quiz__explain")}>
+                                          {qs.answer?.find(
+                                            (item) =>
+                                              item?.isResult &&
+                                              selectedQuestions.find(
+                                                (o) =>
+                                                  o.idAnswer.toString() ===
+                                                  item?._id?.toString()
+                                              )
+                                          ) ? (
+                                            <p style={{ color: "#33cd99" }}>
+                                              Bạn chọn đáp án đúng
+                                            </p>
+                                          ) : (
+                                            <p style={{ color: "#ff4747" }}>
+                                              Bạn chọn đáp án sai
+                                            </p>
+                                          )}
+                                        </div>
+                                      )}
                                     </Space>
                                   </div>
                                 </div>
@@ -462,34 +508,78 @@ const PracticePages = () => {
                           </div>
                         </div>
 
-                        <div className={cx("practice__palette--question-list")}>
+                        <div
+                          className={cx("practice__palette--question-list")}
+                          style={
+                            isRemake ? { height: "30vh" } : { height: "60vh" }
+                          }
+                        >
                           <Row
                             style={{
                               marginTop: "0.4rem",
                             }}
                             gutter={[0, 16]}
                           >
-                            {questions?.map((o, i) => (
-                              <Col
-                                span={3}
-                                className={cx("question-item")}
-                                key={i}
-                              >
-                                <a href={`#${o.id}`}>
-                                  <span
-                                    className={
-                                      selectedQuestions.find(
-                                        (c) => c.idQuestion === o.id
-                                      )
-                                        ? cx("question-item__bground", "active")
-                                        : cx("question-item__bground")
-                                    }
-                                  >
-                                    {i + 1}
-                                  </span>
-                                </a>
-                              </Col>
-                            ))}
+                            {questions?.map((o, i) =>
+                              isRemake ? (
+                                <Col
+                                  span={3}
+                                  className={cx("question-item")}
+                                  key={i}
+                                >
+                                  <a href={`#${o.id}`}>
+                                    <span
+                                      className={
+                                        o.answer?.find(
+                                          (item) =>
+                                            item?.isResult &&
+                                            selectedQuestions.find(
+                                              (o) =>
+                                                o.idAnswer.toString() ===
+                                                item?._id?.toString()
+                                            )
+                                        )
+                                          ? cx(
+                                              "question-item__bground",
+                                              "green",
+                                              "active"
+                                            )
+                                          : cx(
+                                              "question-item__bground",
+                                              "red",
+                                              "active"
+                                            )
+                                      }
+                                    >
+                                      {i + 1}
+                                    </span>
+                                  </a>
+                                </Col>
+                              ) : (
+                                <Col
+                                  span={3}
+                                  className={cx("question-item")}
+                                  key={i}
+                                >
+                                  <a href={`#${o.id}`}>
+                                    <span
+                                      className={
+                                        selectedQuestions.find(
+                                          (c) => c.idQuestion === o.id
+                                        )
+                                          ? cx(
+                                              "question-item__bground",
+                                              "active"
+                                            )
+                                          : cx("question-item__bground")
+                                      }
+                                    >
+                                      {i + 1}
+                                    </span>
+                                  </a>
+                                </Col>
+                              )
+                            )}
                           </Row>
                         </div>
                       </div>
@@ -514,6 +604,9 @@ const PracticePages = () => {
                                       <FaCheckCircle
                                         style={{ color: "#33cd99" }}
                                       />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Số câu đúng
+                                      </span>
                                       <span>{o.correctQuestion}</span>
                                     </div>
                                     <div
@@ -522,14 +615,25 @@ const PracticePages = () => {
                                       <FaTimesCircle
                                         style={{ color: "#ff4747" }}
                                       />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Số câu sai
+                                      </span>
                                       <span>
                                         {totalQuestion - o.correctQuestion}
                                       </span>
                                     </div>
                                     <div className={cx("exam__panel--time")}>
                                       <FaClock style={{ color: "#ffba34" }} />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Thời gian
+                                      </span>
                                       <span>
-                                        {moment(o.timeStudy).format("mm:ss")}
+                                        {moment(
+                                          Math.abs(
+                                            (topic?.timeExam || 0) * 60000 -
+                                              o.timeStudy
+                                          )
+                                        ).format("mm:ss")}
                                       </span>
                                     </div>
                                   </div>
@@ -550,7 +654,9 @@ const PracticePages = () => {
                             <button
                               className={cx("btn")}
                               onClick={() => {
-                                navigate(-1);
+                                navigate(
+                                  `/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`
+                                );
                               }}
                             >
                               Thoát
@@ -579,7 +685,9 @@ const PracticePages = () => {
                       <div
                         className={cx("practice__subnav--item")}
                         onClick={() => {
-                          navigate(-1);
+                          navigate(
+                            `/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`
+                          );
                         }}
                       >
                         <FaSignOutAlt
@@ -697,7 +805,14 @@ const PracticePages = () => {
                 okText={"Nộp bài"}
                 cancelText={"Hủy"}
               >
-                <p>Bạn có chắc chắn muốn nộp bài làm của mình không?</p>
+                {selectedQuestions.length === totalQuestion ? (
+                  <p>Bạn có chắc chắn muốn nộp bài làm của mình không?</p>
+                ) : (
+                  <p>
+                    Bạn vẫn còn câu hỏi chưa trả lời. Bạn có chắc chắn muốn nộp
+                    bài làm của mình không?
+                  </p>
+                )}
               </Modal>
 
               <Modal
