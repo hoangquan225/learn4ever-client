@@ -269,10 +269,13 @@ html {
 
 .quiz-choices__item {
   padding: 1rem;
+
   & > div {
     width: 100%;
+
     & > div {
       width: 100%;
+
       & > label {
         width: 100%;
         padding: 1rem;
@@ -300,6 +303,7 @@ html {
 
 .quiz__explain {
   border-top: 0.5px solid #717171;
+
   & > p {
     color: #666;
     font-size: 1.4rem;
@@ -411,9 +415,9 @@ html {
   }
 }
 
-// .practice__palette--question-list > div:first-child {
-//   width: 100% !important;
-// }
+.practice__palette--review {
+  margin-bottom: 1.2rem;
+}
 
 .question-item {
   text-align: center;
@@ -449,20 +453,14 @@ html {
   }
 }
 
-.practice__palette--review {
-}
-
 .exam__panel--score {
   font-size: 2.5rem;
   font-weight: 700;
   text-align: center;
-  // color: #76b257;
-  color: #000;
-  & > span {
-    // border: 0.15rem solid rgb(118, 178, 87);
-    // box-shadow: 0 0 1rem rgb(118 178 87/ 10%);
-    // padding: 0 1.6rem;
+  color: var(--textColor);
+  position: relative;
 
+  & > span {
     position: absolute;
     transform: translateX(-50%);
     left: 50%;
@@ -473,16 +471,17 @@ html {
 .exam__panel--body {
   display: flex;
   font-size: 2.4rem;
-  & > div {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    border-radius: 1rem;
-    box-shadow: 0 0 2rem rgb(0 0 0 / 10%);
-    width: 100%;
-    margin: 0 0.4rem;
-    padding: 0.5rem 0px;
-  }
+  justify-content: space-around;
+}
+
+.exam__panel--body-item {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 1rem;
+  width: 100%;
+  box-shadow: 0 0 2rem rgb(0 0 0 / 10%);
+  padding: 0.6rem;
 }
 
 .btn-group {
@@ -498,7 +497,6 @@ html {
   align-items: center;
   border: 0.15rem solid #777;
   border-radius: 2rem;
-  // margin-bottom: 0.8rem;
   height: 3.5rem;
   width: 20rem;
   cursor: pointer;
@@ -577,6 +575,7 @@ html {
 
 .practice__drawer {
   border-radius: 2.4rem 2.4rem 0 0;
+
   & > div > div {
     border: none !important;
 
@@ -584,13 +583,23 @@ html {
       justify-content: end !important;
     }
   }
+
   & > div > div:nth-child(2) {
-    padding: 2.4rem 5rem;
+    padding: 0 5rem 2.4rem 5rem;
+
+    @include responsive(xs) {
+      padding: 0 2.4rem 5rem;
+    }
+
+    @include responsive(sm) {
+      padding: 2.4rem 3rem;
+    }
   }
 }
 
 .modal {
   top: 30%;
+
   & > div:nth-child(2) > div:nth-child(2) {
     text-align: center;
     font-family: var(--font-family);
@@ -607,6 +616,7 @@ html {
 
 .modal__feedback {
   width: 700px !important;
+
   & > div:nth-child(2) > div:last-child {
     text-align: center !important;
   }
@@ -645,6 +655,7 @@ html {
 
 .modal__feedback--item {
   text-align: center;
+
   & > span {
     display: flex;
     align-items: center;

@@ -599,35 +599,67 @@ const PracticePages = () => {
                                     />
                                     <span>{o.score}</span>
                                   </div>
-                                  <div className={cx("exam__panel--body")}>
-                                    <div className={cx("exam__panel--correct")}>
+                                  <Row
+                                    className={cx("exam__panel--body")}
+                                    gutter={[16, 16]}
+                                  >
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--correct"
+                                      )}
+                                    >
                                       <FaCheckCircle
-                                        style={{ color: "#33cd99" }}
+                                        style={{
+                                          color: "#33cd99",
+                                          fontSize: "1.8rem",
+                                        }}
                                       />
                                       <span style={{ fontSize: "1.4rem" }}>
-                                        Số câu đúng
+                                        Câu đúng
                                       </span>
-                                      <span>{o.correctQuestion}</span>
-                                    </div>
-                                    <div
-                                      className={cx("exam__panel--inCorrect")}
+                                      <span style={{ fontSize: "2.2rem" }}>
+                                        {o.correctQuestion}
+                                      </span>
+                                    </Col>
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--inCorrect"
+                                      )}
                                     >
                                       <FaTimesCircle
-                                        style={{ color: "#ff4747" }}
+                                        style={{
+                                          color: "#ff4747",
+                                          fontSize: "1.8rem",
+                                        }}
                                       />
                                       <span style={{ fontSize: "1.4rem" }}>
-                                        Số câu sai
+                                        Câu sai
                                       </span>
-                                      <span>
+                                      <span style={{ fontSize: "2.2rem" }}>
                                         {totalQuestion - o.correctQuestion}
                                       </span>
-                                    </div>
-                                    <div className={cx("exam__panel--time")}>
-                                      <FaClock style={{ color: "#ffba34" }} />
+                                    </Col>
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--time"
+                                      )}
+                                    >
+                                      <FaClock
+                                        style={{
+                                          color: "#ffba34",
+                                          fontSize: "1.8rem",
+                                        }}
+                                      />
                                       <span style={{ fontSize: "1.4rem" }}>
                                         Thời gian
                                       </span>
-                                      <span>
+                                      <span style={{ fontSize: "2.2rem" }}>
                                         {moment(
                                           Math.abs(
                                             (topic?.timeExam || 0) * 60000 -
@@ -635,8 +667,8 @@ const PracticePages = () => {
                                           )
                                         ).format("mm:ss")}
                                       </span>
-                                    </div>
-                                  </div>
+                                    </Col>
+                                  </Row>
                                 </>
                               )
                           )}
@@ -679,10 +711,11 @@ const PracticePages = () => {
               </Row>
 
               <div className={cx("practice__subnav")}>
-                <div className={cx("practice__subnav--main")}>
+                <Row className={cx("practice__subnav--main")}>
                   {isRemake ? (
                     <>
-                      <div
+                      <Col
+                        span={8}
                         className={cx("practice__subnav--item")}
                         onClick={() => {
                           navigate(
@@ -696,8 +729,9 @@ const PracticePages = () => {
                         <div className={cx("practice__subnav--item-label")}>
                           Thoát
                         </div>
-                      </div>
-                      <div
+                      </Col>
+                      <Col
+                        span={8}
                         className={cx("practice__subnav--item")}
                         onClick={() => setIsOpenRemakeExam(true)}
                       >
@@ -707,10 +741,11 @@ const PracticePages = () => {
                         <div className={cx("practice__subnav--item-label")}>
                           Làm lại
                         </div>
-                      </div>
+                      </Col>
                     </>
                   ) : (
-                    <div
+                    <Col
+                      span={8}
                       className={cx("practice__subnav--item")}
                       onClick={handleOpenModelSubmit}
                     >
@@ -720,10 +755,11 @@ const PracticePages = () => {
                       <div className={cx("practice__subnav--item-label")}>
                         Nộp bài
                       </div>
-                    </div>
+                    </Col>
                   )}
 
-                  <div
+                  <Col
+                    span={8}
                     className={
                       openQuestionList
                         ? cx("practice__subnav--item", "active")
@@ -737,14 +773,105 @@ const PracticePages = () => {
                     <div className={cx("practice__subnav--item-label")}>
                       Danh sách câu hỏi
                     </div>
-                  </div>
+                  </Col>
                   <Drawer
                     className={cx("practice__drawer")}
                     placement={"bottom"}
                     onClose={handleCloseQuestionList}
                     open={openQuestionList}
+                    height={"80%"}
                   >
                     <div className={cx("practice__palette--body")}>
+                      {isRemake && (
+                        <div className={cx("practice__palette--review")}>
+                          {userInfo?.progess?.map(
+                            (o) =>
+                              o.idTopic === topic?.id && (
+                                <>
+                                  <div className={cx("exam__panel--score")}>
+                                    <FaStar
+                                      style={{
+                                        color: "#ffe644",
+                                        fontSize: "8rem",
+                                      }}
+                                    />
+                                    <span>{o.score}</span>
+                                  </div>
+                                  <Row
+                                    className={cx("exam__panel--body")}
+                                    gutter={[16, 16]}
+                                  >
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--correct"
+                                      )}
+                                    >
+                                      <FaCheckCircle
+                                        style={{
+                                          color: "#33cd99",
+                                          fontSize: "1.8rem",
+                                        }}
+                                      />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Câu đúng
+                                      </span>
+                                      <span style={{ fontSize: "2.2rem" }}>
+                                        {o.correctQuestion}
+                                      </span>
+                                    </Col>
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--inCorrect"
+                                      )}
+                                    >
+                                      <FaTimesCircle
+                                        style={{
+                                          color: "#ff4747",
+                                          fontSize: "1.8rem",
+                                        }}
+                                      />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Câu sai
+                                      </span>
+                                      <span style={{ fontSize: "2.2rem" }}>
+                                        {totalQuestion - o.correctQuestion}
+                                      </span>
+                                    </Col>
+                                    <Col
+                                      span={7}
+                                      className={cx(
+                                        "exam__panel--body-item",
+                                        "exam__panel--time"
+                                      )}
+                                    >
+                                      <FaClock
+                                        style={{
+                                          color: "#ffba34",
+                                          fontSize: "1.8rem",
+                                        }}
+                                      />
+                                      <span style={{ fontSize: "1.4rem" }}>
+                                        Thời gian
+                                      </span>
+                                      <span style={{ fontSize: "2.2rem" }}>
+                                        {moment(
+                                          Math.abs(
+                                            (topic?.timeExam || 0) * 60000 -
+                                              o.timeStudy
+                                          )
+                                        ).format("mm:ss")}
+                                      </span>
+                                    </Col>
+                                  </Row>
+                                </>
+                              )
+                          )}
+                        </div>
+                      )}
                       <div className={cx("practice__palette--progress")}>
                         <Progress
                           percent={
@@ -774,14 +901,31 @@ const PracticePages = () => {
                               className={cx("question-item")}
                               key={i}
                             >
-                              <a href={`#${o.id}`}>
+                              <a
+                                href={`#${o.id}`}
+                                onClick={handleCloseQuestionList}
+                              >
                                 <span
                                   className={
-                                    selectedQuestions.find(
-                                      (c) => c.idQuestion === o.id
+                                    o.answer?.find(
+                                      (item) =>
+                                        item?.isResult &&
+                                        selectedQuestions.find(
+                                          (o) =>
+                                            o.idAnswer.toString() ===
+                                            item?._id?.toString()
+                                        )
                                     )
-                                      ? cx("question-item__bground", "active")
-                                      : cx("question-item__bground")
+                                      ? cx(
+                                          "question-item__bground",
+                                          "green",
+                                          "active"
+                                        )
+                                      : cx(
+                                          "question-item__bground",
+                                          "red",
+                                          "active"
+                                        )
                                   }
                                 >
                                   {i + 1}
@@ -793,7 +937,7 @@ const PracticePages = () => {
                       </div>
                     </div>
                   </Drawer>
-                </div>
+                </Row>
               </div>
 
               <Modal
