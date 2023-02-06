@@ -81,7 +81,7 @@ const PracticePages = () => {
   const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
-  const [timeCoundown, settimeCoundown] = useState<number>(moment().valueOf());
+  const [timeCoundown, setTimeCoundown] = useState<number>(moment().valueOf());
   const timePratice = useRef<any>();
 
   console.log("render");
@@ -105,6 +105,7 @@ const PracticePages = () => {
       console.log("render else ");
       setSelectedQuestions([]);
       setIsRemake(false);
+      setTimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
     }
   }, [topic?.id, userInfo]);
 
@@ -276,7 +277,7 @@ const PracticePages = () => {
     setSelectedQuestions([]);
     setIsOpenRemakeExam(false);
     setIsRemake(false);
-    settimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
+    setTimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
   };
 
   return (
@@ -630,7 +631,7 @@ const PracticePages = () => {
                                       <span>
                                         {moment(
                                           Math.abs(
-                                            (topic?.timeExam || 0) * 60000 -
+                                            Number(topic?.timeExam) * 60000 -
                                               o.timeStudy
                                           )
                                         ).format("mm:ss")}
