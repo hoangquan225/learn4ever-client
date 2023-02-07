@@ -1,5 +1,5 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Layout, notification, Progress } from "antd";
+import { Layout, notification, Progress, Radio, Row, Space } from "antd";
 import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
@@ -32,6 +32,10 @@ import {
   requestLoadCourseBySlug,
 } from "../../redux/slices/courseSlice";
 import {
+  QuestionState,
+  requestLoadQuestionsByIdTopic,
+} from "../../redux/slices/questionSlice";
+import {
   requestLoadTopicByCourse,
   requestLoadTotalLearnedTopic,
   topicState,
@@ -42,6 +46,7 @@ import {
 } from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { Topic } from "../../submodule/models/topic";
+import { answers } from "../../utils/contants";
 import styles from "./learning.module.scss";
 
 const cx = classNames.bind(styles);
@@ -58,12 +63,15 @@ const LearningPages = () => {
   const loading = topicStates.loading;
   const authStates = useAppSelector(authState);
   const userInfo = authStates.userInfo;
+  const questionStates = useAppSelector(QuestionState);
+  const questions = questionStates.questions;
 
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
   const navigate = useNavigate();
   const [isShowSider, setIsShowSider] = useState(false);
   const [indexTopic, setIndexTopic] = useState<any>();
+  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
 
   useEffect(() => {
     if (params.id) {
@@ -81,6 +89,15 @@ const LearningPages = () => {
       loadTotalLearnedTopic(course?.id, userInfo?._id);
     }
   }, [course?.id, userInfo?._id, userInfo]);
+
+  useEffect(() => {
+    if (
+      dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE &&
+      dataTopicActive?.id
+    ) {
+      loadQuestionsByIdTopic(dataTopicActive?.id || "");
+    }
+  }, [dataTopicActive?.id]);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -145,6 +162,23 @@ const LearningPages = () => {
     }
   };
 
+  const loadQuestionsByIdTopic = async (idTopic: string) => {
+    try {
+      const result = await dispatch(
+        requestLoadQuestionsByIdTopic({
+          idTopic,
+          status: TTCSconfig.STATUS_PUBLIC,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
   const handleShowSider = () => {
     setIsShowSider(!isShowSider);
   };
@@ -183,6 +217,26 @@ const LearningPages = () => {
         message: "server error!!",
         duration: 1.5,
       });
+    }
+  };
+
+  const handlSaveSelected = (idQuestion: string, idAnswer: string) => {
+    if (selectedQuestions.find((o) => o.idQuestion === idQuestion)) {
+      setSelectedQuestions([
+        ...selectedQuestions.filter((c) => c.idQuestion !== idQuestion),
+        {
+          idQuestion,
+          idAnswer,
+        },
+      ]);
+    } else {
+      setSelectedQuestions((o) => [
+        ...o,
+        {
+          idQuestion,
+          idAnswer,
+        },
+      ]);
     }
   };
 
@@ -526,6 +580,113 @@ const LearningPages = () => {
                   __html: dataTopicActive?.des ?? "",
                 }}
               ></div>
+
+              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE ? (
+                <div>
+                  {questions.length > 0 &&
+                    questions?.map((question, index) => {
+                      return (
+                        <Row
+                          id={question.id}
+                          className={cx("content__practice")}
+                          key={question.id}
+                        >
+                          <div className={cx("game__view")}>
+                            <div className={cx("game__view--question")}>
+                              <div className={cx("game__view--question-index")}>
+                                <span>{index + 1}.</span>
+                              </div>
+                              <div
+                                className={cx("game__view--question-text")}
+                                dangerouslySetInnerHTML={{
+                                  __html: question.question ?? "",
+                                }}
+                              ></div>
+                            </div>
+
+                            <div className={cx("game__view--quiz-choices")}>
+                              <div className={cx("quiz-choices__item")}>
+                                <Radio.Group style={{ width: "100%" }}>
+                                  <Space
+                                    direction="vertical"
+                                    style={{ width: "100%" }}
+                                  >
+                                    {question.answer?.map((item, i) => {
+                                      return (
+                                        <Radio
+                                          className={
+                                            selectedQuestions.find(
+                                              (o) =>
+                                                o.idQuestion === question.id
+                                            )
+                                              ? item?.isResult
+                                                ? cx(
+                                                    "quiz-choices__item--radio",
+                                                    "correct"
+                                                  )
+                                                : selectedQuestions.find(
+                                                    (o) =>
+                                                      o.idAnswer.toString() ===
+                                                      item?._id?.toString()
+                                                  ) &&
+                                                  cx(
+                                                    "quiz-choices__item--radio",
+                                                    "inCorrect"
+                                                  )
+                                              : cx("quiz-choices__item--radio")
+                                          }
+                                          value={item}
+                                          key={i}
+                                          onClick={(e) => {
+                                            handlSaveSelected(
+                                              question?.id || "",
+                                              item?._id || ""
+                                            );
+                                          }}
+                                          disabled={
+                                            selectedQuestions.find(
+                                              (o) =>
+                                                o.idQuestion === question.id
+                                            )
+                                              ? true
+                                              : false
+                                          }
+                                        >
+                                          <div
+                                            className={cx(
+                                              "quiz-choices__item--answer"
+                                            )}
+                                          >
+                                            {answers[item.index]}. {item.text}
+                                          </div>
+                                        </Radio>
+                                      );
+                                    })}
+
+                                    {selectedQuestions.find(
+                                      (o) => o.idQuestion === question.id
+                                    ) && (
+                                      <div className={cx("quiz__explain")}>
+                                        <p>Giải thích</p>
+                                        <div
+                                          dangerouslySetInnerHTML={{
+                                            __html: question.hint ?? "",
+                                          }}
+                                        ></div>
+                                      </div>
+                                    )}
+                                  </Space>
+                                </Radio.Group>
+                              </div>
+                            </div>
+                          </div>
+                        </Row>
+                      );
+                    })}
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             <div className={cx("content__powered")}>
