@@ -459,6 +459,7 @@ html {
   text-align: center;
   color: var(--textColor);
   position: relative;
+  user-select: none;
 
   & > span {
     position: absolute;
@@ -516,7 +517,7 @@ html {
   position: fixed;
   bottom: 0;
   width: 100%;
-  z-index: 1001;
+  z-index: 101;
   left: 0;
 
   @include responsive(lg) {

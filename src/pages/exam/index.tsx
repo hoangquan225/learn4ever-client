@@ -42,7 +42,11 @@ const ExamPages = () => {
   useEffect(() => {
     if (params.id) {
       const arg = params.id.split("-");
-      loadTopicByCourse(arg[0], Number(arg[1]));
+      if (Number(arg[1]) === TTCSconfig.TYPE_EXAM) {
+        loadTopicByCourse(arg[0], Number(arg[1]));
+      } else {
+        navigate(-1);
+      }
     }
     loadCourse(params.slugChild || "");
   }, [params.slugChild, params.id]);

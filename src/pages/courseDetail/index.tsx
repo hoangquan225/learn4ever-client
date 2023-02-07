@@ -1,15 +1,17 @@
 import { unwrapResult } from "@reduxjs/toolkit";
 import { Breadcrumb, Col, notification, Row } from "antd";
 import classNames from "classnames/bind";
-import { useEffect } from "react";
+import moment from "moment";
+import { useEffect, useState } from "react";
 import {
   FaBatteryFull,
-  FaCheck,
   FaClock,
   FaFilm,
   FaLightbulb,
+  FaPencilRuler,
 } from "react-icons/fa";
 import { NavLink, useParams } from "react-router-dom";
+import { apiLoadTopicByCourse } from "../../api/topic";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -18,6 +20,10 @@ import {
   courseState,
   requestLoadCourseBySlug,
 } from "../../redux/slices/courseSlice";
+import {
+  requestLoadTopicByCourse,
+  topicState,
+} from "../../redux/slices/topicSlice";
 import TTCSconfig from "../../submodule/common/config";
 import styles from "./courseDetail.module.scss";
 
@@ -29,10 +35,54 @@ const CourseDetail = () => {
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
   const loading = courseReducer.loading;
+  const topicStates = useAppSelector(topicState);
+  const topics = topicStates.topics;
+  const topicTotal = topicStates.total;
+  const [totalExam, setTotalExam] = useState<number>(0);
 
   useEffect(() => {
     loadCourse(params.slugChild || "");
   }, [params.slugChild]);
+
+  useEffect(() => {
+    if (course?.id) {
+      loadTopicByCourse(course?.id || "", 1);
+      loadTopicByCourse(course?.id || "", 2);
+    }
+  }, [course?.id]);
+
+  const loadTopicByCourse = async (
+    idCourse: string,
+    type: number,
+    parentId?: string
+  ) => {
+    try {
+      if (type === TTCSconfig.TYPE_LESSON) {
+        const result = await dispatch(
+          requestLoadTopicByCourse({
+            idCourse,
+            type,
+            parentId,
+            status: TTCSconfig.STATUS_PUBLIC,
+          })
+        );
+        unwrapResult(result);
+      } else {
+        const res = await apiLoadTopicByCourse({
+          idCourse,
+          type,
+          parentId,
+          status: TTCSconfig.STATUS_PUBLIC,
+        });
+        setTotalExam(res.data.total);
+      }
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -97,64 +147,14 @@ const CourseDetail = () => {
                 <Col xl={16} lg={16} md={24} sm={24} xs={24}>
                   <h1 className={cx("detail__name")}>{course?.courseName}</h1>
 
+                  <div className={cx("detail__des")}>
+                    <p>{course?.shortDes}</p>
+                  </div>
                   <div
-                    className={cx("detail__des")}
                     dangerouslySetInnerHTML={{
                       __html: course?.des ?? "",
                     }}
                   ></div>
-
-                  <div className={cx("detail__topic")}>
-                    <h2 className={cx("detail__topic--heading")}>
-                      Bạn sẽ học được gì?
-                    </h2>
-                    <ul className={cx("detail__topic--list")}>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Nắm chắc lý thuyết chung trong môn học
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Biết cách làm các dạng bài cơ bản
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Học được cách tư duy bài tập một cách hiệu quả
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Được chia sẻ lại kinh nghiệm qua các bài tập
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className={cx("detail__topic")}>
-                    <h2 className={cx("detail__topic--heading")}>Yêu cầu</h2>
-                    <ul className={cx("detail__topic--list")}>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Nắm chắc các kiến thức của môn học ở các lớp dưới
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Sở hữu máy tính hoặc thiết bị di động kết nối internet
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />Ý thức
-                        cao, trách nhiệm cao trong việc tự học. Thực hành lại
-                        sau mỗi bài học
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Khi học nếu có khúc mắc hãy hỏi/đáp tại phần bình luận
-                      </li>
-                      <li className={cx("detail__topic--item")}>
-                        <FaCheck className={cx("detail__topic--icon")} />
-                        Bạn không cần biết gì hơn nữa, khóa học sẽ chỉ cho bạn
-                        những gì bạn cần biết
-                      </li>
-                    </ul>
-                  </div>
                 </Col>
 
                 <Col xl={8} lg={8} md={24} sm={24} xs={24}>
@@ -200,18 +200,42 @@ const CourseDetail = () => {
                       <li className={cx("detail__item")}>
                         <FaFilm className={cx("detail__icon")} />
                         <span>
-                          Tổng số <strong>38</strong> bài học
+                          Tổng số <strong>{topicTotal}</strong> bài học
                         </span>
                       </li>
                       <li className={cx("detail__item")}>
                         <FaClock className={cx("detail__icon")} />
                         <span>
-                          Thời lượng <strong>12 giờ 10 phút</strong>
+                          Thời lượng{" "}
+                          <strong>
+                            {moment(
+                              topics
+                                .map((topic, i) =>
+                                  topic?.topicChildData.reduce(
+                                    (accumulator, currentValue) =>
+                                      accumulator +
+                                      Number(currentValue.timeExam),
+                                    0
+                                  )
+                                )
+                                .reduce(
+                                  (accumulator, currentValue) =>
+                                    accumulator + currentValue,
+                                  0
+                                ) * 1000
+                            ).format("mm:ss")}
+                          </strong>
+                        </span>
+                      </li>
+                      <li className={cx("detail__item")}>
+                        <FaPencilRuler className={cx("detail__icon")} />
+                        <span>
+                          <strong>{totalExam}</strong> Đề kiểm tra
                         </span>
                       </li>
                       <li className={cx("detail__item")}>
                         <FaBatteryFull className={cx("detail__icon")} />
-                        <span>Học mọi lúc, mọi nơi</span>
+                        <span>Học mọi lúc, thi mọi nơi</span>
                       </li>
                     </ul>
                   </div>

@@ -109,12 +109,9 @@ const CategoryDetail = () => {
                             <div className={cx("categoty__name")}>
                               {course.courseName}
                             </div>
-                            <div
-                              className={cx("category__des")}
-                              dangerouslySetInnerHTML={{
-                                __html: course.des ?? "",
-                              }}
-                            />
+                            <div className={cx("category__des")}>
+                              <p>{course?.shortDes}</p>
+                            </div>
                             <div className={cx("category__join")}>
                               <button className={cx("category__btn")}>
                                 <span>Làm ngay</span>

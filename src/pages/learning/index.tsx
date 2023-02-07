@@ -4,6 +4,7 @@ import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
 import dayjs from "dayjs";
+import moment from "moment";
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
   FaArrowRight,
@@ -66,7 +67,7 @@ const LearningPages = () => {
 
   useEffect(() => {
     if (params.id) {
-      loadByParam(params.id);
+      loadTopicByParam(params.id);
     }
     loadCourse(params.slugChild || "");
 
@@ -98,10 +99,12 @@ const LearningPages = () => {
     }
   };
 
-  const loadByParam = (param: string) => {
+  const loadTopicByParam = (param: string) => {
     const arg = param.split("-");
-    if (Number(arg[1]) === 1) {
+    if (Number(arg[1]) === TTCSconfig.TYPE_LESSON) {
       loadTopicByCourse(arg[0], Number(arg[1]));
+    } else {
+      navigate(-1);
     }
   };
 
@@ -306,8 +309,15 @@ const LearningPages = () => {
                                 topic?.topicChildData.filter(
                                   (o) => o.status === TTCSconfig.STATUS_PUBLIC
                                 ).length
-                              }{" "}
-                              | 24:30
+                              }
+                              &nbsp;|&nbsp;
+                              {moment(
+                                topic?.topicChildData.reduce(
+                                  (accumulator, currentValue) =>
+                                    accumulator + Number(currentValue.timeExam),
+                                  0
+                                ) * 1000
+                              ).format("mm:ss")}
                             </span>
                             <span className={cx("learning__track--item-icon")}>
                               <IoChevronUpOutline
@@ -340,8 +350,15 @@ const LearningPages = () => {
                                 topic?.topicChildData.filter(
                                   (o) => o.status === TTCSconfig.STATUS_PUBLIC
                                 ).length
-                              }{" "}
-                              | 24:30
+                              }
+                              &nbsp;|&nbsp;
+                              {moment(
+                                topic?.topicChildData.reduce(
+                                  (accumulator, currentValue) =>
+                                    accumulator + Number(currentValue.timeExam),
+                                  0
+                                ) * 1000
+                              ).format("mm:ss")}
                             </span>
                             <span className={cx("learning__track--item-icon")}>
                               <IoChevronDownOutline
@@ -398,15 +415,18 @@ const LearningPages = () => {
                                             "learning__track--steps-desc"
                                           )}
                                         >
-                                          {topicChild?.topicType === 4 ? (
+                                          {topicChild?.topicType ===
+                                          TTCSconfig.TYPE_TOPIC_VIDEO ? (
                                             <FaPlayCircle
                                               className={cx("desc-icon")}
                                             />
-                                          ) : topicChild?.topicType === 5 ? (
+                                          ) : topicChild?.topicType ===
+                                            TTCSconfig.TYPE_TOPIC_DOCUMENT ? (
                                             <FaFileAlt
                                               className={cx("desc-icon")}
                                             />
-                                          ) : topicChild?.topicType === 2 ? (
+                                          ) : topicChild?.topicType ===
+                                            TTCSconfig.TYPE_TOPIC_PRATICE ? (
                                             <FaQuestionCircle
                                               className={cx("desc-icon")}
                                             />
@@ -418,7 +438,9 @@ const LearningPages = () => {
                                               "learning__track--steps-time"
                                             )}
                                           >
-                                            01:35
+                                            {moment(
+                                              (topicChild?.timeExam || 0) * 1000
+                                            ).format("mm:ss")}
                                           </span>
                                         </p>
                                       </div>
@@ -467,22 +489,22 @@ const LearningPages = () => {
                   : cx("content__video", "hide-sider")
               }
             >
-              {dataTopicActive?.video && (
+              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO ? (
                 <div className={cx("content__video--center")}>
                   <div className={cx("content__video--player")}>
                     <video
                       controls
                       autoPlay={false}
                       className={cx("content__video--embed")}
-                      src={dataTopicActive?.video}
+                      src={dataTopicActive?.video || ""}
                       title="video player"
                       ref={videoPlayerRef}
                       onTimeUpdate={handleTimeUpdateVideo}
-                      // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      // allowFullScreen
                     ></video>
                   </div>
                 </div>
+              ) : (
+                <></>
               )}
             </div>
 

@@ -137,6 +137,13 @@
 }
 
 .detail__topic--item {
+  &::before {
+    content: "\2714\00A0\00A0";
+    color: var(--primaryColor);
+  }
+}
+
+.detail__topic--item {
   font-size: 1.4rem;
   margin-bottom: 1.2rem;
   display: flex;
