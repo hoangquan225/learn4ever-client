@@ -10,13 +10,10 @@ import {
   Radio,
   Row,
   Space,
-  StatisticProps,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CountDownRender from "../../components/FCCountdown";
-import Countdown from "antd/es/statistic/Countdown";
 import {
   FaCheckCircle,
   FaClock,
@@ -53,6 +50,7 @@ import TTCSconfig from "../../submodule/common/config";
 import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
 import moment from "moment";
+import Countdown, { CountdownTimeDelta } from "react-countdown";
 
 const cx = classNames.bind(styles);
 
@@ -81,10 +79,8 @@ const PracticePages = () => {
   const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
-  const [timeCoundown, setTimeCoundown] = useState<number>(moment().valueOf());
+  const [timeCoundown, setTimeCoundown] = useState<number>(0);
   const timePratice = useRef<any>();
-
-  console.log("render");
 
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
@@ -94,9 +90,10 @@ const PracticePages = () => {
   }, []);
 
   useEffect(() => {
-    if (userInfo?.progess?.find((o) => o.idTopic === topic?.id)) {
+    if (userInfo?.progess?.find((o) => o.idTopic === params.idChild)) {
+      console.log("render if ");
       userInfo?.progess?.forEach(
-        (o) => o.idTopic === topic?.id && setSelectedQuestions(o.answers)
+        (o) => o.idTopic === params.idChild && setSelectedQuestions(o.answers)
       );
       setIsRemake(true);
       setCorrect(0);
@@ -105,9 +102,9 @@ const PracticePages = () => {
       console.log("render else ");
       setSelectedQuestions([]);
       setIsRemake(false);
-      setTimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
+      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
     }
-  }, [topic?.id, userInfo]);
+  }, [params.idChild, userInfo]);
 
   useEffect(() => {
     loadQuestionByTopic(params.idChild || "", 1);
@@ -267,17 +264,25 @@ const PracticePages = () => {
     }
   };
 
-  // const handleFinish = useCallback(handleSubmitOk, [
-  //   correct,
-  //   selectedQuestions,
-  //   topic?.id,
-  // ]);
+  const handleFinish = useCallback(handleSubmitOk, [
+    correct,
+    selectedQuestions,
+    topic?.id,
+  ]);
 
   const handleRemakeExam = () => {
     setSelectedQuestions([]);
     setIsOpenRemakeExam(false);
     setIsRemake(false);
-    setTimeCoundown(moment().valueOf() + (topic?.timeExam || 0) * 1000 * 60);
+    setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+  };
+
+  const renderer = ({ hours, minutes, seconds, completed }: any) => {
+    return (
+      <span>
+        {hours}:{minutes}:{seconds}
+      </span>
+    );
   };
 
   return (
@@ -350,13 +355,16 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      <Countdown
-                        value={!isRemake ? timeCoundown : 0}
-                        onFinish={async () => await handleSubmitOk()}
-                        onChange={(val: StatisticProps["value"]) => {
-                          timePratice.current = val;
-                        }}
-                      />
+                      {!isRemake && (
+                        <Countdown
+                          date={!isRemake ? timeCoundown : 0}
+                          onComplete={handleSubmitOk}
+                          onTick={(timeDelta: CountdownTimeDelta) => {
+                            timePratice.current = timeDelta.total;
+                          }}
+                          renderer={renderer}
+                        />
+                      )}
                     </span>
                   </Row>
 
@@ -588,9 +596,9 @@ const PracticePages = () => {
                       {isRemake && (
                         <div className={cx("practice__palette--review")}>
                           {userInfo?.progess?.map(
-                            (o) =>
+                            (o, i) =>
                               o.idTopic === topic?.id && (
-                                <>
+                                <div key={i}>
                                   <div className={cx("exam__panel--score")}>
                                     <FaStar
                                       style={{
@@ -663,14 +671,14 @@ const PracticePages = () => {
                                       <span style={{ fontSize: "2.2rem" }}>
                                         {moment(
                                           Math.abs(
-                                            Number(topic?.timeExam) * 60000 -
+                                            (topic?.timeExam || 0) * 60000 -
                                               o.timeStudy
                                           )
                                         ).format("mm:ss")}
                                       </span>
                                     </Col>
                                   </Row>
-                                </>
+                                </div>
                               )
                           )}
                         </div>
@@ -781,14 +789,15 @@ const PracticePages = () => {
                     onClose={handleCloseQuestionList}
                     open={openQuestionList}
                     height={"80%"}
+                    zIndex={100}
                   >
                     <div className={cx("practice__palette--body")}>
                       {isRemake && (
                         <div className={cx("practice__palette--review")}>
                           {userInfo?.progess?.map(
-                            (o) =>
+                            (o, i) =>
                               o.idTopic === topic?.id && (
-                                <>
+                                <div key={i}>
                                   <div className={cx("exam__panel--score")}>
                                     <FaStar
                                       style={{
@@ -868,7 +877,7 @@ const PracticePages = () => {
                                       </span>
                                     </Col>
                                   </Row>
-                                </>
+                                </div>
                               )
                           )}
                         </div>
