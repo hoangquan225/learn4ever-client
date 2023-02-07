@@ -125,34 +125,31 @@
   color: var(--textColor);
 }
 
-.detail__topic--heading {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 3.6rem 0 0.4rem;
-}
-
 .detail__longDes {
-  & > div > div > ul > li {
-    &::before {
-      content: "\2714\00A0\00A0";
-      color: var(--primaryColor);
+  & > div > div {
+    & > h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 3.6rem 0 0.4rem;
+    }
+
+    & > ul {
+      list-style: none;
+      margin: 1rem 0;
+
+      & > li {
+        font-size: 1.4rem;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+
+        &::before {
+          content: "\2714\00A0\00A0";
+          color: var(--primaryColor);
+        }
+      }
     }
   }
-}
-
-.detail__topic--list {
-  list-style: none;
-  margin: 1rem 0;
-}
-
-.detail__topic--item {
-}
-
-.detail__topic--item {
-  font-size: 1.4rem;
-  margin-bottom: 1.2rem;
-  display: flex;
-  align-items: center;
 }
 
 .detail__topic--icon {
