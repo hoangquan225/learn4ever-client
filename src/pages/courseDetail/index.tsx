@@ -154,6 +154,7 @@ const CourseDetail = () => {
                     dangerouslySetInnerHTML={{
                       __html: course?.des ?? "",
                     }}
+                    className={cx("detail__longDes")}
                   ></div>
                 </Col>
 
