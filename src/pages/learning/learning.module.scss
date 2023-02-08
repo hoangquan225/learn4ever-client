@@ -550,7 +550,7 @@
   border-radius: 1rem;
 
   @include responsive(xs) {
-    padding: 0.5rem;
+    padding: 1rem;
   }
 }
 
@@ -652,6 +652,10 @@
   font-size: 1.6rem;
   font-family: var(--font-family);
   line-height: 2.4rem;
+
+  & > span > p {
+    display: inline-block;
+  }
 }
 
 // FOOTER

@@ -240,18 +240,20 @@ const LearningPages = () => {
     }
   };
 
+  const [currentTimeVideo, setCurrentTimeVideo] = useState(0);
+
   const videoPlayerRef = (e: any) => {
-    if (e !== null) {
-      console.log({ e });
-    }
+    // if (e !== null) {
+    //   console.log({ e });
+    //   setCurrentTimeVideo(e.currentTime);
+    // }
   };
 
   const handleTimeUpdateVideo = (e: any) => {
-    // console.log(Math.round(videoPlayerRef.current.duration));
-    if (e !== null) {
-      if (Math.round(e.target.currentTime) === 3) console.log("Hello!");
-    }
-    // console.log({ current: e.target?.currentTime });
+    // if (e !== null) {
+    //   e.currentTime = currentTimeVideo;
+    //   console.log(currentTimeVideo);
+    // }
   };
 
   return (
@@ -652,13 +654,18 @@ const LearningPages = () => {
                                               : false
                                           }
                                         >
-                                          <div
+                                          <span
                                             className={cx(
                                               "quiz-choices__item--answer"
                                             )}
                                           >
-                                            {answers[item.index]}. {item.text}
-                                          </div>
+                                            {answers[item.index]}.&nbsp;
+                                            <span
+                                              dangerouslySetInnerHTML={{
+                                                __html: item.text ?? "",
+                                              }}
+                                            ></span>
+                                          </span>
                                         </Radio>
                                       );
                                     })}
