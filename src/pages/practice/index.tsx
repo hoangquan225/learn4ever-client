@@ -75,6 +75,7 @@ const PracticePages = () => {
   const totalQuestion = questionStates.total;
   const navigate = useNavigate();
   const userInfo = useAppSelector(authState).userInfo;
+
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
   const [isReview, setIsReview] = useState(false);
@@ -90,6 +91,7 @@ const PracticePages = () => {
   const [idQuestion, setIdQuestion] = useState<string>();
   const [timeCoundown, setTimeCoundown] = useState<number>(moment().valueOf());
   const [timeRemake, setTimeRemake] = useState<any>(0);
+
   const timePratice = useRef<any>();
   const { Countdown } = Statistic;
   useEffect(() => {
@@ -101,8 +103,6 @@ const PracticePages = () => {
 
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === params.idChild)) {
-      console.log("render if ");
-
       userInfo?.progess?.find(
         (o) => o.idTopic === params.idChild && setSelectedQuestions(o.answers)
       );
@@ -116,8 +116,6 @@ const PracticePages = () => {
       setCorrect(0);
       setCorrectQuestions([]);
     } else {
-      console.log("render else ");
-      console.log(topic?.timeExam);
       setStatusLearn(0);
       setSelectedQuestions([]);
       setIsReview(false);
@@ -132,16 +130,15 @@ const PracticePages = () => {
   }, [params.idChild, params.slugChild]);
 
   // useEffect(() => {
-  //   console.log(isReview);
   //   if (!isReview) {
   //     return () => {
-  //       console.log("reload");
-  //       console.log(isReview);
-  //       console.log({ useEff: selectedQuestions });
-  //       handleLoadPage();
+  //       window.confirm(
+  //         "Bạn chưa nộp bài! Câu trả lời của bạn sẽ không được lưu lại. Bạn có chắc muốn rời khỏi không?"
+  //       );
+  //       // handleLoadPage();
   //     };
   //   }
-  // }, [selectedQuestions]);
+  // }, []);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -407,15 +404,15 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      {!isReview && (
-                        <Countdown
-                          value={timeCoundown}
-                          onFinish={handleSubmitOk}
-                          onChange={(val: StatisticProps["value"]) => {
-                            timePratice.current = val;
-                          }}
-                        />
-                      )}
+                      {/* {!isReview && ( */}
+                      <Countdown
+                        value={!isReview ? timeCoundown : 0}
+                        onFinish={handleSubmitOk}
+                        onChange={(val: StatisticProps["value"]) => {
+                          timePratice.current = val;
+                        }}
+                      />
+                      {/* )} */}
                     </span>
                   </Row>
 
@@ -448,7 +445,12 @@ const PracticePages = () => {
                                   <div
                                     className={cx("game__view--question-text")}
                                   >
-                                    {qs.question}
+                                    <div
+                                      className={cx("category__summary")}
+                                      dangerouslySetInnerHTML={{
+                                        __html: qs.question ?? "",
+                                      }}
+                                    />
                                   </div>
                                 </div>
 
@@ -506,7 +508,12 @@ const PracticePages = () => {
                                                 "quiz-choices__item--answer"
                                               )}
                                             >
-                                              {answers[item.index]}. {item.text}
+                                              {answers[item.index]}.&nbsp;
+                                              <span
+                                                dangerouslySetInnerHTML={{
+                                                  __html: item.text ?? "",
+                                                }}
+                                              ></span>
                                             </div>
                                           </Radio>
                                         );
@@ -516,22 +523,54 @@ const PracticePages = () => {
                                         statusLearn ===
                                           TTCSconfig.STATUS_LEARNED && (
                                           <div className={cx("quiz__explain")}>
-                                            {qs.answer?.find(
-                                              (item) =>
-                                                item?.isResult &&
-                                                selectedQuestions.find(
-                                                  (o) =>
-                                                    o.idAnswer.toString() ===
-                                                    item?._id?.toString()
-                                                )
+                                            {qs.hint && (
+                                              <div
+                                                className={cx(
+                                                  "quiz__explain--item"
+                                                )}
+                                              >
+                                                <p>Giải thích</p>
+                                              </div>
+                                            )}
+
+                                            {selectedQuestions.find(
+                                              (o) => o.idQuestion === qs.id
                                             ) ? (
-                                              <p style={{ color: "#33cd99" }}>
-                                                Bạn chọn đáp án đúng
-                                              </p>
+                                              qs.answer?.find(
+                                                (item) =>
+                                                  item?.isResult &&
+                                                  selectedQuestions.find(
+                                                    (o) =>
+                                                      o.idAnswer.toString() ===
+                                                      item?._id?.toString()
+                                                  )
+                                              ) ? (
+                                                <p style={{ color: "#33cd99" }}>
+                                                  Bạn chọn đáp án đúng
+                                                </p>
+                                              ) : (
+                                                <p style={{ color: "#ff4747" }}>
+                                                  Bạn chọn đáp án sai
+                                                </p>
+                                              )
                                             ) : (
                                               <p style={{ color: "#ff4747" }}>
-                                                Bạn chọn đáp án sai
+                                                Bạn chưa chọn đáp án
                                               </p>
+                                            )}
+
+                                            {qs.hint && (
+                                              <div
+                                                className={cx(
+                                                  "quiz__explain--item"
+                                                )}
+                                              >
+                                                <div
+                                                  dangerouslySetInnerHTML={{
+                                                    __html: qs.hint ?? "",
+                                                  }}
+                                                ></div>
+                                              </div>
                                             )}
                                           </div>
                                         )}

@@ -74,6 +74,7 @@ const LearningPages = () => {
   const userInfo = authStates.userInfo;
   const questionStates = useAppSelector(QuestionState);
   const questions = questionStates.questions;
+  const totalQsTopic = questionStates.total;
 
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
@@ -82,9 +83,12 @@ const LearningPages = () => {
   const [indexTopic, setIndexTopic] = useState<any>();
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPractice, setIsPractice] = useState(true);
   const [timePractice, setTimePractice] = useState<number>(0);
   const [totalQs, setTotalQs] = useState<number>(0);
+  const [isReview, setIsReview] = useState(false);
+  const [isExercise, setIsExercise] = useState(true);
+
+  const videoPlayerRef = useRef<any>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -110,13 +114,44 @@ const LearningPages = () => {
     ) {
       loadQuestionsByIdTopic(dataTopicActive?.id || "");
     }
+    if (
+      dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO &&
+      dataTopicActive?.id
+    ) {
+      videoPlayerRef.current.currentTime =
+        userInfo?.progess?.find((o) => o.idTopic === dataTopicActive?.id)
+          ?.timeStudy || 0;
+      setIsModalOpen(false);
+    }
     if (dataTopicActive?.timePracticeInVideo?.length) {
       dataTopicActive?.timePracticeInVideo?.map((o) => {
         setTimePractice(o.time);
         setTotalQs(o.totalQuestion);
       });
     }
-  }, [dataTopicActive?.id]);
+
+    if (userInfo?.progess?.find((o) => o.idTopic === dataTopicActive?.id)) {
+      userInfo?.progess?.find(
+        (o) =>
+          o.idTopic === dataTopicActive?.id && setSelectedQuestions(o.answers)
+      );
+      setIsReview(true);
+    } else {
+      setSelectedQuestions([]);
+      setIsReview(false);
+    }
+  }, [dataTopicActive?.id, userInfo]);
+
+  useEffect(() => {
+    if (
+      selectedQuestions.length === totalQsTopic &&
+      !isReview &&
+      totalQsTopic &&
+      dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE
+    ) {
+      handleSubmitExercise();
+    }
+  }, [selectedQuestions]);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -202,6 +237,32 @@ const LearningPages = () => {
     try {
       const res = await apiLoadTopicById({ id });
       setDataTopicActive(res.data);
+      setIsExercise(true);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+  };
+
+  const handleUpdateDocument = async (idTopic: string, idUser: string) => {
+    try {
+      if (
+        dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_DOCUMENT &&
+        dataTopicActive &&
+        !userInfo?.progess?.find((o) => o.idTopic === idTopic)
+      ) {
+        const result = await dispatch(
+          requestUpdateStudiedForUser({
+            idTopic,
+            idUser,
+            status: TTCSconfig.STATUS_LEARNED,
+            timeStudy: 0,
+          })
+        );
+        unwrapResult(result);
+      }
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -255,6 +316,32 @@ const LearningPages = () => {
     }
   };
 
+  const handleSubmitExercise = async () => {
+    try {
+      const result = await dispatch(
+        requestUpdateStudiedForUser({
+          idTopic: dataTopicActive?.id || "",
+          idUser: userInfo?._id || "",
+          status: TTCSconfig.STATUS_LEARNED,
+          timeStudy: 0,
+          answers: selectedQuestions,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
+    setIsReview(true);
+  };
+
+  const handleRemakeExercise = () => {
+    setSelectedQuestions([]);
+    setIsReview(false);
+  };
+
   const handleShowSider = () => {
     setIsShowSider(!isShowSider);
   };
@@ -265,27 +352,35 @@ const LearningPages = () => {
 
   const handleCancelModal = () => {
     setIsModalOpen(false);
+    videoPlayerRef.current.play();
   };
 
-  const [currentTimeVideo, setCurrentTimeVideo] = useState(0);
-
-  const videoPlayerRef = useRef<any>(null);
-  // const videoPlayerRef = (e: any) => {
-  //   console.log("video ref");
-
-  //   if (e !== null) {
-  //     console.log({ ref: e });
-  //     // setCurrentTimeVideo(e.currentTime);
-  //   }
-  // };
-
+  let previousTime = 0;
   const handleTimeUpdateVideo = (e: any) => {
-    if (e.target.currentTime > timePractice && isPractice) {
+    if (
+      Math.floor(e.target.currentTime) === timePractice &&
+      isExercise &&
+      timePractice
+    ) {
       videoPlayerRef.current.pause();
-      console.log(videoPlayerRef.current);
-
       setIsModalOpen(true);
-      setIsPractice(false);
+      setIsExercise(false);
+    }
+    if ((e.target.currentTime / Number(dataTopicActive?.timeExam)) * 100 > 90) {
+      handleUpdateLearned(
+        dataTopicActive?.id || "",
+        userInfo?._id || "",
+        Math.floor(e.target.currentTime)
+      );
+    }
+    setTimeout(() => {
+      previousTime = e.target.currentTime;
+    }, 1695);
+  };
+
+  const handleSeekingVideo = (e: any) => {
+    if (e.target.currentTime > previousTime) {
+      e.target.currentTime = previousTime;
     }
   };
 
@@ -479,10 +574,9 @@ const LearningPages = () => {
                                       }
                                       onClick={() => {
                                         setIndexTopic(topic.id);
-                                        handleUpdateLearned(
+                                        handleUpdateDocument(
                                           topicChild.id || "",
-                                          userInfo?._id || "",
-                                          0
+                                          userInfo?._id || ""
                                         );
                                         handleChangeTopic(topicChild.id || "");
                                       }}
@@ -578,22 +672,25 @@ const LearningPages = () => {
                   : cx("content__video", "hide-sider")
               }
             >
-              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO ? (
+              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO && (
                 <div className={cx("content__video--center")}>
                   <div className={cx("content__video--player")}>
                     <video
                       controls
                       autoPlay={false}
                       className={cx("content__video--embed")}
-                      src={dataTopicActive?.video || ""}
                       title="video player"
                       ref={videoPlayerRef}
                       onTimeUpdate={handleTimeUpdateVideo}
-                    ></video>
+                      onSeeking={handleSeekingVideo}
+                    >
+                      <source
+                        src={dataTopicActive?.video || ""}
+                        type="video/mp4"
+                      />
+                    </video>
                   </div>
                 </div>
-              ) : (
-                <></>
               )}
             </div>
 
@@ -616,7 +713,7 @@ const LearningPages = () => {
                 }}
               ></div>
 
-              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE ? (
+              {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE && (
                 <div>
                   {questions.length > 0 &&
                     questions?.map((question, index) => {
@@ -723,9 +820,10 @@ const LearningPages = () => {
                         </Row>
                       );
                     })}
+                  {isReview && (
+                    <Button onClick={handleRemakeExercise}>Làm lại</Button>
+                  )}
                 </div>
-              ) : (
-                <></>
               )}
             </div>
 

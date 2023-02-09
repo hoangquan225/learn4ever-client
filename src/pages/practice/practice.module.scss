@@ -302,15 +302,32 @@ html {
 }
 
 .quiz__explain {
-  border-top: 0.5px solid #717171;
+  font-family: var(--font-family);
 
   & > p {
-    color: #666;
     font-size: 1.4rem;
     font-style: italic;
-    font-family: var(--font-family);
     font-weight: 500;
     padding: 1rem 0;
+    border-top: 0.5px solid #717171;
+  }
+}
+
+.quiz__explain--item {
+  & > p {
+    color: #009d9d;
+    font-size: 1.6rem;
+    font-weight: 500;
+    padding: 1rem 0;
+    // border-bottom: 0.5px solid #717171;
+  }
+
+  & > div > p {
+    font-size: 1.4rem;
+    // margin-top: 1rem;
+    color: #777;
+    font-style: italic;
+    font-weight: 400;
   }
 }
 

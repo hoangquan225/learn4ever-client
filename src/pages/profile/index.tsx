@@ -83,7 +83,6 @@ const ProfilePages = () => {
           })
         );
         const res = unwrapResult(actionResult);
-        console.log(res);
 
         switch (res.loginCode) {
           case TTCSconfig.LOGIN_SUCCESS:
