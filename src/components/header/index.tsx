@@ -23,6 +23,7 @@ import {
   requestLoadCategorys,
 } from "../../redux/slices/categorySlice";
 import { Category } from "../../submodule/models/category";
+import { apiLogout } from "../../api/auth";
 
 const cx = classNames.bind(styles);
 
@@ -40,9 +41,16 @@ const Header = () => {
   const categorys = categoryStates.categorys;
   const loading = categoryStates.loading;
 
-  const handleLogout = useCallback(() => {
-    Cookies.remove("token");
-    window.location.href = "/";
+  const handleLogout = useCallback(async () => {
+    try {
+      if (userInfo?._id) {
+        const res = apiLogout({ idUser: userInfo?._id });
+      }
+      Cookies.remove("token");
+      window.location.href = "/";
+    } catch (error) {
+      notification.error({ message: "Lỗi server", duration: 1.5 });
+    }
   }, []);
 
   useEffect(() => {

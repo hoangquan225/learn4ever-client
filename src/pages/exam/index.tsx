@@ -244,16 +244,36 @@ const ExamPages = () => {
                                             okText="Yes"
                                             cancelText="No"
                                           >
-                                            <button
-                                              className={cx("exam__panel--btn")}
-                                            >
-                                              <span>Làm bài</span>
-                                              <BiChevronRight
+                                            {userInfo?.progess?.find(
+                                              (o) => o.idTopic === dataChild.id
+                                            ) ? (
+                                              <button
                                                 className={cx(
-                                                  "exam__panel--icon"
+                                                  "exam__panel--btn",
+                                                  "review"
                                                 )}
-                                              />
-                                            </button>
+                                              >
+                                                <span>Xem lại</span>
+                                                <BiChevronRight
+                                                  className={cx(
+                                                    "exam__panel--icon"
+                                                  )}
+                                                />
+                                              </button>
+                                            ) : (
+                                              <button
+                                                className={cx(
+                                                  "exam__panel--btn"
+                                                )}
+                                              >
+                                                <span>Làm bài</span>
+                                                <BiChevronRight
+                                                  className={cx(
+                                                    "exam__panel--icon"
+                                                  )}
+                                                />
+                                              </button>
+                                            )}
                                           </Popconfirm>
                                         </div>
                                       </div>

@@ -9,3 +9,7 @@ export const apiLogin = (payload: { account: string; password: string }) => {
 export const apiRegister = (payload: { userInfo: UserInfo }) => {
   return ApiConfig(EndPoint.REGISTER, { payload });
 };
+
+export const apiLogout = (payload: { idUser: string }) => {
+  return ApiConfig(EndPoint.LOGOUT, { payload });
+};

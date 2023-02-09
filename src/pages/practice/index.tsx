@@ -10,10 +10,19 @@ import {
   Radio,
   Row,
   Space,
+  Statistic,
+  StatisticProps,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   FaCheckCircle,
   FaClock,
@@ -50,7 +59,6 @@ import TTCSconfig from "../../submodule/common/config";
 import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
 import moment from "moment";
-import Countdown, { CountdownTimeDelta } from "react-countdown";
 
 const cx = classNames.bind(styles);
 
@@ -69,19 +77,21 @@ const PracticePages = () => {
   const userInfo = useAppSelector(authState).userInfo;
   const [clockStick, setClockStick] = useState(false);
   const [openQuestionList, setOpenQuestionList] = useState(false);
-  const [isRemake, setIsRemake] = useState(false);
+  const [isReview, setIsReview] = useState(false);
+  const [statusLearn, setStatusLearn] = useState<any>(0);
   const [isOpenModelSubmit, setIsOpenModelSubmit] = useState(false);
   const [isOpenModelFeedback, setIsOpenModelFeedback] = useState(false);
-  const [isOpenRemakeExam, setIsOpenRemakeExam] = useState(false);
+  const [isOpenReviewExam, setIsOpenReviewExam] = useState(false);
   const [correct, setCorrect] = useState(0);
-  const [correctQuestions, setCorrectQuestions] = useState<String[]>([]);
+  const [correctQuestions, setCorrectQuestions] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
-  const [selectedFeedback, setSelectFeedback] = useState<Number[]>([]);
+  const [selectedFeedback, setSelectFeedback] = useState<number[]>([]);
   const [textFeedback, setTextFeedback] = useState<string>("");
   const [idQuestion, setIdQuestion] = useState<string>();
-  const [timeCoundown, setTimeCoundown] = useState<number>(0);
+  const [timeCoundown, setTimeCoundown] = useState<number>(moment().valueOf());
+  const [timeRemake, setTimeRemake] = useState<any>(0);
   const timePratice = useRef<any>();
-
+  const { Countdown } = Statistic;
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
     return () => {
@@ -92,25 +102,46 @@ const PracticePages = () => {
   useEffect(() => {
     if (userInfo?.progess?.find((o) => o.idTopic === params.idChild)) {
       console.log("render if ");
-      userInfo?.progess?.forEach(
+
+      userInfo?.progess?.find(
         (o) => o.idTopic === params.idChild && setSelectedQuestions(o.answers)
       );
-      setIsRemake(true);
+      setTimeRemake(
+        userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.timeStudy
+      );
+      setStatusLearn(
+        userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.status
+      );
+      setIsReview(true);
       setCorrect(0);
       setCorrectQuestions([]);
     } else {
       console.log("render else ");
+      console.log(topic?.timeExam);
+      setStatusLearn(0);
       setSelectedQuestions([]);
-      setIsRemake(false);
+      setIsReview(false);
       setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
     }
-  }, [params.idChild, userInfo]);
+  }, [params.idChild, userInfo, topic?.id]);
 
   useEffect(() => {
     loadQuestionByTopic(params.idChild || "", 1);
     loadCourse(params.slugChild || "");
     loadTopicById(params.idChild || "");
   }, [params.idChild, params.slugChild]);
+
+  // useEffect(() => {
+  //   console.log(isReview);
+  //   if (!isReview) {
+  //     return () => {
+  //       console.log("reload");
+  //       console.log(isReview);
+  //       console.log({ useEff: selectedQuestions });
+  //       handleLoadPage();
+  //     };
+  //   }
+  // }, [selectedQuestions]);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -172,14 +203,6 @@ const PracticePages = () => {
     setOpenQuestionList(!openQuestionList);
   };
 
-  const handleOpenModelSubmit = () => {
-    setIsOpenModelSubmit(true);
-  };
-
-  const handleOpenModelFeedback = () => {
-    setIsOpenModelFeedback(true);
-  };
-
   const handleSubmitOk = async () => {
     try {
       const result = await dispatch(
@@ -201,6 +224,26 @@ const PracticePages = () => {
       });
     }
     setIsOpenModelSubmit(false);
+  };
+
+  const handleLoadPage = async () => {
+    try {
+      const result = await dispatch(
+        requestUpdateStudiedForUser({
+          idTopic: topic?.id || "",
+          idUser: userInfo?._id || "",
+          status: TTCSconfig.STATUS_LEARNING,
+          timeStudy: timePratice.current,
+          answers: selectedQuestions,
+        })
+      );
+      unwrapResult(result);
+    } catch (error) {
+      notification.error({
+        message: "server error!!",
+        duration: 1.5,
+      });
+    }
   };
 
   const handleFeedbackOk = async () => {
@@ -227,7 +270,7 @@ const PracticePages = () => {
   const handleCancel = () => {
     setIsOpenModelSubmit(false);
     setIsOpenModelFeedback(false);
-    setIsOpenRemakeExam(false);
+    setIsOpenReviewExam(false);
     setSelectFeedback([]);
     setTextFeedback("");
     setCorrect(0);
@@ -264,17 +307,26 @@ const PracticePages = () => {
     }
   };
 
-  const handleFinish = useCallback(handleSubmitOk, [
-    correct,
-    selectedQuestions,
-    topic?.id,
-  ]);
-
-  const handleRemakeExam = () => {
-    setSelectedQuestions([]);
-    setIsOpenRemakeExam(false);
-    setIsRemake(false);
-    setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+  const handleReviewExam = () => {
+    if (statusLearn === TTCSconfig.STATUS_LEARNED) {
+      setSelectedQuestions([]);
+      setStatusLearn(0);
+      setIsOpenReviewExam(false);
+      setIsReview(false);
+      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+    } else if (statusLearn === TTCSconfig.STATUS_LEARNING) {
+      setIsOpenReviewExam(false);
+      setIsReview(false);
+      setCorrect(
+        selectedQuestions.map((o) => {
+          questions.map((c) =>
+            c.answer.find((an) => an._id === o.idAnswer && an.isResult)
+          );
+        }).length
+      );
+      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+      // setTimeCoundown(Date.now() + (timeRemake || 0) * 1000 * 60);
+    }
   };
 
   const renderer = ({ hours, minutes, seconds, completed }: any) => {
@@ -355,14 +407,13 @@ const PracticePages = () => {
                   >
                     <FaRegClock className={cx("practice__clock--icon")} />
                     <span className={cx("practice__clock--time")}>
-                      {!isRemake && (
+                      {!isReview && (
                         <Countdown
-                          date={!isRemake ? timeCoundown : 0}
-                          onComplete={handleSubmitOk}
-                          onTick={(timeDelta: CountdownTimeDelta) => {
-                            timePratice.current = timeDelta.total;
+                          value={timeCoundown}
+                          onFinish={handleSubmitOk}
+                          onChange={(val: StatisticProps["value"]) => {
+                            timePratice.current = val;
                           }}
-                          renderer={renderer}
                         />
                       )}
                     </span>
@@ -382,7 +433,7 @@ const PracticePages = () => {
                                 <FaMarker
                                   className={cx("feedback-icon")}
                                   onClick={() => {
-                                    handleOpenModelFeedback();
+                                    setIsOpenModelFeedback(true);
                                     setIdQuestion(qs?.id);
                                   }}
                                 />
@@ -408,21 +459,23 @@ const PracticePages = () => {
                                         return (
                                           <Radio
                                             className={
-                                              isRemake
-                                                ? item?.isResult
-                                                  ? cx(
-                                                      "quiz-choices__item--radio",
-                                                      "correct"
-                                                    )
-                                                  : selectedQuestions.find(
-                                                      (o) =>
-                                                        o.idAnswer.toString() ===
-                                                        item?._id?.toString()
-                                                    ) &&
-                                                    cx(
-                                                      "quiz-choices__item--radio",
-                                                      "inCorrect"
-                                                    )
+                                              isReview
+                                                ? statusLearn ===
+                                                    TTCSconfig.STATUS_LEARNED &&
+                                                  (item?.isResult
+                                                    ? cx(
+                                                        "quiz-choices__item--radio",
+                                                        "correct"
+                                                      )
+                                                    : selectedQuestions.find(
+                                                        (o) =>
+                                                          o.idAnswer.toString() ===
+                                                          item?._id?.toString()
+                                                      ) &&
+                                                      cx(
+                                                        "quiz-choices__item--radio",
+                                                        "inCorrect"
+                                                      ))
                                                 : cx(
                                                     "quiz-choices__item--radio"
                                                   )
@@ -446,7 +499,7 @@ const PracticePages = () => {
                                                 item?.isResult
                                               );
                                             }}
-                                            disabled={isRemake}
+                                            disabled={isReview}
                                           >
                                             <div
                                               className={cx(
@@ -459,27 +512,29 @@ const PracticePages = () => {
                                         );
                                       })}
 
-                                      {isRemake && (
-                                        <div className={cx("quiz__explain")}>
-                                          {qs.answer?.find(
-                                            (item) =>
-                                              item?.isResult &&
-                                              selectedQuestions.find(
-                                                (o) =>
-                                                  o.idAnswer.toString() ===
-                                                  item?._id?.toString()
-                                              )
-                                          ) ? (
-                                            <p style={{ color: "#33cd99" }}>
-                                              Bạn chọn đáp án đúng
-                                            </p>
-                                          ) : (
-                                            <p style={{ color: "#ff4747" }}>
-                                              Bạn chọn đáp án sai
-                                            </p>
-                                          )}
-                                        </div>
-                                      )}
+                                      {isReview &&
+                                        statusLearn ===
+                                          TTCSconfig.STATUS_LEARNED && (
+                                          <div className={cx("quiz__explain")}>
+                                            {qs.answer?.find(
+                                              (item) =>
+                                                item?.isResult &&
+                                                selectedQuestions.find(
+                                                  (o) =>
+                                                    o.idAnswer.toString() ===
+                                                    item?._id?.toString()
+                                                )
+                                            ) ? (
+                                              <p style={{ color: "#33cd99" }}>
+                                                Bạn chọn đáp án đúng
+                                              </p>
+                                            ) : (
+                                              <p style={{ color: "#ff4747" }}>
+                                                Bạn chọn đáp án sai
+                                              </p>
+                                            )}
+                                          </div>
+                                        )}
                                     </Space>
                                   </div>
                                 </div>
@@ -520,7 +575,7 @@ const PracticePages = () => {
                         <div
                           className={cx("practice__palette--question-list")}
                           style={
-                            isRemake ? { height: "30vh" } : { height: "60vh" }
+                            isReview ? { height: "30vh" } : { height: "60vh" }
                           }
                         >
                           <Row
@@ -530,7 +585,7 @@ const PracticePages = () => {
                             gutter={[0, 16]}
                           >
                             {questions?.map((o, i) =>
-                              isRemake ? (
+                              isReview ? (
                                 <Col
                                   span={3}
                                   className={cx("question-item")}
@@ -539,25 +594,28 @@ const PracticePages = () => {
                                   <a href={`#${o.id}`}>
                                     <span
                                       className={
-                                        o.answer?.find(
-                                          (item) =>
-                                            item?.isResult &&
-                                            selectedQuestions.find(
-                                              (o) =>
-                                                o.idAnswer.toString() ===
-                                                item?._id?.toString()
+                                        statusLearn ===
+                                        TTCSconfig.STATUS_LEARNED
+                                          ? o.answer?.find(
+                                              (item) =>
+                                                item?.isResult &&
+                                                selectedQuestions.find(
+                                                  (o) =>
+                                                    o.idAnswer.toString() ===
+                                                    item?._id?.toString()
+                                                )
                                             )
-                                        )
-                                          ? cx(
-                                              "question-item__bground",
-                                              "green",
-                                              "active"
-                                            )
-                                          : cx(
-                                              "question-item__bground",
-                                              "red",
-                                              "active"
-                                            )
+                                            ? cx(
+                                                "question-item__bground",
+                                                "green",
+                                                "active"
+                                              )
+                                            : cx(
+                                                "question-item__bground",
+                                                "red",
+                                                "active"
+                                              )
+                                          : cx("question-item__bground")
                                       }
                                     >
                                       {i + 1}
@@ -593,121 +651,143 @@ const PracticePages = () => {
                         </div>
                       </div>
 
-                      {isRemake && (
-                        <div className={cx("practice__palette--review")}>
-                          {userInfo?.progess?.map(
-                            (o, i) =>
-                              o.idTopic === topic?.id && (
-                                <div key={i}>
-                                  <div className={cx("exam__panel--score")}>
-                                    <FaStar
-                                      style={{
-                                        color: "#ffe644",
-                                        fontSize: "8rem",
-                                      }}
-                                    />
-                                    <span>{o.score}</span>
+                      {isReview &&
+                        statusLearn === TTCSconfig.STATUS_LEARNED && (
+                          <div className={cx("practice__palette--review")}>
+                            {userInfo?.progess?.map(
+                              (o, i) =>
+                                o.idTopic === topic?.id && (
+                                  <div key={i}>
+                                    <div className={cx("exam__panel--score")}>
+                                      <FaStar
+                                        style={{
+                                          color: "#ffe644",
+                                          fontSize: "8rem",
+                                        }}
+                                      />
+                                      <span>{o.score}</span>
+                                    </div>
+                                    <Row
+                                      className={cx("exam__panel--body")}
+                                      gutter={[16, 16]}
+                                    >
+                                      <Col
+                                        span={7}
+                                        className={cx(
+                                          "exam__panel--body-item",
+                                          "exam__panel--correct"
+                                        )}
+                                      >
+                                        <FaCheckCircle
+                                          style={{
+                                            color: "#33cd99",
+                                            fontSize: "1.8rem",
+                                          }}
+                                        />
+                                        <span style={{ fontSize: "1.4rem" }}>
+                                          Câu đúng
+                                        </span>
+                                        <span style={{ fontSize: "2.2rem" }}>
+                                          {o.correctQuestion}
+                                        </span>
+                                      </Col>
+                                      <Col
+                                        span={7}
+                                        className={cx(
+                                          "exam__panel--body-item",
+                                          "exam__panel--inCorrect"
+                                        )}
+                                      >
+                                        <FaTimesCircle
+                                          style={{
+                                            color: "#ff4747",
+                                            fontSize: "1.8rem",
+                                          }}
+                                        />
+                                        <span style={{ fontSize: "1.4rem" }}>
+                                          Câu sai
+                                        </span>
+                                        <span style={{ fontSize: "2.2rem" }}>
+                                          {totalQuestion - o.correctQuestion}
+                                        </span>
+                                      </Col>
+                                      <Col
+                                        span={7}
+                                        className={cx(
+                                          "exam__panel--body-item",
+                                          "exam__panel--time"
+                                        )}
+                                      >
+                                        <FaClock
+                                          style={{
+                                            color: "#ffba34",
+                                            fontSize: "1.8rem",
+                                          }}
+                                        />
+                                        <span style={{ fontSize: "1.4rem" }}>
+                                          Thời gian
+                                        </span>
+                                        <span style={{ fontSize: "2.2rem" }}>
+                                          {moment(
+                                            Math.abs(
+                                              (topic?.timeExam || 0) * 60000 -
+                                                o.timeStudy
+                                            )
+                                          ).format("mm:ss")}
+                                        </span>
+                                      </Col>
+                                    </Row>
                                   </div>
-                                  <Row
-                                    className={cx("exam__panel--body")}
-                                    gutter={[16, 16]}
-                                  >
-                                    <Col
-                                      span={7}
-                                      className={cx(
-                                        "exam__panel--body-item",
-                                        "exam__panel--correct"
-                                      )}
-                                    >
-                                      <FaCheckCircle
-                                        style={{
-                                          color: "#33cd99",
-                                          fontSize: "1.8rem",
-                                        }}
-                                      />
-                                      <span style={{ fontSize: "1.4rem" }}>
-                                        Câu đúng
-                                      </span>
-                                      <span style={{ fontSize: "2.2rem" }}>
-                                        {o.correctQuestion}
-                                      </span>
-                                    </Col>
-                                    <Col
-                                      span={7}
-                                      className={cx(
-                                        "exam__panel--body-item",
-                                        "exam__panel--inCorrect"
-                                      )}
-                                    >
-                                      <FaTimesCircle
-                                        style={{
-                                          color: "#ff4747",
-                                          fontSize: "1.8rem",
-                                        }}
-                                      />
-                                      <span style={{ fontSize: "1.4rem" }}>
-                                        Câu sai
-                                      </span>
-                                      <span style={{ fontSize: "2.2rem" }}>
-                                        {totalQuestion - o.correctQuestion}
-                                      </span>
-                                    </Col>
-                                    <Col
-                                      span={7}
-                                      className={cx(
-                                        "exam__panel--body-item",
-                                        "exam__panel--time"
-                                      )}
-                                    >
-                                      <FaClock
-                                        style={{
-                                          color: "#ffba34",
-                                          fontSize: "1.8rem",
-                                        }}
-                                      />
-                                      <span style={{ fontSize: "1.4rem" }}>
-                                        Thời gian
-                                      </span>
-                                      <span style={{ fontSize: "2.2rem" }}>
-                                        {moment(
-                                          Math.abs(
-                                            (topic?.timeExam || 0) * 60000 -
-                                              o.timeStudy
-                                          )
-                                        ).format("mm:ss")}
-                                      </span>
-                                    </Col>
-                                  </Row>
-                                </div>
-                              )
-                          )}
-                        </div>
-                      )}
-                      <div className={cx("practice__palette--footer")}>
-                        {isRemake ? (
-                          <div className={cx("btn-group")}>
-                            <button
-                              className={cx("btn", "btn__submit")}
-                              onClick={() => setIsOpenRemakeExam(true)}
-                            >
-                              Làm lại
-                            </button>
-                            <button
-                              className={cx("btn")}
-                              onClick={() => {
-                                navigate(
-                                  `/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`
-                                );
-                              }}
-                            >
-                              Thoát
-                            </button>
+                                )
+                            )}
                           </div>
+                        )}
+                      <div className={cx("practice__palette--footer")}>
+                        {isReview ? (
+                          statusLearn === TTCSconfig.STATUS_LEARNED ? (
+                            <div className={cx("btn-group")}>
+                              <button
+                                className={cx("btn", "btn__submit")}
+                                onClick={() => setIsOpenReviewExam(true)}
+                              >
+                                Làm lại
+                              </button>
+                              <button
+                                className={cx("btn")}
+                                onClick={() => {
+                                  navigate(
+                                    `/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`
+                                  );
+                                }}
+                              >
+                                Thoát
+                              </button>
+                            </div>
+                          ) : (
+                            <div className={cx("btn-group")}>
+                              <button
+                                className={cx("btn", "btn__submit")}
+                                onClick={() => setIsOpenReviewExam(true)}
+                              >
+                                Làm tiếp
+                              </button>
+                              <button
+                                className={cx("btn")}
+                                onClick={() => {
+                                  navigate(
+                                    `/${course?.category?.slug}/${course?.slug}/de-kiem-tra/${params.id}`
+                                  );
+                                }}
+                              >
+                                Thoát
+                              </button>
+                            </div>
+                          )
                         ) : (
                           <div className={cx("btn-group")}>
                             <button
                               className={cx("btn", "btn__submit")}
-                              onClick={handleOpenModelSubmit}
+                              onClick={() => setIsOpenModelSubmit(true)}
                             >
                               Nộp bài
                             </button>
@@ -721,7 +801,7 @@ const PracticePages = () => {
 
               <div className={cx("practice__subnav")}>
                 <Row className={cx("practice__subnav--main")}>
-                  {isRemake ? (
+                  {isReview ? (
                     <>
                       <Col
                         span={8}
@@ -742,7 +822,7 @@ const PracticePages = () => {
                       <Col
                         span={8}
                         className={cx("practice__subnav--item")}
-                        onClick={() => setIsOpenRemakeExam(true)}
+                        onClick={() => setIsOpenReviewExam(true)}
                       >
                         <FaUndoAlt
                           className={cx("practice__subnav--item-icon")}
@@ -756,7 +836,7 @@ const PracticePages = () => {
                     <Col
                       span={8}
                       className={cx("practice__subnav--item")}
-                      onClick={handleOpenModelSubmit}
+                      onClick={() => setIsOpenModelSubmit(true)}
                     >
                       <FaRegCheckCircle
                         className={cx("practice__subnav--item-icon")}
@@ -792,7 +872,7 @@ const PracticePages = () => {
                     zIndex={100}
                   >
                     <div className={cx("practice__palette--body")}>
-                      {isRemake && (
+                      {isReview && (
                         <div className={cx("practice__palette--review")}>
                           {userInfo?.progess?.map(
                             (o, i) =>
@@ -972,8 +1052,8 @@ const PracticePages = () => {
               <Modal
                 className={cx("modal", "modal__submit")}
                 title="Làm lại"
-                open={isOpenRemakeExam}
-                onOk={handleRemakeExam}
+                open={isOpenReviewExam}
+                onOk={handleReviewExam}
                 onCancel={handleCancel}
                 okText={"Làm lại"}
                 cancelText={"Hủy"}
@@ -1025,8 +1105,9 @@ const PracticePages = () => {
                     >
                       <span
                         className={
-                          selectedFeedback.find((c) => c === o?.type) &&
-                          cx("selected")
+                          selectedFeedback.find((c) => c === o?.type)
+                            ? cx("selected")
+                            : ""
                         }
                       >
                         {o.text}
