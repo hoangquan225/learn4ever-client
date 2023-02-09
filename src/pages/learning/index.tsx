@@ -1,5 +1,5 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Layout, notification, Progress, Radio, Row, Space } from "antd";
+import { Layout, Modal, notification, Progress, Radio, Row, Space } from "antd";
 import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
@@ -72,6 +72,7 @@ const LearningPages = () => {
   const [isShowSider, setIsShowSider] = useState(false);
   const [indexTopic, setIndexTopic] = useState<any>();
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -179,10 +180,6 @@ const LearningPages = () => {
     }
   };
 
-  const handleShowSider = () => {
-    setIsShowSider(!isShowSider);
-  };
-
   const handleChangeTopic = async (id: string) => {
     try {
       const res = await apiLoadTopicById({ id });
@@ -240,6 +237,18 @@ const LearningPages = () => {
     }
   };
 
+  const handleShowSider = () => {
+    setIsShowSider(!isShowSider);
+  };
+
+  const handleShowModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalOpen(false);
+  };
+
   const [currentTimeVideo, setCurrentTimeVideo] = useState(0);
 
   const videoPlayerRef = (e: any) => {
@@ -255,6 +264,8 @@ const LearningPages = () => {
     //   console.log(currentTimeVideo);
     // }
   };
+
+  console.log(dataTopicActive?.timePracticeInVideo);
 
   return (
     <>
@@ -706,10 +717,123 @@ const LearningPages = () => {
           </Content>
         </Layout>
 
+        <Modal
+          title="Nghỉ tay chút nào!"
+          open={isModalOpen}
+          closable={false}
+          maskClosable={false}
+          footer={null}
+        >
+          {dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO &&
+            dataTopicActive?.timePracticeInVideo?.map((list, i) => {
+              return (
+                <div key={i}>
+                  {list.questionData?.map((qs, index) => {
+                    return (
+                      <div className={cx("game__view")} key={index}>
+                        <div className={cx("game__view--question")}>
+                          <div className={cx("game__view--question-index")}>
+                            <span>{qs.index}.&nbsp;</span>
+                          </div>
+                          <div className={cx("game__view--question-text")}>
+                            {qs.question}
+                          </div>
+                        </div>
+
+                        <div className={cx("game__view--quiz-choices")}>
+                          <div className={cx("quiz-choices__item")}>
+                            <Radio.Group style={{ width: "100%" }}>
+                              <Space
+                                direction="vertical"
+                                style={{ width: "100%" }}
+                              >
+                                {qs.answer?.map((item, i) => {
+                                  return (
+                                    <Radio
+                                      className={
+                                        selectedQuestions.find(
+                                          (o) => o.idQuestion === qs.id
+                                        )
+                                          ? item?.isResult
+                                            ? cx(
+                                                "quiz-choices__item--radio",
+                                                "correct"
+                                              )
+                                            : selectedQuestions.find(
+                                                (o) =>
+                                                  o.idAnswer.toString() ===
+                                                  item?._id?.toString()
+                                              ) &&
+                                              cx(
+                                                "quiz-choices__item--radio",
+                                                "inCorrect"
+                                              )
+                                          : cx("quiz-choices__item--radio")
+                                      }
+                                      value={item}
+                                      key={i}
+                                      onClick={(e) => {
+                                        handlSaveSelected(
+                                          qs?.id || "",
+                                          item?._id || ""
+                                        );
+                                      }}
+                                      disabled={
+                                        selectedQuestions.find(
+                                          (o) => o.idQuestion === qs.id
+                                        )
+                                          ? true
+                                          : false
+                                      }
+                                    >
+                                      <span
+                                        className={cx(
+                                          "quiz-choices__item--answer"
+                                        )}
+                                      >
+                                        {answers[item.index]}.&nbsp;
+                                        <span
+                                          dangerouslySetInnerHTML={{
+                                            __html: item.text ?? "",
+                                          }}
+                                        ></span>
+                                      </span>
+                                    </Radio>
+                                  );
+                                })}
+
+                                {selectedQuestions.find(
+                                  (o) => o.idQuestion === qs.id
+                                ) && (
+                                  <div className={cx("quiz__explain")}>
+                                    <p>Giải thích</p>
+                                    <div
+                                      dangerouslySetInnerHTML={{
+                                        __html: qs.hint ?? "",
+                                      }}
+                                    ></div>
+                                  </div>
+                                )}
+                              </Space>
+                            </Radio.Group>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          <button onClick={handleCancelModal}>NHAN VAO DI</button>
+        </Modal>
+
         {/* FOOTER */}
         <div className={cx("learning__footer")}>
           <div className={cx("learning__footer--wrapper")}>
-            <button className={cx("learning__footer--btn-prev")}>
+            <button
+              className={cx("learning__footer--btn-prev")}
+              onClick={handleShowModal}
+            >
               <FaChevronLeft className={cx("learning__footer--btn-icon")} />
               <span>BÀI TRƯỚC</span>
             </button>

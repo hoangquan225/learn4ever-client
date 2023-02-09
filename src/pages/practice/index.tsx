@@ -357,7 +357,7 @@ const PracticePages = () => {
                     <span className={cx("practice__clock--time")}>
                       {!isRemake && (
                         <Countdown
-                          date={!isRemake ? timeCoundown : 0}
+                          date={!isRemake ? timeCoundown : timeCoundown}
                           onComplete={handleSubmitOk}
                           onTick={(timeDelta: CountdownTimeDelta) => {
                             timePratice.current = timeDelta.total;
