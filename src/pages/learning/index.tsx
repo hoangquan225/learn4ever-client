@@ -1,5 +1,14 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Layout, Modal, notification, Progress, Radio, Row, Space } from "antd";
+import {
+  Button,
+  Layout,
+  Modal,
+  notification,
+  Progress,
+  Radio,
+  Row,
+  Space,
+} from "antd";
 import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
@@ -73,6 +82,9 @@ const LearningPages = () => {
   const [indexTopic, setIndexTopic] = useState<any>();
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPractice, setIsPractice] = useState(true);
+  const [timePractice, setTimePractice] = useState<number>(0);
+  const [totalQs, setTotalQs] = useState<number>(0);
 
   useEffect(() => {
     if (params.id) {
@@ -97,6 +109,12 @@ const LearningPages = () => {
       dataTopicActive?.id
     ) {
       loadQuestionsByIdTopic(dataTopicActive?.id || "");
+    }
+    if (dataTopicActive?.timePracticeInVideo?.length) {
+      dataTopicActive?.timePracticeInVideo?.map((o) => {
+        setTimePractice(o.time);
+        setTotalQs(o.totalQuestion);
+      });
     }
   }, [dataTopicActive?.id]);
 
@@ -183,7 +201,7 @@ const LearningPages = () => {
   const handleChangeTopic = async (id: string) => {
     try {
       const res = await apiLoadTopicById({ id });
-      setDataTopicActive(new Topic(res.data));
+      setDataTopicActive(res.data);
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -251,21 +269,25 @@ const LearningPages = () => {
 
   const [currentTimeVideo, setCurrentTimeVideo] = useState(0);
 
-  const videoPlayerRef = (e: any) => {
-    // if (e !== null) {
-    //   console.log({ e });
-    //   setCurrentTimeVideo(e.currentTime);
-    // }
-  };
+  const videoPlayerRef = useRef<any>(null);
+  // const videoPlayerRef = (e: any) => {
+  //   console.log("video ref");
+
+  //   if (e !== null) {
+  //     console.log({ ref: e });
+  //     // setCurrentTimeVideo(e.currentTime);
+  //   }
+  // };
 
   const handleTimeUpdateVideo = (e: any) => {
-    // if (e !== null) {
-    //   e.currentTime = currentTimeVideo;
-    //   console.log(currentTimeVideo);
-    // }
-  };
+    if (e.target.currentTime > timePractice && isPractice) {
+      videoPlayerRef.current.pause();
+      console.log(videoPlayerRef.current);
 
-  console.log(dataTopicActive?.timePracticeInVideo);
+      setIsModalOpen(true);
+      setIsPractice(false);
+    }
+  };
 
   return (
     <>
@@ -736,7 +758,11 @@ const LearningPages = () => {
                             <span>{qs.index}.&nbsp;</span>
                           </div>
                           <div className={cx("game__view--question-text")}>
-                            {qs.question}
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: qs.question ?? "",
+                              }}
+                            ></div>
                           </div>
                         </div>
 
@@ -824,7 +850,11 @@ const LearningPages = () => {
                 </div>
               );
             })}
-          <button onClick={handleCancelModal}>NHAN VAO DI</button>
+          {selectedQuestions.length === totalQs && (
+            <Button onClick={handleCancelModal} type="primary">
+              Tiếp Tục
+            </Button>
+          )}
         </Modal>
 
         {/* FOOTER */}
