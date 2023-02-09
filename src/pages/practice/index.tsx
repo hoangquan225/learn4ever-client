@@ -409,10 +409,17 @@ const PracticePages = () => {
                     <span className={cx("practice__clock--time")}>
                       {!isReview && (
                         <Countdown
+<<<<<<< HEAD
                           value={timeCoundown}
                           onFinish={handleSubmitOk}
                           onChange={(val: StatisticProps["value"]) => {
                             timePratice.current = val;
+=======
+                          date={!isRemake ? timeCoundown : timeCoundown}
+                          onComplete={handleSubmitOk}
+                          onTick={(timeDelta: CountdownTimeDelta) => {
+                            timePratice.current = timeDelta.total;
+>>>>>>> 26a21f86e7c392537d755cd723c22b89c7ab1300
                           }}
                         />
                       )}
