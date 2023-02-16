@@ -129,6 +129,9 @@ const LearningPages = () => {
         setTimePractice(o.time);
         setTotalQs(o.totalQuestion);
       });
+    } else {
+      setTimePractice(0);
+      setTotalQs(0);
     }
 
     if (userInfo?.progess?.find((o) => o.idTopic === dataTopicActive?.id)) {
@@ -863,80 +866,85 @@ const LearningPages = () => {
 
                         <div className={cx("game__view--quiz-choices")}>
                           <div className={cx("quiz-choices__item")}>
-                            <Radio.Group style={{ width: "100%" }}>
-                              <Space
-                                direction="vertical"
-                                style={{ width: "100%" }}
-                              >
-                                {qs.answer?.map((item, i) => {
-                                  return (
-                                    <Radio
-                                      className={
-                                        selectedQuestions.find(
-                                          (o) => o.idQuestion === qs.id
-                                        )
-                                          ? item?.isResult
-                                            ? cx(
-                                                "quiz-choices__item--radio",
-                                                "correct"
-                                              )
-                                            : selectedQuestions.find(
-                                                (o) =>
-                                                  o.idAnswer.toString() ===
-                                                  item?._id?.toString()
-                                              ) &&
-                                              cx(
-                                                "quiz-choices__item--radio",
-                                                "inCorrect"
-                                              )
-                                          : cx("quiz-choices__item--radio")
-                                      }
-                                      value={item}
-                                      key={i}
-                                      onClick={(e) => {
-                                        handlSaveSelected(
-                                          qs?.id || "",
-                                          item?._id || ""
-                                        );
-                                      }}
-                                      disabled={
-                                        selectedQuestions.find(
-                                          (o) => o.idQuestion === qs.id
-                                        )
-                                          ? true
-                                          : false
-                                      }
+                            <Space
+                              direction="vertical"
+                              style={{ width: "100%" }}
+                            >
+                              {qs.answer?.map((item, i) => {
+                                return (
+                                  <Radio
+                                    className={
+                                      selectedQuestions.find(
+                                        (o) => o.idQuestion === qs.id
+                                      )
+                                        ? item?.isResult
+                                          ? cx(
+                                              "quiz-choices__item--radio",
+                                              "correct"
+                                            )
+                                          : selectedQuestions.find(
+                                              (o) =>
+                                                o.idAnswer.toString() ===
+                                                item?._id?.toString()
+                                            ) &&
+                                            cx(
+                                              "quiz-choices__item--radio",
+                                              "inCorrect"
+                                            )
+                                        : cx("quiz-choices__item--radio")
+                                    }
+                                    value={item}
+                                    key={i}
+                                    onClick={(e) => {
+                                      handlSaveSelected(
+                                        qs?.id || "",
+                                        item?._id || ""
+                                      );
+                                    }}
+                                    disabled={
+                                      selectedQuestions.find(
+                                        (o) => o.idQuestion === qs.id
+                                      )
+                                        ? true
+                                        : false
+                                    }
+                                    checked={
+                                      !!selectedQuestions.find(
+                                        (o) =>
+                                          o.idAnswer.toString() ===
+                                          item?._id?.toString()
+                                      )
+                                    }
+                                  >
+                                    <span
+                                      className={cx(
+                                        "quiz-choices__item--answer"
+                                      )}
                                     >
+                                      {answers[item.index]}.&nbsp;
                                       <span
-                                        className={cx(
-                                          "quiz-choices__item--answer"
-                                        )}
-                                      >
-                                        {answers[item.index]}.&nbsp;
-                                        <span
-                                          dangerouslySetInnerHTML={{
-                                            __html: item.text ?? "",
-                                          }}
-                                        ></span>
-                                      </span>
-                                    </Radio>
-                                  );
-                                })}
+                                        dangerouslySetInnerHTML={{
+                                          __html: item.text ?? "",
+                                        }}
+                                      ></span>
+                                    </span>
+                                  </Radio>
+                                );
+                              })}
 
-                                {selectedQuestions.find(
-                                  (o) => o.idQuestion === qs.id
-                                ) && (
-                                  <div className={cx("quiz__explain")}>
-                                    <p>Giải thích</p>
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: qs.hint ?? "",
-                                      }}
-                                    ></div>
-                                  </div>
-                                )}
-                              </Space>
-                            </Radio.Group>
+                              {selectedQuestions.find(
+                                (o) => o.idQuestion === qs.id
+                              ) && (
+                                <div className={cx("quiz__explain")}>
+                                  <p>Giải thích</p>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: qs.hint ?? "",
+                                    }}
+                                  ></div>
+                                </div>
+                              )}
+                            </Space>
                           </div>
                         </div>
                       </div>
