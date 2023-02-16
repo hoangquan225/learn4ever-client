@@ -4,6 +4,7 @@ import {
   Layout,
   Modal,
   notification,
+  Popconfirm,
   Progress,
   Radio,
   Row,
@@ -74,7 +75,6 @@ const LearningPages = () => {
   const userInfo = authStates.userInfo;
   const questionStates = useAppSelector(QuestionState);
   const questions = questionStates.questions;
-  const totalQsTopic = questionStates.total;
 
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
@@ -114,6 +114,7 @@ const LearningPages = () => {
     ) {
       loadQuestionsByIdTopic(dataTopicActive?.id || "");
     }
+
     if (
       dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO &&
       dataTopicActive?.id
@@ -140,18 +141,9 @@ const LearningPages = () => {
       setSelectedQuestions([]);
       setIsReview(false);
     }
-  }, [dataTopicActive?.id, userInfo]);
 
-  useEffect(() => {
-    if (
-      selectedQuestions.length === totalQsTopic &&
-      !isReview &&
-      totalQsTopic &&
-      dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_PRATICE
-    ) {
-      handleSubmitExercise();
-    }
-  }, [selectedQuestions]);
+    handleUpdateDocument(dataTopicActive?.id || "", userInfo?._id || "");
+  }, [dataTopicActive?.id, userInfo]);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -574,10 +566,6 @@ const LearningPages = () => {
                                       }
                                       onClick={() => {
                                         setIndexTopic(topic.id);
-                                        handleUpdateDocument(
-                                          topicChild.id || "",
-                                          userInfo?._id || ""
-                                        );
                                         handleChangeTopic(topicChild.id || "");
                                       }}
                                     >
@@ -633,7 +621,10 @@ const LearningPages = () => {
                                         )}
                                       >
                                         {userInfo?.progess?.find(
-                                          (c) => c.idTopic === topicChild.id
+                                          (c) =>
+                                            c.idTopic === topicChild.id &&
+                                            c.status ===
+                                              TTCSconfig.STATUS_LEARNED
                                         ) && (
                                           <FaCheckCircle
                                             className={cx("status-icon")}
@@ -738,90 +729,96 @@ const LearningPages = () => {
 
                             <div className={cx("game__view--quiz-choices")}>
                               <div className={cx("quiz-choices__item")}>
-                                <Radio.Group style={{ width: "100%" }}>
-                                  <Space
-                                    direction="vertical"
-                                    style={{ width: "100%" }}
-                                  >
-                                    {question.answer?.map((item, i) => {
-                                      return (
-                                        <Radio
-                                          className={
-                                            selectedQuestions.find(
-                                              (o) =>
-                                                o.idQuestion === question.id
-                                            )
-                                              ? item?.isResult
-                                                ? cx(
-                                                    "quiz-choices__item--radio",
-                                                    "correct"
-                                                  )
-                                                : selectedQuestions.find(
-                                                    (o) =>
-                                                      o.idAnswer.toString() ===
-                                                      item?._id?.toString()
-                                                  ) &&
-                                                  cx(
-                                                    "quiz-choices__item--radio",
-                                                    "inCorrect"
-                                                  )
-                                              : cx("quiz-choices__item--radio")
-                                          }
-                                          value={item}
-                                          key={i}
-                                          onClick={(e) => {
-                                            handlSaveSelected(
-                                              question?.id || "",
-                                              item?._id || ""
-                                            );
-                                          }}
-                                          disabled={
-                                            selectedQuestions.find(
-                                              (o) =>
-                                                o.idQuestion === question.id
-                                            )
-                                              ? true
-                                              : false
-                                          }
+                                <Space direction="vertical">
+                                  {question.answer?.map((item, i) => {
+                                    return (
+                                      <Radio
+                                        className={
+                                          selectedQuestions.find(
+                                            (o) => o.idQuestion === question.id
+                                          )
+                                            ? item?.isResult
+                                              ? cx(
+                                                  "quiz-choices__item--radio",
+                                                  "correct"
+                                                )
+                                              : selectedQuestions.find(
+                                                  (o) =>
+                                                    o.idAnswer.toString() ===
+                                                    item?._id?.toString()
+                                                ) &&
+                                                cx(
+                                                  "quiz-choices__item--radio",
+                                                  "inCorrect"
+                                                )
+                                            : cx("quiz-choices__item--radio")
+                                        }
+                                        value={item}
+                                        key={i}
+                                        onClick={(e) => {
+                                          handlSaveSelected(
+                                            question?.id || "",
+                                            item?._id || ""
+                                          );
+                                        }}
+                                        disabled={isReview}
+                                        checked={
+                                          !!selectedQuestions.find(
+                                            (o) =>
+                                              o.idAnswer.toString() ===
+                                              item?._id?.toString()
+                                          )
+                                        }
+                                      >
+                                        <span
+                                          className={cx(
+                                            "quiz-choices__item--answer"
+                                          )}
                                         >
+                                          {answers[item.index]}.&nbsp;
                                           <span
-                                            className={cx(
-                                              "quiz-choices__item--answer"
-                                            )}
-                                          >
-                                            {answers[item.index]}.&nbsp;
-                                            <span
-                                              dangerouslySetInnerHTML={{
-                                                __html: item.text ?? "",
-                                              }}
-                                            ></span>
-                                          </span>
-                                        </Radio>
-                                      );
-                                    })}
+                                            dangerouslySetInnerHTML={{
+                                              __html: item.text ?? "",
+                                            }}
+                                          ></span>
+                                        </span>
+                                      </Radio>
+                                    );
+                                  })}
 
-                                    {selectedQuestions.find(
-                                      (o) => o.idQuestion === question.id
-                                    ) && (
-                                      <div className={cx("quiz__explain")}>
-                                        <p>Giải thích</p>
-                                        <div
-                                          dangerouslySetInnerHTML={{
-                                            __html: question.hint ?? "",
-                                          }}
-                                        ></div>
-                                      </div>
-                                    )}
-                                  </Space>
-                                </Radio.Group>
+                                  {selectedQuestions.find(
+                                    (o) => o.idQuestion === question.id
+                                  ) && (
+                                    <div className={cx("quiz__explain")}>
+                                      <p>Giải thích</p>
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: question.hint ?? "",
+                                        }}
+                                      ></div>
+                                    </div>
+                                  )}
+                                </Space>
                               </div>
                             </div>
                           </div>
                         </Row>
                       );
                     })}
-                  {isReview && (
-                    <Button onClick={handleRemakeExercise}>Làm lại</Button>
+                  {isReview ? (
+                    <Button onClick={handleRemakeExercise} type="primary">
+                      Làm lại
+                    </Button>
+                  ) : (
+                    <Popconfirm
+                      placement="top"
+                      title="Bạn cos chắc muốn nộp?"
+                      onConfirm={() => handleSubmitExercise()}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button type="primary">Nộp bài</Button>
+                    </Popconfirm>
                   )}
                 </div>
               )}

@@ -15,14 +15,7 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import classNames from "classnames/bind";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaCheckCircle,
   FaClock,
@@ -106,9 +99,9 @@ const PracticePages = () => {
       userInfo?.progess?.find(
         (o) => o.idTopic === params.idChild && setSelectedQuestions(o.answers)
       );
-      setTimeRemake(
-        userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.timeStudy
-      );
+      // setTimeRemake(
+      //   userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.timeStudy
+      // );
       setStatusLearn(
         userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.status
       );
@@ -311,27 +304,20 @@ const PracticePages = () => {
       setIsOpenReviewExam(false);
       setIsReview(false);
       setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
-    } else if (statusLearn === TTCSconfig.STATUS_LEARNING) {
-      setIsOpenReviewExam(false);
-      setIsReview(false);
-      setCorrect(
-        selectedQuestions.map((o) => {
-          questions.map((c) =>
-            c.answer.find((an) => an._id === o.idAnswer && an.isResult)
-          );
-        }).length
-      );
-      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
-      // setTimeCoundown(Date.now() + (timeRemake || 0) * 1000 * 60);
     }
-  };
-
-  const renderer = ({ hours, minutes, seconds, completed }: any) => {
-    return (
-      <span>
-        {hours}:{minutes}:{seconds}
-      </span>
-    );
+    // else if (statusLearn === TTCSconfig.STATUS_LEARNING) {
+    //   setIsOpenReviewExam(false);
+    //   setIsReview(false);
+    //   setCorrect(
+    //     selectedQuestions.map((o) => {
+    //       questions.map((c) =>
+    //         c.answer.find((an) => an._id === o.idAnswer && an.isResult)
+    //       );
+    //     }).length
+    //   );
+    //   // setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+    //   setTimeCoundown(Date.now() + (timeRemake || 0) * 1000 * 60);
+    // }
   };
 
   return (
