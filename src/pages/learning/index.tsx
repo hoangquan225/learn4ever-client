@@ -22,6 +22,7 @@ import {
   FaCheckCircle,
   FaChevronLeft,
   FaChevronRight,
+  FaComments,
   FaFileAlt,
   FaHeart,
   FaPlayCircle,
@@ -36,6 +37,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiLoadTopicById } from "../../api/topic";
 import logo from "../../assets/img/learn4ever-icon.png";
+import Comment from "../../components/comment";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
   courseState,
@@ -87,6 +89,11 @@ const LearningPages = () => {
   const [totalQs, setTotalQs] = useState<number>(0);
   const [isReview, setIsReview] = useState(false);
   const [isExercise, setIsExercise] = useState(true);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   const videoPlayerRef = useRef<any>(null);
 
@@ -147,6 +154,19 @@ const LearningPages = () => {
 
     handleUpdateDocument(dataTopicActive?.id || "", userInfo?._id || "");
   }, [dataTopicActive?.id, userInfo]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -238,6 +258,9 @@ const LearningPages = () => {
         message: "server error!!",
         duration: 1.5,
       });
+    }
+    if (screenSize.width < 992) {
+      setIsShowSider(false);
     }
   };
 
@@ -377,6 +400,15 @@ const LearningPages = () => {
     if (e.target.currentTime > previousTime) {
       e.target.currentTime = previousTime;
     }
+  };
+
+  const handleCloseComment = () => {
+    setIsCommentOpen(false);
+  };
+
+  const handleOpenComment = () => {
+    setIsCommentOpen(true);
+    videoPlayerRef.current.pause();
   };
 
   return (
@@ -837,6 +869,7 @@ const LearningPages = () => {
           </Content>
         </Layout>
 
+        {/* MODAL */}
         <Modal
           title="Nghỉ tay chút nào!"
           open={isModalOpen}
@@ -963,10 +996,7 @@ const LearningPages = () => {
         {/* FOOTER */}
         <div className={cx("learning__footer")}>
           <div className={cx("learning__footer--wrapper")}>
-            <button
-              className={cx("learning__footer--btn-prev")}
-              onClick={handleShowModal}
-            >
+            <button className={cx("learning__footer--btn-prev")}>
               <FaChevronLeft className={cx("learning__footer--btn-icon")} />
               <span>BÀI TRƯỚC</span>
             </button>
@@ -1002,6 +1032,32 @@ const LearningPages = () => {
             </div>
           </div>
         </div>
+
+        {/* COMMENT */}
+        <div
+          className={
+            isShowSider
+              ? cx("learning__comment--toggle")
+              : cx("learning__comment--toggle", "hide-sider")
+          }
+        >
+          <button
+            className={cx("learning__comment--btn")}
+            onClick={handleOpenComment}
+          >
+            <FaComments className={cx("learning__comment--icon")} />
+            <span className={cx("learning__comment--text")}>Hỏi đáp</span>
+          </button>
+        </div>
+
+        <Comment
+          className={cx("comment__drawer")}
+          placement={"right"}
+          open={isCommentOpen}
+          onClose={handleCloseComment}
+          width={screenSize.width >= 768 ? "100vh" : "100%"}
+          zIndex={6}
+        />
       </div>
     </>
   );
