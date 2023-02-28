@@ -676,13 +676,9 @@ const LearningPages = () => {
                       title="video player"
                       ref={videoPlayerRef}
                       onTimeUpdate={handleTimeUpdateVideo}
-                      onSeeking={handleSeekingVideo}
-                    >
-                      <source
-                        src={dataTopicActive?.video || ""}
-                        type="video/mp4"
-                      />
-                    </video>
+                      // onSeeking={handleSeekingVideo}
+                      src={dataTopicActive?.video || ""}
+                    ></video>
                   </div>
                 </div>
               )}
