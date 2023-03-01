@@ -1,4 +1,4 @@
-import { Avatar, Drawer } from "antd";
+import { Avatar, Button, Drawer } from "antd";
 import classNames from "classnames/bind";
 import { FaChevronDown, FaChevronUp, FaEllipsisH } from "react-icons/fa";
 import { AvatarIcon } from "../icons/icons";
@@ -10,6 +10,9 @@ import reactionPhanno from "../../assets/img/reactionPhanno.svg";
 import reactionThuong from "../../assets/img/reactionThuong.svg";
 import reactionTim from "../../assets/img/reactionTim.svg";
 import reactionWow from "../../assets/img/reactionWow.svg";
+import TinyMCEEditor from "../TinyMCE";
+import { useRef, useState } from "react";
+import { Editor } from "tinymce";
 
 const cx = classNames.bind(styles);
 
@@ -23,6 +26,9 @@ type CommentProps = {
 };
 
 const Comment = (props: CommentProps) => {
+  const [openComment, setOpenComment] = useState<boolean>(false)
+  const content = useRef<Editor>()
+
   return (
     <>
       <div className={cx("comment")}>
@@ -48,7 +54,40 @@ const Comment = (props: CommentProps) => {
               </div>
               <div className={cx("comment__content--wrapper")}>
                 <div className={cx("comment__content--placeholder")}>
-                  <span>Bạn có thắc mắc gì trong bài học này?</span>
+                  {
+                    openComment
+                      ? (
+                        <div>
+                          <TinyMCEEditor
+                            editorRef={content}
+                            keyMCE={`${Math.random()}`}
+                            placeholder='Bạn có thắc mắc gì trong bài học này?'
+                            height={200}
+                          />
+                          <div>
+                            {/* css nhé */}
+                            <Button
+                              onClick={() => {
+                                setOpenComment(false)
+                              }}
+                            >Huỷ</Button>
+                            <Button
+                              onClick={() => {
+                                setOpenComment(false)
+                                console.log(content.current?.getContent());
+                              }}
+                            >Bình luận</Button>
+                          </div>
+                        </div>
+                      )
+                      : (
+                        <span
+                          onClick={() => {
+                            setOpenComment(true)
+                          }}
+                        >Bạn có thắc mắc gì trong bài học này?</span>
+                      )
+                  }
                 </div>
               </div>
             </div>
