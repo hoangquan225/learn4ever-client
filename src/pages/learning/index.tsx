@@ -15,7 +15,7 @@ import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
 import dayjs from "dayjs";
 import moment from "moment";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   FaArrowRight,
   FaBars,
@@ -37,8 +37,9 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiLoadTopicById } from "../../api/topic";
 import logo from "../../assets/img/learn4ever-icon.png";
-import Comment from "../../components/comment";
+import FCComment from "../../components/comment";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { requestLoadComments } from "../../redux/slices/commentSlice";
 import {
   courseState,
   requestLoadCourseBySlug,
@@ -402,13 +403,22 @@ const LearningPages = () => {
     }
   };
 
-  const handleCloseComment = () => {
+  const handleCloseComment = useCallback(() => {
     setIsCommentOpen(false);
-  };
+  }, [])
 
-  const handleOpenComment = () => {
+  const handleOpenComment = async () => {
     setIsCommentOpen(true);
     videoPlayerRef.current.pause();
+    try {
+      const res = await dispatch(requestLoadComments({ idTopic: dataTopicActive?.id || '' }))
+      unwrapResult(res)
+    } catch (error) {
+      notification.error({
+        message: 'lỗi server, không tải được dữ liệu',
+        duration: 1.5
+      })
+    }
   };
 
   return (
@@ -585,7 +595,7 @@ const LearningPages = () => {
                             (topicChild, indexChild) => {
                               return (
                                 topicChild.status ===
-                                  TTCSconfig.STATUS_PUBLIC && (
+                                TTCSconfig.STATUS_PUBLIC && (
                                   <div
                                     className={cx("learning__track--steps")}
                                     key={indexChild}
@@ -594,9 +604,9 @@ const LearningPages = () => {
                                       className={
                                         dataTopicActive?.id === topicChild.id
                                           ? cx(
-                                              "learning__track--steps-item",
-                                              "active"
-                                            )
+                                            "learning__track--steps-item",
+                                            "active"
+                                          )
                                           : cx("learning__track--steps-item")
                                       }
                                       onClick={() => {
@@ -622,7 +632,7 @@ const LearningPages = () => {
                                           )}
                                         >
                                           {topicChild?.topicType ===
-                                          TTCSconfig.TYPE_TOPIC_VIDEO ? (
+                                            TTCSconfig.TYPE_TOPIC_VIDEO ? (
                                             <FaPlayCircle
                                               className={cx("desc-icon")}
                                             />
@@ -659,12 +669,12 @@ const LearningPages = () => {
                                           (c) =>
                                             c.idTopic === topicChild.id &&
                                             c.status ===
-                                              TTCSconfig.STATUS_LEARNED
+                                            TTCSconfig.STATUS_LEARNED
                                         ) && (
-                                          <FaCheckCircle
-                                            className={cx("status-icon")}
-                                          />
-                                        )}
+                                            <FaCheckCircle
+                                              className={cx("status-icon")}
+                                            />
+                                          )}
                                       </div>
                                     </div>
                                   </div>
@@ -770,18 +780,18 @@ const LearningPages = () => {
                                           )
                                             ? item?.isResult
                                               ? cx(
-                                                  "quiz-choices__item--radio",
-                                                  "correct"
-                                                )
+                                                "quiz-choices__item--radio",
+                                                "correct"
+                                              )
                                               : selectedQuestions.find(
-                                                  (o) =>
-                                                    o.idAnswer.toString() ===
-                                                    item?._id?.toString()
-                                                ) &&
-                                                cx(
-                                                  "quiz-choices__item--radio",
-                                                  "inCorrect"
-                                                )
+                                                (o) =>
+                                                  o.idAnswer.toString() ===
+                                                  item?._id?.toString()
+                                              ) &&
+                                              cx(
+                                                "quiz-choices__item--radio",
+                                                "inCorrect"
+                                              )
                                             : cx("quiz-choices__item--radio")
                                         }
                                         value={item}
@@ -820,15 +830,15 @@ const LearningPages = () => {
                                   {selectedQuestions.find(
                                     (o) => o.idQuestion === question.id
                                   ) && (
-                                    <div className={cx("quiz__explain")}>
-                                      <p>Giải thích</p>
-                                      <div
-                                        dangerouslySetInnerHTML={{
-                                          __html: question.hint ?? "",
-                                        }}
-                                      ></div>
-                                    </div>
-                                  )}
+                                      <div className={cx("quiz__explain")}>
+                                        <p>Giải thích</p>
+                                        <div
+                                          dangerouslySetInnerHTML={{
+                                            __html: question.hint ?? "",
+                                          }}
+                                        ></div>
+                                      </div>
+                                    )}
                                 </Space>
                               </div>
                             </div>
@@ -908,18 +918,18 @@ const LearningPages = () => {
                                       )
                                         ? item?.isResult
                                           ? cx(
-                                              "quiz-choices__item--radio",
-                                              "correct"
-                                            )
+                                            "quiz-choices__item--radio",
+                                            "correct"
+                                          )
                                           : selectedQuestions.find(
-                                              (o) =>
-                                                o.idAnswer.toString() ===
-                                                item?._id?.toString()
-                                            ) &&
-                                            cx(
-                                              "quiz-choices__item--radio",
-                                              "inCorrect"
-                                            )
+                                            (o) =>
+                                              o.idAnswer.toString() ===
+                                              item?._id?.toString()
+                                          ) &&
+                                          cx(
+                                            "quiz-choices__item--radio",
+                                            "inCorrect"
+                                          )
                                         : cx("quiz-choices__item--radio")
                                     }
                                     value={item}
@@ -964,15 +974,15 @@ const LearningPages = () => {
                               {selectedQuestions.find(
                                 (o) => o.idQuestion === qs.id
                               ) && (
-                                <div className={cx("quiz__explain")}>
-                                  <p>Giải thích</p>
-                                  <div
-                                    dangerouslySetInnerHTML={{
-                                      __html: qs.hint ?? "",
-                                    }}
-                                  ></div>
-                                </div>
-                              )}
+                                  <div className={cx("quiz__explain")}>
+                                    <p>Giải thích</p>
+                                    <div
+                                      dangerouslySetInnerHTML={{
+                                        __html: qs.hint ?? "",
+                                      }}
+                                    ></div>
+                                  </div>
+                                )}
                             </Space>
                           </div>
                         </div>
@@ -1030,30 +1040,38 @@ const LearningPages = () => {
         </div>
 
         {/* COMMENT */}
-        <div
-          className={
-            isShowSider
-              ? cx("learning__comment--toggle")
-              : cx("learning__comment--toggle", "hide-sider")
-          }
-        >
-          <button
-            className={cx("learning__comment--btn")}
-            onClick={handleOpenComment}
-          >
-            <FaComments className={cx("learning__comment--icon")} />
-            <span className={cx("learning__comment--text")}>Hỏi đáp</span>
-          </button>
-        </div>
+        {
+          dataTopicActive && (
+            <>
+              <div
+                className={
+                  isShowSider
+                    ? cx("learning__comment--toggle")
+                    : cx("learning__comment--toggle", "hide-sider")
+                }
+              >
+                <button
+                  className={cx("learning__comment--btn")}
+                  onClick={handleOpenComment}
+                >
+                  <FaComments className={cx("learning__comment--icon")} />
+                  <span className={cx("learning__comment--text")}>Hỏi đáp</span>
+                </button>
+              </div>
 
-        <Comment
-          className={cx("comment__drawer")}
-          placement={"right"}
-          open={isCommentOpen}
-          onClose={handleCloseComment}
-          width={screenSize.width >= 768 ? "100vh" : "100%"}
-          zIndex={6}
-        />
+              <FCComment
+                className={cx("comment__drawer")}
+                placement={"right"}
+                open={isCommentOpen}
+                onClose={handleCloseComment}
+                width={screenSize.width >= 768 ? "70%" : "100%"}
+                zIndex={6}
+                dataTopicActive={dataTopicActive}
+              />
+            </>
+          )
+        }
+
       </div>
     </>
   );

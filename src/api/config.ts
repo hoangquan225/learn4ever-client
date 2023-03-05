@@ -30,16 +30,28 @@ export const ApiConfig = async (
   return axiosInstance.request(config);
 };
 
-export const ApiUploadFile = async (
-  url: string,
-  file: string | Blob,
-  fieldName = "file"
-) => {
+export const ApiUploadFile = async (url: string, file: string | Blob | any, fieldName = "file", setProgress?: React.Dispatch<React.SetStateAction<number>>, onProgress?: ((event: any) => void) | undefined) => {
   const formData = new FormData();
-  formData.append(fieldName, file);
+  if (typeof file === 'object' && file?.length) {
+    for (let i = 0; i < file?.length; i++) {
+      formData.append("file", file[i])
+    };
+  } else {
+    formData.append("file", file, fieldName)
+  }
   return axiosInstance.post(url, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "multipart/form-data"
     },
-  });
-};
+    // onUploadProgress: (event: any) => {
+    //     const percent = Math.floor((event.loaded / event.total) * 100);
+    //     if (setProgress && onProgress) {
+    //         setProgress(percent);
+    //         // if (percent === 100) {
+    //         //     setTimeout(() => setProgress(0), 1000);
+    //         // }
+    //         onProgress({ percent: (event.loaded / event.total) * 100 });
+    //     }
+    // }, 
+  })
+}

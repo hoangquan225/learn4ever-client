@@ -1,4 +1,4 @@
-import { Avatar, Button, Drawer } from "antd";
+import { Avatar, Button, Drawer, message, notification } from "antd";
 import classNames from "classnames/bind";
 import { FaChevronDown, FaChevronUp, FaEllipsisH } from "react-icons/fa";
 import { AvatarIcon } from "../icons/icons";
@@ -11,8 +11,15 @@ import reactionThuong from "../../assets/img/reactionThuong.svg";
 import reactionTim from "../../assets/img/reactionTim.svg";
 import reactionWow from "../../assets/img/reactionWow.svg";
 import TinyMCEEditor from "../TinyMCE";
-import { useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "tinymce";
+import { Topic } from "../../submodule/models/topic";
+import { useAppDispatch } from "../../redux/hook";
+import { commentState, requestLoadComments, requestUpdateComment } from "../../redux/slices/commentSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
+import { authState } from "../../redux/slices/userSlice";
+import { Comment } from "../../submodule/models/comment";
 
 const cx = classNames.bind(styles);
 
@@ -23,11 +30,42 @@ type CommentProps = {
   width: string | number;
   zIndex: number;
   className: string;
+  dataTopicActive: Topic
 };
 
-const Comment = (props: CommentProps) => {
+const FCComment = (props: CommentProps) => {
+  const { dataTopicActive } = props
+  const dispatch = useAppDispatch()
+  const commentStates = useSelector(commentState)
+  const userStates = useSelector(authState)
   const [openComment, setOpenComment] = useState<boolean>(false)
   const content = useRef<Editor>()
+
+  console.log(commentStates.loading); // tạo giao diện loading comments
+
+  const handleCreateComment = async () => {
+    setOpenComment(false)
+    const text = content.current?.getContent()
+    const idTopic = dataTopicActive.id
+    console.log(new Comment({
+      content: text,
+      idTopic,
+      idUser: userStates.userInfo?._id,
+      index: commentStates.comments.length + 1
+    }));
+
+    try {
+      const res = await dispatch(requestUpdateComment(new Comment({
+        content: text,
+        idTopic,
+        idUser: userStates.userInfo?._id,
+        index: commentStates.comments.length + 1
+      })))
+      unwrapResult(res)
+    } catch (error) {
+      message.error('lỗi server, không gửi được comment')
+    }
+  }
 
   return (
     <>
@@ -60,7 +98,7 @@ const Comment = (props: CommentProps) => {
                         <div>
                           <TinyMCEEditor
                             editorRef={content}
-                            keyMCE={`${Math.random()}`}
+                            // keyMCE={`${Math.random()}`}
                             placeholder='Bạn có thắc mắc gì trong bài học này?'
                             height={200}
                           />
@@ -72,10 +110,7 @@ const Comment = (props: CommentProps) => {
                               }}
                             >Huỷ</Button>
                             <Button
-                              onClick={() => {
-                                setOpenComment(false)
-                                console.log(content.current?.getContent());
-                              }}
+                              onClick={handleCreateComment}
                             >Bình luận</Button>
                           </div>
                         </div>
@@ -177,4 +212,4 @@ const Comment = (props: CommentProps) => {
   );
 };
 
-export default Comment;
+export default memo(FCComment);
