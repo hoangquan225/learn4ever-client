@@ -15,7 +15,7 @@ import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
 import dayjs from "dayjs";
 import moment from "moment";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   FaArrowRight,
   FaBars,
@@ -36,6 +36,7 @@ import {
 } from "react-icons/io5";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiLoadTopicById } from "../../api/topic";
+import { RealtimeContext } from "../../App";
 import logo from "../../assets/img/learn4ever-icon.png";
 import FCComment from "../../components/comment";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -59,10 +60,13 @@ import {
 } from "../../redux/slices/userSlice";
 import TTCSconfig from "../../submodule/common/config";
 import { Topic } from "../../submodule/models/topic";
+import { UserInfo } from "../../submodule/models/user";
 import { answers } from "../../utils/contants";
 import styles from "./learning.module.scss";
 
 const cx = classNames.bind(styles);
+
+// const realtime = new SocketService();
 
 const LearningPages = () => {
   const dispatch = useAppDispatch();
@@ -78,6 +82,7 @@ const LearningPages = () => {
   const userInfo = authStates.userInfo;
   const questionStates = useAppSelector(QuestionState);
   const questions = questionStates.questions;
+  const realtime = useContext(RealtimeContext);
 
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([]);
   const [dataTopicActive, setDataTopicActive] = useState<Topic>();
@@ -154,6 +159,10 @@ const LearningPages = () => {
     }
 
     handleUpdateDocument(dataTopicActive?.id || "", userInfo?._id || "");
+
+    return () => {
+      dataTopicActive?.id && userInfo && realtime.leaveComment({ idTopic: dataTopicActive?.id, userInfo })
+    }
   }, [dataTopicActive?.id, userInfo]);
 
   useEffect(() => {
@@ -409,11 +418,14 @@ const LearningPages = () => {
 
   const handleOpenComment = async () => {
     setIsCommentOpen(true);
-    videoPlayerRef.current.pause();
+    dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO && videoPlayerRef.current.pause();
     try {
-      const res = await dispatch(requestLoadComments({ idTopic: dataTopicActive?.id || '' }))
+      const res = await dispatch(requestLoadComments({ idTopic: dataTopicActive?.id || '', limit: 10, skip: 0 }))
       unwrapResult(res)
+      dataTopicActive?.id && userInfo && realtime.joinComment({ idTopic: dataTopicActive?.id, userInfo })
+      realtime.loadComment(dispatch)
     } catch (error) {
+      console.log(error);
       notification.error({
         message: 'lỗi server, không tải được dữ liệu',
         duration: 1.5
@@ -1064,7 +1076,7 @@ const LearningPages = () => {
                 placement={"right"}
                 open={isCommentOpen}
                 onClose={handleCloseComment}
-                width={screenSize.width >= 768 ? "70%" : "100%"}
+                width={screenSize.width >= 768 ? "40%" : "100%"}
                 zIndex={6}
                 dataTopicActive={dataTopicActive}
               />

@@ -23,6 +23,15 @@ import { Comment } from "../../submodule/models/comment";
 
 const cx = classNames.bind(styles);
 
+const ReactType = [
+  reactionTim,
+  reactionThuong,
+  reactionHaha,
+  reactionWow,
+  reactionBuon,
+  reactionPhanno,
+]
+
 type CommentProps = {
   placement: any;
   open: boolean;
@@ -41,18 +50,9 @@ const FCComment = (props: CommentProps) => {
   const [openComment, setOpenComment] = useState<boolean>(false)
   const content = useRef<Editor>()
 
-  console.log(commentStates.loading); // tạo giao diện loading comments
-
   const handleCreateComment = async () => {
-    setOpenComment(false)
     const text = content.current?.getContent()
     const idTopic = dataTopicActive.id
-    console.log(new Comment({
-      content: text,
-      idTopic,
-      idUser: userStates.userInfo?._id,
-      index: commentStates.comments.length + 1
-    }));
 
     try {
       const res = await dispatch(requestUpdateComment(new Comment({
@@ -64,7 +64,100 @@ const FCComment = (props: CommentProps) => {
       unwrapResult(res)
     } catch (error) {
       message.error('lỗi server, không gửi được comment')
+    } finally {
+      setOpenComment(false)
     }
+  }
+
+  const ItemComment = (comment: Comment, key: number) => {
+    const { userInfo, content, react } = comment
+    return (
+      <div className={cx("comment__detail")} key={key}>
+        <div className={cx("comment__avt--wrapper")}>
+          {userInfo?.avatar
+            ? <Avatar src={userInfo?.avatar} />
+            : <Avatar style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>{userInfo?.name.charAt(0)}</Avatar>
+          }
+        </div>
+        <div className={cx("comment__detail--cmtbody")}>
+          <div className={cx("comment__detail--cmtinner")}>
+            <div className={cx("comment__detail--cmtwrapper")}>
+              <div className={cx("comment__detail--cmtcontent")}>
+                <div className={cx("comment__detail--heading")}>
+                  <span>{userInfo?.name}</span>
+                </div>
+                <div className={cx("comment__detail--text")}>
+                  <div dangerouslySetInnerHTML={{
+                    __html: content,
+                  }}>
+                  </div>
+                </div>
+                {/* <div className={cx("comment__detail--showMore")}>
+                  <strong>Mở rộng</strong>
+                  <FaChevronDown
+                    className={cx("comment__detail--icon")}
+                  />
+                  <strong>Thu nhỏ</strong>
+                  <FaChevronUp className={cx("comment__detail--icon")} />
+                </div> */}
+                {react && react?.length > 0 && <div className={cx("comment__detail--react")}>
+                  <Avatar.Group
+                    maxCount={7}
+                    className={cx("comment__detail--reactGroup")}
+                    size={20}
+                  >
+                    {/* <Avatar src={reactionLike} />
+                    <Avatar src={reactionTim} />
+                    <Avatar src={reactionThuong} />
+                    <Avatar src={reactionHaha} />
+                    <Avatar src={reactionWow} />
+                    <Avatar src={reactionBuon} />
+                    <Avatar src={reactionPhanno} /> */}
+                    {
+                      react?.map((item) => {
+                        return <Avatar src={ReactType[item.type]} />
+                      })
+                    }
+                  </Avatar.Group>
+                  <div className={cx("comment__detail--reactNum")}>
+                    {react?.length}
+                  </div>
+                </div>}
+              </div>
+              <div className={cx("comment__detail--cmttime")}>
+                <div className={cx("comment__detail--create")}>
+                  <div className={cx("comment__detail--createLeft")}>
+                    <button className={cx("comment__detail--like")}>
+                      <span className={cx("comment__detail--liketext")}>
+                        Thích
+                      </span>
+                    </button>
+                    ·
+                    <span className={cx("comment__detail--replytext")}>
+                      Trả lời
+                    </span>
+                  </div>
+                  <div className={cx("comment__detail--createRight")}>
+                    ·
+                    <span className={cx("comment__detail--time")}>
+                      14 giờ trước
+                    </span>
+                    <span className={cx("comment__detail--more")}>
+                      ·
+                      <button className={cx("comment__detail--morebtn")}>
+                        <FaEllipsisH
+                          className={cx("comment__detail--moreicon")}
+                        />
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -80,7 +173,7 @@ const FCComment = (props: CommentProps) => {
         >
           <div className={cx("comment__inner")}>
             <div className={cx("comment__heading")}>
-              <h4 className={cx("comment__heading--count")}>So binh luan</h4>
+              <h4 className={cx("comment__heading--count")}>{commentStates.total} Bình luận</h4>
               <p className={cx("comment__heading--help")}>
                 (Nếu thấy bình luận spam, các bạn bấm report giúp admin nhé)
               </p>
@@ -127,84 +220,12 @@ const FCComment = (props: CommentProps) => {
               </div>
             </div>
 
-            <div className={cx("comment__detail")}>
-              <div className={cx("comment__avt--wrapper")}>
-                <AvatarIcon className={cx("comment__avt--fallback")} />
-              </div>
-              <div className={cx("comment__detail--cmtbody")}>
-                <div className={cx("comment__detail--cmtinner")}>
-                  <div className={cx("comment__detail--cmtwrapper")}>
-                    <div className={cx("comment__detail--cmtcontent")}>
-                      <div className={cx("comment__detail--heading")}>
-                        <span>bom dep trai</span>
-                      </div>
-                      <div className={cx("comment__detail--text")}>
-                        <p>
-                          co le can mot cai bau duoi.....co le can mot cai bau
-                          duoi.....co le can mot cai bau duoi.....co le can mot
-                          cai bau duoi.....co le can mot cai bau duoi.....
-                        </p>
-                      </div>
-                      <div className={cx("comment__detail--showMore")}>
-                        <strong>Mở rộng</strong>
-                        <FaChevronDown
-                          className={cx("comment__detail--icon")}
-                        />
-                        {/* <strong>Thu nhỏ</strong>
-                        <FaChevronUp className={cx("comment__detail--icon")} /> */}
-                      </div>
-                      <div className={cx("comment__detail--react")}>
-                        <Avatar.Group
-                          maxCount={7}
-                          className={cx("comment__detail--reactGroup")}
-                          size={20}
-                        >
-                          <Avatar src={reactionLike} />
-                          <Avatar src={reactionTim} />
-                          <Avatar src={reactionThuong} />
-                          <Avatar src={reactionHaha} />
-                          <Avatar src={reactionWow} />
-                          <Avatar src={reactionBuon} />
-                          <Avatar src={reactionPhanno} />
-                        </Avatar.Group>
-                        <div className={cx("comment__detail--reactNum")}>
-                          12
-                        </div>
-                      </div>
-                    </div>
-                    <div className={cx("comment__detail--cmttime")}>
-                      <div className={cx("comment__detail--create")}>
-                        <div className={cx("comment__detail--createLeft")}>
-                          <button className={cx("comment__detail--like")}>
-                            <span className={cx("comment__detail--liketext")}>
-                              Thích
-                            </span>
-                          </button>
-                          ·
-                          <span className={cx("comment__detail--replytext")}>
-                            Trả lời
-                          </span>
-                        </div>
-                        <div className={cx("comment__detail--createRight")}>
-                          ·
-                          <span className={cx("comment__detail--time")}>
-                            14 giờ trước
-                          </span>
-                          <span className={cx("comment__detail--more")}>
-                            ·
-                            <button className={cx("comment__detail--morebtn")}>
-                              <FaEllipsisH
-                                className={cx("comment__detail--moreicon")}
-                              />
-                            </button>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {
+              commentStates.comments.map((comment, key) => {
+                return ItemComment(comment, key)
+              })
+            }
+
           </div>
         </Drawer>
       </div>

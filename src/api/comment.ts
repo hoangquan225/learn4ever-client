@@ -6,6 +6,6 @@ export const apiUpdateComment = async (payload: Comment) => {
     return ApiConfig(EndPoint.UPDATE_COMMENT, { payload });
 };
 
-export const apiLoadComments = async (params: { idTopic: string }) => {
+export const apiLoadComments = async (params: { idTopic: string, limit: number, skip: number }) => {
     return ApiConfig(EndPoint.GET_COMMENT, { params });
 };
