@@ -1,8 +1,11 @@
-import { Avatar, Button, Drawer, message, notification } from "antd";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { Avatar, Drawer, message, notification } from "antd";
 import classNames from "classnames/bind";
-import { FaChevronDown, FaChevronUp, FaEllipsisH } from "react-icons/fa";
-import { AvatarIcon } from "../icons/icons";
-import styles from "./comment.module.scss";
+import { memo, useEffect, useRef, useState } from "react";
+import { FaEllipsisH } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { Editor } from "tinymce";
+import { apiLoadComments } from "../../api/comment";
 import reactionBuon from "../../assets/img/reactionBuon.svg";
 import reactionHaha from "../../assets/img/reactionHaha.svg";
 import reactionLike from "../../assets/img/reactionLike.svg";
@@ -10,27 +13,31 @@ import reactionPhanno from "../../assets/img/reactionPhanno.svg";
 import reactionThuong from "../../assets/img/reactionThuong.svg";
 import reactionTim from "../../assets/img/reactionTim.svg";
 import reactionWow from "../../assets/img/reactionWow.svg";
-import TinyMCEEditor from "../TinyMCE";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { Editor } from "tinymce";
-import { Topic } from "../../submodule/models/topic";
 import { useAppDispatch } from "../../redux/hook";
-import { commentState, requestLoadComments, requestUpdateComment } from "../../redux/slices/commentSlice";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { useSelector } from "react-redux";
+import {
+  commentState,
+  requestUpdateComment,
+  setComments,
+} from "../../redux/slices/commentSlice";
 import { authState } from "../../redux/slices/userSlice";
+import TTCSconfig from "../../submodule/common/config";
 import { Comment } from "../../submodule/models/comment";
+import { Topic } from "../../submodule/models/topic";
+import { AvatarIcon } from "../icons/icons";
+import TinyMCEEditor from "../TinyMCE";
+import styles from "./comment.module.scss";
 
 const cx = classNames.bind(styles);
 
 const ReactType = [
   reactionTim,
   reactionThuong,
+  reactionLike,
   reactionHaha,
   reactionWow,
   reactionBuon,
   reactionPhanno,
-]
+];
 
 type CommentProps = {
   placement: any;
@@ -39,45 +46,109 @@ type CommentProps = {
   width: string | number;
   zIndex: number;
   className: string;
-  dataTopicActive: Topic
+  dataTopicActive: Topic;
 };
 
 const FCComment = (props: CommentProps) => {
-  const { dataTopicActive } = props
-  const dispatch = useAppDispatch()
-  const commentStates = useSelector(commentState)
-  const userStates = useSelector(authState)
-  const [openComment, setOpenComment] = useState<boolean>(false)
-  const content = useRef<Editor>()
+  const { dataTopicActive } = props;
+  const dispatch = useAppDispatch();
+  const commentStates = useSelector(commentState);
+  const userStates = useSelector(authState);
+  const [openComment, setOpenComment] = useState<boolean>(false);
+  const [skip, setSkip] = useState(0);
+  const content = useRef<Editor>();
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [isTotalComment, setIsTotalComment] = useState(false);
+  const drawerRef = useRef(null);
+
+  const handleScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop >= scrollHeight - clientHeight && !isTotalComment) {
+      setSkip((prevSkip) => prevSkip + TTCSconfig.LIMIT);
+    }
+  };
+  console.log(commentStates.total);
+
+  useEffect(() => {
+    if (skip) {
+      handleLoadComment(TTCSconfig.LIMIT, skip);
+    }
+
+    if (commentStates.comments.length === commentStates.total) {
+      setIsTotalComment(true);
+    }
+  }, [skip]);
+
+  useEffect(() => {
+    setSkip(0);
+    setIsTotalComment(false);
+  }, [dataTopicActive?.id]);
+
+  const handleLoadComment = async (limit?: number, skip?: number) => {
+    try {
+      const res = await apiLoadComments({
+        idTopic: dataTopicActive?.id || "",
+        limit,
+        skip,
+      });
+      dispatch(setComments(res.data.data));
+    } catch (error) {
+      console.log(error);
+      notification.error({
+        message: "lỗi server, không tải được dữ liệu",
+        duration: 1.5,
+      });
+    }
+  };
 
   const handleCreateComment = async () => {
-    const text = content.current?.getContent()
-    const idTopic = dataTopicActive.id
+    const text = content.current?.getContent();
+    const idTopic = dataTopicActive.id;
 
     try {
-      const res = await dispatch(requestUpdateComment(new Comment({
-        content: text,
-        idTopic,
-        idUser: userStates.userInfo?._id,
-        index: commentStates.comments.length + 1
-      })))
-      unwrapResult(res)
+      const res = await dispatch(
+        requestUpdateComment(
+          new Comment({
+            content: text,
+            idTopic,
+            idUser: userStates.userInfo?._id,
+            index: commentStates.comments.length + 1,
+          })
+        )
+      );
+      unwrapResult(res);
     } catch (error) {
-      message.error('lỗi server, không gửi được comment')
+      message.error("lỗi server, không gửi được comment");
     } finally {
-      setOpenComment(false)
+      setOpenComment(false);
     }
-  }
+  };
+
+  // const handleLikeButtonClick = () => {
+  //   // Handle like button click
+  // };
+
+  const handleTooltipMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleTooltipMouseLeave = () => {
+    setShowTooltip(false);
+  };
 
   const ItemComment = (comment: Comment, key: number) => {
-    const { userInfo, content, react } = comment
+    const { userInfo, content, react } = comment;
     return (
       <div className={cx("comment__detail")} key={key}>
         <div className={cx("comment__avt--wrapper")}>
-          {userInfo?.avatar
-            ? <Avatar src={userInfo?.avatar} />
-            : <Avatar style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>{userInfo?.name.charAt(0)}</Avatar>
-          }
+          {userInfo?.avatar ? (
+            <Avatar src={userInfo?.avatar} />
+          ) : (
+            <Avatar style={{ backgroundColor: "#fde3cf", color: "#f56a00" }}>
+              {userInfo?.name.charAt(0)}
+            </Avatar>
+          )}
         </div>
         <div className={cx("comment__detail--cmtbody")}>
           <div className={cx("comment__detail--cmtinner")}>
@@ -86,12 +157,12 @@ const FCComment = (props: CommentProps) => {
                 <div className={cx("comment__detail--heading")}>
                   <span>{userInfo?.name}</span>
                 </div>
-                <div className={cx("comment__detail--text")}>
-                  <div dangerouslySetInnerHTML={{
+                <div
+                  className={cx("comment__detail--text")}
+                  dangerouslySetInnerHTML={{
                     __html: content,
-                  }}>
-                  </div>
-                </div>
+                  }}
+                ></div>
                 {/* <div className={cx("comment__detail--showMore")}>
                   <strong>Mở rộng</strong>
                   <FaChevronDown
@@ -100,29 +171,22 @@ const FCComment = (props: CommentProps) => {
                   <strong>Thu nhỏ</strong>
                   <FaChevronUp className={cx("comment__detail--icon")} />
                 </div> */}
-                {react && react?.length > 0 && <div className={cx("comment__detail--react")}>
-                  <Avatar.Group
-                    maxCount={7}
-                    className={cx("comment__detail--reactGroup")}
-                    size={20}
-                  >
-                    {/* <Avatar src={reactionLike} />
-                    <Avatar src={reactionTim} />
-                    <Avatar src={reactionThuong} />
-                    <Avatar src={reactionHaha} />
-                    <Avatar src={reactionWow} />
-                    <Avatar src={reactionBuon} />
-                    <Avatar src={reactionPhanno} /> */}
-                    {
-                      react?.map((item) => {
-                        return <Avatar src={ReactType[item.type]} />
-                      })
-                    }
-                  </Avatar.Group>
-                  <div className={cx("comment__detail--reactNum")}>
-                    {react?.length}
+                {react && react?.length > 0 && (
+                  <div className={cx("comment__detail--react")}>
+                    <Avatar.Group
+                      maxCount={7}
+                      className={cx("comment__detail--reactGroup")}
+                      size={20}
+                    >
+                      {react?.map((item) => {
+                        return <Avatar src={ReactType[item.type]} />;
+                      })}
+                    </Avatar.Group>
+                    <div className={cx("comment__detail--reactNum")}>
+                      {react?.length}
+                    </div>
                   </div>
-                </div>}
+                )}
               </div>
               <div className={cx("comment__detail--cmttime")}>
                 <div className={cx("comment__detail--create")}>
@@ -131,6 +195,8 @@ const FCComment = (props: CommentProps) => {
                       <span className={cx("comment__detail--liketext")}>
                         Thích
                       </span>
+
+                      {showTooltip && <div>vcl</div>}
                     </button>
                     ·
                     <span className={cx("comment__detail--replytext")}>
@@ -157,8 +223,8 @@ const FCComment = (props: CommentProps) => {
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -171,61 +237,75 @@ const FCComment = (props: CommentProps) => {
           width={props.width}
           zIndex={props.zIndex}
         >
-          <div className={cx("comment__inner")}>
-            <div className={cx("comment__heading")}>
-              <h4 className={cx("comment__heading--count")}>{commentStates.total} Bình luận</h4>
-              <p className={cx("comment__heading--help")}>
-                (Nếu thấy bình luận spam, các bạn bấm report giúp admin nhé)
-              </p>
-            </div>
-
-            <div className={cx("comment__cmtbox")}>
-              <div className={cx("comment__avt--wrapper")}>
-                <AvatarIcon className={cx("comment__avt--fallback")} />
+          <div
+            style={{ height: "100%", overflow: "auto" }}
+            ref={drawerRef}
+            onScroll={handleScroll}
+          >
+            <div className={cx("comment__inner")}>
+              <div className={cx("comment__heading")}>
+                <h4 className={cx("comment__heading--count")}>
+                  {commentStates.total} Bình luận
+                </h4>
+                <p className={cx("comment__heading--help")}>
+                  (Nếu thấy bình luận spam, các bạn bấm report giúp admin nhé)
+                </p>
               </div>
-              <div className={cx("comment__content--wrapper")}>
-                <div className={cx("comment__content--placeholder")}>
-                  {
-                    openComment
-                      ? (
-                        <div>
-                          <TinyMCEEditor
-                            editorRef={content}
-                            // keyMCE={`${Math.random()}`}
-                            placeholder='Bạn có thắc mắc gì trong bài học này?'
-                            height={200}
-                          />
-                          <div>
-                            {/* css nhé */}
-                            <Button
-                              onClick={() => {
-                                setOpenComment(false)
-                              }}
-                            >Huỷ</Button>
-                            <Button
-                              onClick={handleCreateComment}
-                            >Bình luận</Button>
-                          </div>
+
+              <div className={cx("comment__cmtbox")}>
+                <div className={cx("comment__avt--wrapper")}>
+                  <AvatarIcon className={cx("comment__avt--fallback")} />
+                </div>
+                <div className={cx("comment__content--wrapper")}>
+                  <div className={cx("comment__content--placeholder")}>
+                    {openComment ? (
+                      <div className={cx("comment__content--tinymce")}>
+                        <TinyMCEEditor
+                          editorRef={content}
+                          // keyMCE={`${Math.random()}`}
+                          placeholder="Bạn có thắc mắc gì trong bài học này?"
+                          height={200}
+                        />
+                        <div className={cx("comment__content--action")}>
+                          <button
+                            className={cx(
+                              "comment__content--btn",
+                              "cancel-btn"
+                            )}
+                            onClick={() => {
+                              setOpenComment(false);
+                            }}
+                          >
+                            Huỷ
+                          </button>
+                          <button
+                            className={cx(
+                              "comment__content--btn",
+                              "accept-btn"
+                            )}
+                            onClick={handleCreateComment}
+                          >
+                            Bình luận
+                          </button>
                         </div>
-                      )
-                      : (
-                        <span
-                          onClick={() => {
-                            setOpenComment(true)
-                          }}
-                        >Bạn có thắc mắc gì trong bài học này?</span>
-                      )
-                  }
+                      </div>
+                    ) : (
+                      <span
+                        onClick={() => {
+                          setOpenComment(true);
+                        }}
+                      >
+                        Bạn có thắc mắc gì trong bài học này?
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {commentStates.comments.map((comment, key) => {
+                return ItemComment(comment, key);
+              })}
             </div>
-
-            {
-              commentStates.comments.map((comment, key) => {
-                return ItemComment(comment, key)
-              })
-            }
-
           </div>
         </Drawer>
       </div>
@@ -234,3 +314,5 @@ const FCComment = (props: CommentProps) => {
 };
 
 export default memo(FCComment);
+{
+}

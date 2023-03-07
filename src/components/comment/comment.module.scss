@@ -71,8 +71,8 @@
 .comment__avt--fallback {
   background: transparent;
   border-radius: 50%;
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .comment__content--wrapper {
@@ -86,10 +86,58 @@
   cursor: text;
   display: flex;
   padding: 0.8rem 0;
+  width: 90%;
 
   & > span {
     color: #999;
     font-size: 1.3rem;
+  }
+}
+
+.comment__content--tinymce {
+  width: 100%;
+}
+
+.comment__content--action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.comment__content--btn {
+  background: transparent;
+  border-radius: 2rem;
+  color: #888;
+  display: inline-block;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: var(--font-family);
+  padding: 1rem 1.6rem;
+  text-transform: uppercase;
+  transition: all 0.2s ease-in-out;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+
+  &.cancel-btn {
+    margin-right: 1.6rem;
+  }
+
+  &.cancel-btn:hover {
+    background: #ebebeb;
+    color: #777;
+    opacity: 0.8;
+  }
+
+  &.accept-btn {
+    background: var(--primaryColor);
+    color: #fff;
+  }
+
+  &.accept-btn:hover {
+    opacity: 0.8;
   }
 }
 
@@ -140,13 +188,13 @@
 
 .comment__detail--text {
   font-size: 1.3rem;
-  margin-bottom: 5px !important;
+  margin-bottom: 0.5rem !important;
   overflow-x: auto;
   word-break: break-word;
   max-width: 45vw;
   color: var(--textColor);
   line-height: 1.6;
-  margin-top: 4px;
+  margin-top: 0.4rem;
   overflow: hidden;
 
   & > p {

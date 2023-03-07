@@ -15,7 +15,14 @@ import Sider from "antd/es/layout/Sider";
 import classNames from "classnames/bind";
 import dayjs from "dayjs";
 import moment from "moment";
-import { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   FaArrowRight,
   FaBars,
@@ -96,6 +103,7 @@ const LearningPages = () => {
   const [isReview, setIsReview] = useState(false);
   const [isExercise, setIsExercise] = useState(true);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isReviewComment, setIsReviewComment] = useState(true);
   const [screenSize, setScreenSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -161,9 +169,15 @@ const LearningPages = () => {
     handleUpdateDocument(dataTopicActive?.id || "", userInfo?._id || "");
 
     return () => {
-      dataTopicActive?.id && userInfo && realtime.leaveComment({ idTopic: dataTopicActive?.id, userInfo })
-    }
+      dataTopicActive?.id &&
+        userInfo &&
+        realtime.leaveComment({ idTopic: dataTopicActive?.id, userInfo });
+    };
   }, [dataTopicActive?.id, userInfo]);
+
+  // useEffect(() => {
+
+  // }, [dataTopicActive?.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -414,22 +428,34 @@ const LearningPages = () => {
 
   const handleCloseComment = useCallback(() => {
     setIsCommentOpen(false);
-  }, [])
+  }, []);
 
   const handleOpenComment = async () => {
     setIsCommentOpen(true);
-    dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO && videoPlayerRef.current.pause();
+    dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO &&
+      videoPlayerRef.current.pause();
     try {
-      const res = await dispatch(requestLoadComments({ idTopic: dataTopicActive?.id || '', limit: 10, skip: 0 }))
-      unwrapResult(res)
-      dataTopicActive?.id && userInfo && realtime.joinComment({ idTopic: dataTopicActive?.id, userInfo })
-      realtime.loadComment(dispatch)
+      if (isReviewComment) {
+        const res = await dispatch(
+          requestLoadComments({
+            idTopic: dataTopicActive?.id || "",
+            limit: TTCSconfig.LIMIT,
+            skip: 0,
+          })
+        );
+        unwrapResult(res);
+        setIsReviewComment(false);
+      }
+      dataTopicActive?.id &&
+        userInfo &&
+        realtime.joinComment({ idTopic: dataTopicActive?.id, userInfo });
+      realtime.loadComment(dispatch);
     } catch (error) {
       console.log(error);
       notification.error({
-        message: 'lỗi server, không tải được dữ liệu',
-        duration: 1.5
-      })
+        message: "lỗi server, không tải được dữ liệu",
+        duration: 1.5,
+      });
     }
   };
 
@@ -607,7 +633,7 @@ const LearningPages = () => {
                             (topicChild, indexChild) => {
                               return (
                                 topicChild.status ===
-                                TTCSconfig.STATUS_PUBLIC && (
+                                  TTCSconfig.STATUS_PUBLIC && (
                                   <div
                                     className={cx("learning__track--steps")}
                                     key={indexChild}
@@ -616,14 +642,15 @@ const LearningPages = () => {
                                       className={
                                         dataTopicActive?.id === topicChild.id
                                           ? cx(
-                                            "learning__track--steps-item",
-                                            "active"
-                                          )
+                                              "learning__track--steps-item",
+                                              "active"
+                                            )
                                           : cx("learning__track--steps-item")
                                       }
                                       onClick={() => {
                                         setIndexTopic(topic.id);
                                         handleChangeTopic(topicChild.id || "");
+                                        setIsReviewComment(true);
                                       }}
                                     >
                                       <div
@@ -644,7 +671,7 @@ const LearningPages = () => {
                                           )}
                                         >
                                           {topicChild?.topicType ===
-                                            TTCSconfig.TYPE_TOPIC_VIDEO ? (
+                                          TTCSconfig.TYPE_TOPIC_VIDEO ? (
                                             <FaPlayCircle
                                               className={cx("desc-icon")}
                                             />
@@ -681,12 +708,12 @@ const LearningPages = () => {
                                           (c) =>
                                             c.idTopic === topicChild.id &&
                                             c.status ===
-                                            TTCSconfig.STATUS_LEARNED
+                                              TTCSconfig.STATUS_LEARNED
                                         ) && (
-                                            <FaCheckCircle
-                                              className={cx("status-icon")}
-                                            />
-                                          )}
+                                          <FaCheckCircle
+                                            className={cx("status-icon")}
+                                          />
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -792,18 +819,18 @@ const LearningPages = () => {
                                           )
                                             ? item?.isResult
                                               ? cx(
-                                                "quiz-choices__item--radio",
-                                                "correct"
-                                              )
+                                                  "quiz-choices__item--radio",
+                                                  "correct"
+                                                )
                                               : selectedQuestions.find(
-                                                (o) =>
-                                                  o.idAnswer.toString() ===
-                                                  item?._id?.toString()
-                                              ) &&
-                                              cx(
-                                                "quiz-choices__item--radio",
-                                                "inCorrect"
-                                              )
+                                                  (o) =>
+                                                    o.idAnswer.toString() ===
+                                                    item?._id?.toString()
+                                                ) &&
+                                                cx(
+                                                  "quiz-choices__item--radio",
+                                                  "inCorrect"
+                                                )
                                             : cx("quiz-choices__item--radio")
                                         }
                                         value={item}
@@ -842,15 +869,15 @@ const LearningPages = () => {
                                   {selectedQuestions.find(
                                     (o) => o.idQuestion === question.id
                                   ) && (
-                                      <div className={cx("quiz__explain")}>
-                                        <p>Giải thích</p>
-                                        <div
-                                          dangerouslySetInnerHTML={{
-                                            __html: question.hint ?? "",
-                                          }}
-                                        ></div>
-                                      </div>
-                                    )}
+                                    <div className={cx("quiz__explain")}>
+                                      <p>Giải thích</p>
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: question.hint ?? "",
+                                        }}
+                                      ></div>
+                                    </div>
+                                  )}
                                 </Space>
                               </div>
                             </div>
@@ -930,18 +957,18 @@ const LearningPages = () => {
                                       )
                                         ? item?.isResult
                                           ? cx(
-                                            "quiz-choices__item--radio",
-                                            "correct"
-                                          )
+                                              "quiz-choices__item--radio",
+                                              "correct"
+                                            )
                                           : selectedQuestions.find(
-                                            (o) =>
-                                              o.idAnswer.toString() ===
-                                              item?._id?.toString()
-                                          ) &&
-                                          cx(
-                                            "quiz-choices__item--radio",
-                                            "inCorrect"
-                                          )
+                                              (o) =>
+                                                o.idAnswer.toString() ===
+                                                item?._id?.toString()
+                                            ) &&
+                                            cx(
+                                              "quiz-choices__item--radio",
+                                              "inCorrect"
+                                            )
                                         : cx("quiz-choices__item--radio")
                                     }
                                     value={item}
@@ -986,15 +1013,15 @@ const LearningPages = () => {
                               {selectedQuestions.find(
                                 (o) => o.idQuestion === qs.id
                               ) && (
-                                  <div className={cx("quiz__explain")}>
-                                    <p>Giải thích</p>
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: qs.hint ?? "",
-                                      }}
-                                    ></div>
-                                  </div>
-                                )}
+                                <div className={cx("quiz__explain")}>
+                                  <p>Giải thích</p>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: qs.hint ?? "",
+                                    }}
+                                  ></div>
+                                </div>
+                              )}
                             </Space>
                           </div>
                         </div>
@@ -1052,38 +1079,35 @@ const LearningPages = () => {
         </div>
 
         {/* COMMENT */}
-        {
-          dataTopicActive && (
-            <>
-              <div
-                className={
-                  isShowSider
-                    ? cx("learning__comment--toggle")
-                    : cx("learning__comment--toggle", "hide-sider")
-                }
+        {dataTopicActive && (
+          <>
+            <div
+              className={
+                isShowSider
+                  ? cx("learning__comment--toggle")
+                  : cx("learning__comment--toggle", "hide-sider")
+              }
+            >
+              <button
+                className={cx("learning__comment--btn")}
+                onClick={handleOpenComment}
               >
-                <button
-                  className={cx("learning__comment--btn")}
-                  onClick={handleOpenComment}
-                >
-                  <FaComments className={cx("learning__comment--icon")} />
-                  <span className={cx("learning__comment--text")}>Hỏi đáp</span>
-                </button>
-              </div>
+                <FaComments className={cx("learning__comment--icon")} />
+                <span className={cx("learning__comment--text")}>Hỏi đáp</span>
+              </button>
+            </div>
 
-              <FCComment
-                className={cx("comment__drawer")}
-                placement={"right"}
-                open={isCommentOpen}
-                onClose={handleCloseComment}
-                width={screenSize.width >= 768 ? "40%" : "100%"}
-                zIndex={6}
-                dataTopicActive={dataTopicActive}
-              />
-            </>
-          )
-        }
-
+            <FCComment
+              className={cx("comment__drawer")}
+              placement={"right"}
+              open={isCommentOpen}
+              onClose={handleCloseComment}
+              width={screenSize.width >= 768 ? "100vh" : "100%"}
+              zIndex={6}
+              dataTopicActive={dataTopicActive}
+            />
+          </>
+        )}
       </div>
     </>
   );
