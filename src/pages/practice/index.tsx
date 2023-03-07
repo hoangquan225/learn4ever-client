@@ -245,6 +245,7 @@ const PracticePages = () => {
           idCourse: course?.id,
           type: selectedFeedback,
           idUser: userInfo?._id,
+          status: TTCSconfig.STATUS_PRIVATE,
         });
       }
     } catch (error) {
