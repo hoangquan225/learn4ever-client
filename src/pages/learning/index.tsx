@@ -175,9 +175,9 @@ const LearningPages = () => {
     };
   }, [dataTopicActive?.id, userInfo]);
 
-  // useEffect(() => {
-
-  // }, [dataTopicActive?.id]);
+  useEffect(() => {
+    setIsReviewComment(true);
+  }, [dataTopicActive?.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -650,7 +650,6 @@ const LearningPages = () => {
                                       onClick={() => {
                                         setIndexTopic(topic.id);
                                         handleChangeTopic(topicChild.id || "");
-                                        setIsReviewComment(true);
                                       }}
                                     >
                                       <div
