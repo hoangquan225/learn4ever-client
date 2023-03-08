@@ -1,7 +1,7 @@
 import { unwrapResult } from "@reduxjs/toolkit";
 import { Avatar, Drawer, message, notification } from "antd";
 import classNames from "classnames/bind";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Editor } from "tinymce";
@@ -26,6 +26,7 @@ import { Topic } from "../../submodule/models/topic";
 import { AvatarIcon } from "../icons/icons";
 import TinyMCEEditor from "../TinyMCE";
 import styles from "./comment.module.scss";
+import { RealtimeContext } from "../../App";
 
 const cx = classNames.bind(styles);
 
@@ -51,15 +52,17 @@ type CommentProps = {
 
 const FCComment = (props: CommentProps) => {
   const { dataTopicActive } = props;
+  const drawerRef = useRef(null);
+  const content = useRef<Editor>();
   const dispatch = useAppDispatch();
   const commentStates = useSelector(commentState);
   const userStates = useSelector(authState);
+  const realtime = useContext(RealtimeContext);
   const [openComment, setOpenComment] = useState<boolean>(false);
   const [skip, setSkip] = useState(0);
-  const content = useRef<Editor>();
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTotalComment, setIsTotalComment] = useState(false);
-  const drawerRef = useRef(null);
+  const [timeoutId, setTimeoutId] = useState<number>();
 
   const handleScroll = (e: any) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -68,7 +71,6 @@ const FCComment = (props: CommentProps) => {
       setSkip((prevSkip) => prevSkip + TTCSconfig.LIMIT);
     }
   };
-  console.log(commentStates.total);
 
   useEffect(() => {
     if (skip) {
@@ -264,7 +266,25 @@ const FCComment = (props: CommentProps) => {
                           editorRef={content}
                           // keyMCE={`${Math.random()}`}
                           placeholder="Bạn có thắc mắc gì trong bài học này?"
-                          height={200}
+                          height={300}
+                          onChange={(value: string) => {
+                            // Nếu timeoutId đã được đặt trước đó, hủy bỏ
+                            if (timeoutId) {
+                              window.clearTimeout(timeoutId);
+                            }
+
+                            // Đặt timeout để gọi sau 2 giây
+                            setTimeoutId(
+                              window.setTimeout(() => {
+                                // console.log(`Kết quả: ${value}`);
+
+                                dataTopicActive.id && userStates.userInfo && realtime.writingComment({
+                                  idTopic: dataTopicActive.id || '',
+                                  userInfo: userStates.userInfo
+                                })
+                              }, 1000)
+                            );
+                          }}
                         />
                         <div className={cx("comment__content--action")}>
                           <button

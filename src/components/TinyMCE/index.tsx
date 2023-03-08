@@ -11,8 +11,9 @@ const TinyMCEEditor = (props: {
   keyMCE?: string;
   placeholder?: string;
   height?: number;
+  onChange?: (value: string) => void
 }) => {
-  const { editorRef, keyMCE = '', placeholder = "", height = 500 } = props;
+  const { editorRef, keyMCE = '', placeholder = "", height = 500, onChange } = props;
 
   const handleImageUpload: any = async (
     blobInfo: any,
@@ -35,6 +36,8 @@ const TinyMCEEditor = (props: {
         ref={editorRef}
         key={keyMCE}
         apiKey="x7iqyfri0yduoqx0qrv9r5h50yq6gj7bybcu12uc2x2a9qkl"
+        // onChange={(_, editor) => {onChange}}
+        onEditorChange={(value, editor) => { onChange && onChange(value) }}
         init={{
           height: height,
           menubar: true,

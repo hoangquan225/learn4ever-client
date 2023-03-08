@@ -54,4 +54,11 @@ export class SocketService {
 
     })
   }
+
+  writingComment = (props: { idTopic: string, userInfo: UserInfo | null }) => {
+    console.log({ props, socket: this.socket });
+    this.socket.emit("writing_comment", props).on("writing_comment", (msg: UserInfo) => {
+      console.log(msg);
+    });
+  };
 }
