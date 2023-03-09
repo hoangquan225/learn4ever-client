@@ -59,7 +59,6 @@ const FCComment = (props: CommentProps) => {
   const userStates = useSelector(authState);
   const realtime = useContext(RealtimeContext);
   const [openComment, setOpenComment] = useState<boolean>(false);
-  const [openReplyComment, setOpenReplyComment] = useState<boolean>(false);
   const [skip, setSkip] = useState(0);
   const [isTotalComment, setIsTotalComment] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number>();
