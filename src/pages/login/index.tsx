@@ -1,6 +1,6 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, notification } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
 import classNames from "classnames/bind";
 import Cookies from "js-cookie";
@@ -11,6 +11,8 @@ import { RootState } from "../../redux/store";
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import styles from "./login.module.scss";
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -28,6 +30,42 @@ const LoginPages = () => {
       navigate(-1);
     }
   }, [userInfo]);
+
+  const [user, setUser] = useState<any>();
+  const [profile, setProfile] = useState<any>();
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setUser(codeResponse),
+    onError: (error) => console.log('Login Failed:', error)
+  });
+
+  useEffect(
+    () => {
+      if (user) {
+        console.log({ user });
+
+        axios
+          .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: 'application/json'
+            }
+          })
+          .then((res) => {
+            setProfile(res.data);
+          })
+          .catch((err) => console.log(err));
+      }
+    },
+    [user]
+  );
+
+  // log out function to log the user out of google and set the profile array to null
+  const logOut = () => {
+    googleLogout();
+    setProfile(null);
+    setUser(null);
+  };
 
   const handleLogin: any = async (data: {
     account: string;
@@ -134,6 +172,21 @@ const LoginPages = () => {
                 style={{ padding: "12px" }}
               />
             </Form.Item>
+            <div style={{ textAlign: 'center' }}>
+              {profile ? (
+                <div>
+                  <img src={profile.picture} alt="user image" />
+                  <h3>User Logged in</h3>
+                  <p>Name: {profile.name}</p>
+                  <p>Email Address: {profile.email}</p>
+                  <p>Sau nghĩ xem lưu vào db như nào</p>
+                  <br />
+                  <button onClick={logOut} style={{ cursor: 'pointer' }}>Log out</button>
+                </div>
+              ) : (
+                <button onClick={() => login()} style={{ cursor: 'pointer' }}>Sign in with Google 🚀 </button>
+              )}
+            </div>
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Duy trì đăng nhập</Checkbox>
