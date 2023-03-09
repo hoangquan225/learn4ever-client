@@ -279,11 +279,6 @@
   display: flex;
 }
 
-.comment__detail--like {
-  background-color: transparent;
-  text-align: center;
-}
-
 .comment__detail--liketext,
 .comment__detail--replytext {
   color: var(--primaryColor);
@@ -324,5 +319,63 @@
   &:hover {
     color: var(--textColor);
     cursor: pointer;
+  }
+}
+
+.tooltip__reactions {
+  padding-bottom: 0;
+  max-width: 40rem !important;
+
+  & > div {
+    font-family: var(--font-family) !important;
+
+    & > div {
+      background-color: #fff !important;
+      border-radius: 99rem !important;
+      border: #d7d7d7 solid 0.05rem;
+      display: flex;
+      padding: 0.6rem 1.2rem !important;
+
+      & > .reaction__icon:first-child {
+        margin-left: 0;
+      }
+
+      & > .reaction__icon:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.reaction__icon {
+  height: 3.6rem;
+  width: 3.6rem;
+  margin: 0 0.5rem;
+  transform-origin: bottom center;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.4);
+    transition: transform 0.2s ease-in-out;
+  }
+}
+
+.reaction__title {
+  padding-bottom: 0;
+
+  & > div {
+    font-family: var(--font-family) !important;
+
+    & > div {
+      border-radius: 99rem !important;
+      font-size: 1.1rem !important;
+      font-weight: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.2rem 0.4rem !important;
+      min-height: 1.8rem !important;
+    }
   }
 }
