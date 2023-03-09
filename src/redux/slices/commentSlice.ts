@@ -49,7 +49,7 @@ export const commentSlice = createSlice({
         state.comments = comments;
       } else {
         // create
-        state.comments = [...comments, data];
+        state.comments = [data, ...comments];
       }
     },
     setComments: (state, action) => {

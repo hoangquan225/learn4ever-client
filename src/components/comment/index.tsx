@@ -1,7 +1,7 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Avatar, Drawer, message, notification } from "antd";
+import { Avatar, Drawer, message, notification, Tooltip } from "antd";
 import classNames from "classnames/bind";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useContext, useEffect, useRef, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Editor } from "tinymce";
@@ -31,13 +31,13 @@ import { RealtimeContext } from "../../App";
 const cx = classNames.bind(styles);
 
 const ReactType = [
-  reactionTim,
-  reactionThuong,
-  reactionLike,
-  reactionHaha,
-  reactionWow,
-  reactionBuon,
-  reactionPhanno,
+  { icon: reactionLike, title: "Thích" },
+  { icon: reactionTim, title: "Yêu thích" },
+  { icon: reactionThuong, title: "Thương thương" },
+  { icon: reactionHaha, title: "Haha" },
+  { icon: reactionWow, title: "Wow" },
+  { icon: reactionBuon, title: "Buồn" },
+  { icon: reactionPhanno, title: "Phẫn nộ" },
 ];
 
 type CommentProps = {
@@ -59,18 +59,10 @@ const FCComment = (props: CommentProps) => {
   const userStates = useSelector(authState);
   const realtime = useContext(RealtimeContext);
   const [openComment, setOpenComment] = useState<boolean>(false);
+  const [openReplyComment, setOpenReplyComment] = useState<boolean>(false);
   const [skip, setSkip] = useState(0);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [isTotalComment, setIsTotalComment] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number>();
-
-  const handleScroll = (e: any) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
-
-    if (scrollTop >= scrollHeight - clientHeight && !isTotalComment) {
-      setSkip((prevSkip) => prevSkip + TTCSconfig.LIMIT);
-    }
-  };
 
   useEffect(() => {
     if (skip) {
@@ -86,6 +78,14 @@ const FCComment = (props: CommentProps) => {
     setSkip(0);
     setIsTotalComment(false);
   }, [dataTopicActive?.id]);
+
+  const handleScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop >= scrollHeight - clientHeight && !isTotalComment) {
+      setSkip((prevSkip) => prevSkip + TTCSconfig.LIMIT);
+    }
+  };
 
   const handleLoadComment = async (limit?: number, skip?: number) => {
     try {
@@ -125,18 +125,6 @@ const FCComment = (props: CommentProps) => {
     } finally {
       setOpenComment(false);
     }
-  };
-
-  // const handleLikeButtonClick = () => {
-  //   // Handle like button click
-  // };
-
-  const handleTooltipMouseEnter = () => {
-    setShowTooltip(true);
-  };
-
-  const handleTooltipMouseLeave = () => {
-    setShowTooltip(false);
   };
 
   const ItemComment = (comment: Comment, key: number) => {
@@ -181,7 +169,7 @@ const FCComment = (props: CommentProps) => {
                       size={20}
                     >
                       {react?.map((item) => {
-                        return <Avatar src={ReactType[item.type]} />;
+                        return <Avatar src={ReactType[item.type].icon} />;
                       })}
                     </Avatar.Group>
                     <div className={cx("comment__detail--reactNum")}>
@@ -193,13 +181,35 @@ const FCComment = (props: CommentProps) => {
               <div className={cx("comment__detail--cmttime")}>
                 <div className={cx("comment__detail--create")}>
                   <div className={cx("comment__detail--createLeft")}>
-                    <button className={cx("comment__detail--like")}>
+                    <Tooltip
+                      title={ReactType.map((reaction, key) => {
+                        return (
+                          <Fragment key={key}>
+                            <Tooltip
+                              title={reaction.title}
+                              showArrow={false}
+                              mouseEnterDelay={0.2}
+                              mouseLeaveDelay={0}
+                              overlayClassName={cx("reaction__title")}
+                            >
+                              <img
+                                src={reaction.icon}
+                                alt="cam xuc"
+                                className={cx("reaction__icon")}
+                              />
+                            </Tooltip>
+                          </Fragment>
+                        );
+                      })}
+                      placement="topLeft"
+                      trigger="hover"
+                      showArrow={false}
+                      overlayClassName={cx("tooltip__reactions")}
+                    >
                       <span className={cx("comment__detail--liketext")}>
                         Thích
                       </span>
-
-                      {showTooltip && <div>vcl</div>}
-                    </button>
+                    </Tooltip>
                     ·
                     <span className={cx("comment__detail--replytext")}>
                       Trả lời
@@ -278,11 +288,13 @@ const FCComment = (props: CommentProps) => {
                               window.setTimeout(() => {
                                 // console.log(`Kết quả: ${value}`);
 
-                                dataTopicActive.id && userStates.userInfo && realtime.writingComment({
-                                  idTopic: dataTopicActive.id || '',
-                                  userInfo: userStates.userInfo
-                                })
-                              }, 1000)
+                                dataTopicActive.id &&
+                                  userStates.userInfo &&
+                                  realtime.writingComment({
+                                    idTopic: dataTopicActive.id || "",
+                                    userInfo: userStates.userInfo,
+                                  });
+                              }, 800)
                             );
                           }}
                         />
