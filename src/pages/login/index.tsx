@@ -6,13 +6,16 @@ import classNames from "classnames/bind";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { requestLogin } from "../../redux/slices/userSlice";
+import {
+  requestLogin,
+  requestLoginWithGoogle,
+} from "../../redux/slices/userSlice";
 import { RootState } from "../../redux/store";
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import styles from "./login.module.scss";
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -34,31 +37,68 @@ const LoginPages = () => {
   const [user, setUser] = useState<any>();
   const [profile, setProfile] = useState<any>();
 
+  console.log(profile);
+
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => setUser(codeResponse),
-    onError: (error) => console.log('Login Failed:', error)
+    onError: (error) => console.log("Login Failed:", error),
   });
 
-  useEffect(
-    () => {
-      if (user) {
-        console.log({ user });
-
-        axios
-          .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+  useEffect(() => {
+    if (user) {
+      console.log({ user });
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
             headers: {
               Authorization: `Bearer ${user.access_token}`,
-              Accept: 'application/json'
-            }
-          })
-          .then((res) => {
-            setProfile(res.data);
-          })
-          .catch((err) => console.log(err));
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          setProfile(res.data);
+          handleLoginWithGoogle(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
+
+  const handleLoginWithGoogle = async (data: any) => {
+    try {
+      const actionResult = await dispatch(
+        requestLoginWithGoogle({
+          ...data,
+          facebookId: data.id,
+          avatar: data.picture,
+        })
+      );
+
+      const res = unwrapResult(actionResult);
+      switch (res.loginCode) {
+        case TTCSconfig.LOGIN_FAILED:
+          return notification.error({
+            message: "Đăng ký thất bại",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_SUCCESS:
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30,
+          });
+          return notification.success({
+            message: "Đăng nhập thành công",
+            duration: 1.5,
+          });
       }
-    },
-    [user]
-  );
+    } catch (err) {
+      notification.error({
+        message: "Đăng ký thất bại, lỗi server",
+        duration: 1.5,
+      });
+    }
+  };
 
   // log out function to log the user out of google and set the profile array to null
   const logOut = () => {
@@ -73,7 +113,6 @@ const LoginPages = () => {
   }) => {
     try {
       const encodePassword = encrypt(data.password);
-      // const res: any = await apiLogin({ account: data.account, password: encodePassword })
       const actionResult = await dispatch(
         requestLogin({
           account: data.account,
@@ -172,7 +211,7 @@ const LoginPages = () => {
                 style={{ padding: "12px" }}
               />
             </Form.Item>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: "center" }}>
               {profile ? (
                 <div>
                   <img src={profile.picture} alt="user image" />
@@ -181,10 +220,14 @@ const LoginPages = () => {
                   <p>Email Address: {profile.email}</p>
                   <p>Sau nghĩ xem lưu vào db như nào</p>
                   <br />
-                  <button onClick={logOut} style={{ cursor: 'pointer' }}>Log out</button>
+                  <button onClick={logOut} style={{ cursor: "pointer" }}>
+                    Log out
+                  </button>
                 </div>
               ) : (
-                <button onClick={() => login()} style={{ cursor: 'pointer' }}>Sign in with Google 🚀 </button>
+                <button onClick={() => login()} style={{ cursor: "pointer" }}>
+                  Sign in with Google 🚀{" "}
+                </button>
               )}
             </div>
             <Form.Item>

@@ -13,3 +13,7 @@ export const apiRegister = (payload: { userInfo: UserInfo }) => {
 export const apiLogout = (payload: { idUser: string }) => {
   return ApiConfig(EndPoint.LOGOUT, { payload });
 };
+
+export const apiLoginWithGoogle = (payload: { userInfo: UserInfo }) => {
+  return ApiConfig(EndPoint.LOGIN_WITH_GOOGLE, { payload });
+};
