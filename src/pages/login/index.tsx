@@ -15,6 +15,7 @@ import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import styles from "./login.module.scss";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 
 const cx = classNames.bind(styles);
@@ -46,7 +47,6 @@ const LoginPages = () => {
 
   useEffect(() => {
     if (user) {
-      console.log({ user });
       axios
         .get(
           `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
@@ -69,7 +69,8 @@ const LoginPages = () => {
     try {
       const actionResult = await dispatch(
         requestLoginWithGoogle({
-          ...data,
+          name: data.name,
+          account: data.email,
           facebookId: data.id,
           avatar: data.picture,
         })
@@ -211,25 +212,7 @@ const LoginPages = () => {
                 style={{ padding: "12px" }}
               />
             </Form.Item>
-            <div style={{ textAlign: "center" }}>
-              {profile ? (
-                <div>
-                  <img src={profile.picture} alt="user image" />
-                  <h3>User Logged in</h3>
-                  <p>Name: {profile.name}</p>
-                  <p>Email Address: {profile.email}</p>
-                  <p>Sau nghĩ xem lưu vào db như nào</p>
-                  <br />
-                  <button onClick={logOut} style={{ cursor: "pointer" }}>
-                    Log out
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => login()} style={{ cursor: "pointer" }}>
-                  Sign in with Google 🚀{" "}
-                </button>
-              )}
-            </div>
+
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Duy trì đăng nhập</Checkbox>
@@ -249,14 +232,29 @@ const LoginPages = () => {
               >
                 Đăng nhập
               </Button>
-              <div className={cx("login__or")}>
-                <span className={cx("login__ortext")}>HOẶC</span>
-              </div>
+
               <div className={cx("login__toregister")}>
                 Bạn chưa có tài khoản?{" "}
                 <Link to="/dang-ky" className={cx("login__toregisterlink")}>
                   Đăng ký ngay!
                 </Link>
+              </div>
+
+              <div className={cx("login__or")}>
+                <span className={cx("login__ortext")}>HOẶC</span>
+              </div>
+
+              <div style={{ textAlign: "center" }}>
+                <button
+                  className={cx("btn_login-google")}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    login();
+                  }}
+                >
+                  <FcGoogle />
+                  <p>Sign in with Google</p>
+                </button>
               </div>
             </Form.Item>
           </Form>

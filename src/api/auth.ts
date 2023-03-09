@@ -14,6 +14,11 @@ export const apiLogout = (payload: { idUser: string }) => {
   return ApiConfig(EndPoint.LOGOUT, { payload });
 };
 
-export const apiLoginWithGoogle = (payload: { userInfo: UserInfo }) => {
+export const apiLoginWithGoogle = (payload: {
+  name: string;
+  account: string;
+  facebookId: string;
+  avatar: string;
+}) => {
   return ApiConfig(EndPoint.LOGIN_WITH_GOOGLE, { payload });
 };

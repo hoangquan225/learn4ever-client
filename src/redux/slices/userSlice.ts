@@ -41,7 +41,12 @@ export const requestRegister = createAsyncThunk(
 
 export const requestLoginWithGoogle = createAsyncThunk(
   "auth/loginGoogle",
-  async (props: { userInfo: UserInfo }) => {
+  async (props: {
+    name: string;
+    account: string;
+    facebookId: string;
+    avatar: string;
+  }) => {
     const res = await apiLoginWithGoogle(props);
     return res.data;
   }
