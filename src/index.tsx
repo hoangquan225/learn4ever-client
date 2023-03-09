@@ -5,17 +5,20 @@ import { store } from "./redux/store";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import GlobalStyles from "./styles";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
 
 root.render(
   // <React.StrictMode>
+  <GoogleOAuthProvider clientId="340504559300-3dah71nq1r5i1khgs4e09md2p0itaaat.apps.googleusercontent.com">
     <Provider store={store}>
       <GlobalStyles>
         <App />
       </GlobalStyles>
     </Provider>
+  </GoogleOAuthProvider>
   // </React.StrictMode>
 );
 
