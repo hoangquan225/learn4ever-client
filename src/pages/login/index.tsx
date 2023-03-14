@@ -244,18 +244,16 @@ const LoginPages = () => {
                 <span className={cx("login__ortext")}>HOẶC</span>
               </div>
 
-              <div style={{ textAlign: "center" }}>
-                <button
-                  className={cx("btn_login-google")}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    login();
-                  }}
-                >
-                  <FcGoogle />
-                  <p>Sign in with Google</p>
-                </button>
-              </div>
+              <button
+                className={cx("btn_login-google")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  login();
+                }}
+              >
+                <FcGoogle />
+                <p>Sign in with Google</p>
+              </button>
             </Form.Item>
           </Form>
         </div>

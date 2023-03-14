@@ -120,6 +120,16 @@ const RegisterPages = () => {
                       required: true,
                       message: "Vui lòng nhập trường này!",
                     },
+                    {
+                      min: 6,
+                      max: 15,
+                      message: "Tên tài khoản phải có 6-15 ký tự",
+                    },
+                    {
+                      pattern: /^[a-zA-Z0-9_.-]+$/,
+                      message:
+                        "Tên đăng nhập chỉ chứa các kí tự cho phép gồm: chữ in hoa, chữ in thường, chữ số (a-z, A-Z, 0-9), dấu gạch dưới, dấu gạch ngang và dấu chấm.",
+                    },
                   ]}
                 >
                   <Input
@@ -211,8 +221,8 @@ const RegisterPages = () => {
                   name="phoneNumber"
                   rules={[
                     {
-                      pattern: PhoneRegExp,
-                      message: "vui lòng nhập số điện thoại",
+                      pattern: /^0\d{9}$/,
+                      message: "Định dạng số điện thoại không đúng",
                     },
                     {
                       required: true,
@@ -371,8 +381,16 @@ const RegisterPages = () => {
                       required: true,
                       message: "Vui lòng nhập trường này!",
                     },
+                    {
+                      message: "Mật khẩu phải có ít nhất 8 ký tự",
+                    },
+                    {
+                      min: 8,
+                      pattern: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$*])/,
+                      message:
+                        "Mật khẩu phải có ít nhất 8 ký tự, phải chứa nhất một ký tự đặc biệt, một chữ hoa, một chữ thường và một số",
+                    },
                   ]}
-                  //   hasFeedback
                 >
                   <Input.Password
                     prefix={

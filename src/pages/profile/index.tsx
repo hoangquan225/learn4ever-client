@@ -460,6 +460,10 @@ const ProfilePages = () => {
                                 className={cx("profile__formitem")}
                                 dependencies={["password"]}
                                 rules={[
+                                  {
+                                    required: true,
+                                    message: "Vui lòng nhập trường này!",
+                                  },
                                   ({ getFieldValue }) => ({
                                     validator(_, value) {
                                       if (
@@ -475,6 +479,13 @@ const ProfilePages = () => {
                                       );
                                     },
                                   }),
+                                  {
+                                    min: 8,
+                                    pattern:
+                                      /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$*])/,
+                                    message:
+                                      "Mật khẩu phải có ít nhất 8 ký tự, phải chứa nhất một ký tự đặc biệt, một chữ hoa, một chữ thường và một số",
+                                  },
                                 ]}
                               >
                                 <Input
@@ -496,6 +507,10 @@ const ProfilePages = () => {
                                 className={cx("profile__formitem")}
                                 dependencies={["newPassword"]}
                                 rules={[
+                                  {
+                                    required: true,
+                                    message: "Vui lòng nhập trường này!",
+                                  },
                                   ({ getFieldValue }) => ({
                                     validator(_, value) {
                                       if (
