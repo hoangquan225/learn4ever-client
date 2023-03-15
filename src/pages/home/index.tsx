@@ -6,18 +6,14 @@ import Banner2 from "../../components/banner2";
 import Panel from "../../components/panel";
 import Feedback from "../../components/feedback";
 import Footer from "../../components/footer";
-import { Carousel, notification } from "antd";
+import { Carousel } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import {
-  categoryState,
-  requestLoadCategorys,
-} from "../../redux/slices/categorySlice";
-import { useEffect } from "react";
-import { unwrapResult } from "@reduxjs/toolkit";
+import { categoryState } from "../../redux/slices/categorySlice";
 import { Link } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Category } from "../../submodule/models/category";
+import Chatbot from "../../components/chatbot";
 
 const cx = classNames.bind(styles);
 
@@ -92,7 +88,7 @@ const HomePages = () => {
       <div className={cx("home")}>
         <Header />
         <Banner1 />
-
+        <Chatbot />
         <div className={cx("category")}>
           <div className={cx("category__container")}>
             <div className={cx("wide")}>

@@ -81,7 +81,7 @@ export const requestUpdateStudiedForUser = createAsyncThunk(
   async (props: {
     idTopic: string;
     idUser: string;
-    status: number;
+    status?: number;
     timeStudy: number;
     score?: number;
     correctQuestion?: number;

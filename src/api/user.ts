@@ -28,7 +28,7 @@ export const apiChangePassword = async (payload: {
 export const apiUpdateStudiedForUser = async (payload: {
   idTopic: string;
   idUser: string;
-  status: number;
+  status?: number;
   timeStudy: number;
   score?: number;
   correctQuestion?: number;

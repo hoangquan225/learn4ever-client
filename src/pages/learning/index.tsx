@@ -179,6 +179,22 @@ const LearningPages = () => {
     setIsReviewComment(true);
   }, [dataTopicActive?.id]);
 
+  // useEffect(() => {
+  //   return () => {
+  //     if (dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO) {
+  //       dataTopicActive?.topicType === TTCSconfig.TYPE_TOPIC_VIDEO &&
+  //         dataTopicActive?.id &&
+  //         userInfo &&
+  //         videoPlayerRef.current.currentTime &&
+  //         handleUpdateLearned(
+  //           dataTopicActive?.id || "",
+  //           userInfo?._id || "",
+  //           Math.floor(videoPlayerRef.current.currentTime)
+  //         );
+  //     }
+  //   };
+  // }, [dataTopicActive?.id, videoPlayerRef?.current?.currentTime]);
+
   useEffect(() => {
     const handleResize = () => {
       setScreenSize({
@@ -189,7 +205,9 @@ const LearningPages = () => {
 
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const loadCourse = async (slugChild: string) => {
@@ -316,19 +334,34 @@ const LearningPages = () => {
   const handleUpdateLearned = async (
     idTopic: string,
     idUser: string,
-    timeStudy: number
+    timeStudy: number,
+    status?: number
   ) => {
     try {
-      if (!userInfo?.progess?.find((o) => o.idTopic === idTopic)) {
-        const result = await dispatch(
-          requestUpdateStudiedForUser({
-            idTopic,
-            idUser,
-            status: TTCSconfig.STATUS_LEARNED,
-            timeStudy,
-          })
-        );
-        unwrapResult(result);
+      if (
+        !userInfo?.progess?.find((o) => o.idTopic === idTopic && o.status === 2)
+      ) {
+        console.log("b");
+        if (status) {
+          const result = await dispatch(
+            requestUpdateStudiedForUser({
+              idTopic,
+              idUser,
+              status,
+              timeStudy,
+            })
+          );
+          unwrapResult(result);
+        } else {
+          const result = await dispatch(
+            requestUpdateStudiedForUser({
+              idTopic,
+              idUser,
+              timeStudy,
+            })
+          );
+          unwrapResult(result);
+        }
       }
     } catch (error) {
       notification.error({
@@ -412,7 +445,8 @@ const LearningPages = () => {
       handleUpdateLearned(
         dataTopicActive?.id || "",
         userInfo?._id || "",
-        Math.floor(e.target.currentTime)
+        Math.floor(e.target.currentTime),
+        TTCSconfig.STATUS_LEARNED
       );
     }
     setTimeout(() => {
