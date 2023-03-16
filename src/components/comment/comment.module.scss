@@ -285,11 +285,22 @@
   opacity: 0.8;
   font-size: 1.3rem;
   margin: 0 0.4rem;
+  cursor: pointer;
 
   &:hover {
-    cursor: pointer;
     text-decoration: underline;
   }
+}
+
+.comment__detail--liketext {
+  font-weight: 400;
+}
+
+.comment__detail--liketext--selected {
+  font-weight: 500;
+  color: var(--primaryColor);
+  opacity: 1;
+  cursor: pointer;
 }
 
 .comment__detail--time {

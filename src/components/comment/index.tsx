@@ -31,13 +31,13 @@ import { RealtimeContext } from "../../App";
 const cx = classNames.bind(styles);
 
 const ReactType = [
-  { icon: reactionLike, title: "Thích" },
-  { icon: reactionTim, title: "Yêu thích" },
-  { icon: reactionThuong, title: "Thương thương" },
-  { icon: reactionHaha, title: "Haha" },
-  { icon: reactionWow, title: "Wow" },
-  { icon: reactionBuon, title: "Buồn" },
-  { icon: reactionPhanno, title: "Phẫn nộ" },
+  { icon: reactionLike, title: "Thích", name: "like" },
+  { icon: reactionTim, title: "Yêu thích", name: "love" },
+  { icon: reactionThuong, title: "Thương thương", name: "care" },
+  { icon: reactionHaha, title: "Haha", name: "haha" },
+  { icon: reactionWow, title: "Wow", name: "wow" },
+  { icon: reactionBuon, title: "Buồn", name: "sad" },
+  { icon: reactionPhanno, title: "Phẫn nộ", name: "angry" },
 ];
 
 type CommentProps = {
@@ -62,6 +62,21 @@ const FCComment = (props: CommentProps) => {
   const [skip, setSkip] = useState(0);
   const [isTotalComment, setIsTotalComment] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number>();
+  const [selectedReaction, setSelectedReaction] = useState(null);
+
+  const handleReactions = (title: any) => {
+    if (selectedReaction !== title) {
+      setSelectedReaction(title);
+    } else {
+      setSelectedReaction(null);
+    }
+  };
+
+  const handleLike = () => {
+    if (selectedReaction !== null) {
+      setSelectedReaction(null);
+    }
+  };
 
   useEffect(() => {
     if (skip) {
@@ -195,6 +210,7 @@ const FCComment = (props: CommentProps) => {
                                 src={reaction.icon}
                                 alt="cam xuc"
                                 className={cx("reaction__icon")}
+                                onClick={() => handleReactions(reaction.title)}
                               />
                             </Tooltip>
                           </Fragment>
@@ -205,8 +221,19 @@ const FCComment = (props: CommentProps) => {
                       showArrow={false}
                       overlayClassName={cx("tooltip__reactions")}
                     >
-                      <span className={cx("comment__detail--liketext")}>
-                        Thích
+                      <span
+                        // className={cx("comment__detail--liketext", {
+                        //   "comment__detail--liketext--selected":
+                        //     selectedReaction === null,
+                        // })}
+                        className={
+                          selectedReaction === null
+                            ? cx("comment__detail--liketext")
+                            : cx("comment__detail--liketext--selected")
+                        }
+                        onClick={handleLike}
+                      >
+                        {selectedReaction ? selectedReaction : "Thích"}
                       </span>
                     </Tooltip>
                     ·
