@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { UserInfo } from "../../submodule/models/user";
-import { apiLogin, apiRegister } from "../../api/auth";
+import { apiLogin, apiLoginWithGoogle, apiRegister } from "../../api/auth";
 import {
   apiChangePassword,
   apiGetUserFromToken,
@@ -39,6 +39,19 @@ export const requestRegister = createAsyncThunk(
   }
 );
 
+export const requestLoginWithGoogle = createAsyncThunk(
+  "auth/loginGoogle",
+  async (props: {
+    name: string;
+    account: string;
+    facebookId: string;
+    avatar: string;
+  }) => {
+    const res = await apiLoginWithGoogle(props);
+    return res.data;
+  }
+);
+
 export const requestGetUserFromToken = createAsyncThunk(
   "user/requestGetUserFromToken",
   async (props: { token: string }) => {
@@ -68,7 +81,7 @@ export const requestUpdateStudiedForUser = createAsyncThunk(
   async (props: {
     idTopic: string;
     idUser: string;
-    status: number;
+    status?: number;
     timeStudy: number;
     score?: number;
     correctQuestion?: number;
@@ -145,6 +158,28 @@ export const authSlice = createSlice({
         state.loading = false;
       }
     );
+
+    /**
+     * loginWithGoogle
+     */
+    builder.addCase(requestLoginWithGoogle.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      requestLoginWithGoogle.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        if (action.payload.loginCode === TTCSconfig.STATUS_SUCCESS)
+          state.userInfo = new UserInfo(action.payload.userInfo);
+      }
+    );
+    builder.addCase(
+      requestLoginWithGoogle.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+      }
+    );
+
     /**
      * updateUser
      */

@@ -35,6 +35,7 @@ const ExamPages = () => {
   const loading = courseReducer.loading;
   const topicStates = useAppSelector(topicState);
   const topics = topicStates.topics;
+  const loadingTopic = topicStates.loading;
   const userInfo = useAppSelector(authState).userInfo;
   const [indexOpenTopic, setIndexOpenTopic] = useState<number[]>([1]);
   const navigate = useNavigate();
@@ -142,150 +143,160 @@ const ExamPages = () => {
                 </h1>
               </div>
 
-              <div className={cx("exam__view")}>
-                {topics.length > 0 &&
-                  topics?.map((data, i) => {
-                    const dataChild = data.topicChildData;
-                    return (
-                      <div className={cx("exam__panel")} key={data.id}>
-                        <div className={cx("exam__panel--item")}>
-                          {indexOpenTopic.find((o) => o === i + 1) ? (
-                            <div
-                              className={cx("exam__panel--title")}
-                              onClick={() => {
-                                const indexPrev = indexOpenTopic.filter(
-                                  (o) => o !== i + 1
-                                );
-                                setIndexOpenTopic(indexPrev);
-                              }}
-                            >
-                              <FaChevronUp className={cx("panel__icon")} />
-                              <h3 className={cx("panel__text")}>
-                                {data?.name}
-                              </h3>
-                            </div>
-                          ) : (
-                            <div
-                              className={cx("exam__panel--title")}
-                              onClick={() => {
-                                setIndexOpenTopic([...indexOpenTopic, i + 1]);
-                              }}
-                            >
-                              <FaChevronDown className={cx("panel__icon")} />
-                              <h3 className={cx("panel__text")}>
-                                {data?.name}
-                              </h3>
-                            </div>
-                          )}
+              {!loadingTopic && (
+                <div className={cx("exam__view")}>
+                  {topics.length > 0 &&
+                    topics?.map((data, i) => {
+                      const dataChild = data.topicChildData;
+                      return (
+                        <div className={cx("exam__panel")} key={data.id}>
+                          <div className={cx("exam__panel--item")}>
+                            {indexOpenTopic.find((o) => o === i + 1) ? (
+                              <div
+                                className={cx("exam__panel--title")}
+                                onClick={() => {
+                                  const indexPrev = indexOpenTopic.filter(
+                                    (o) => o !== i + 1
+                                  );
+                                  setIndexOpenTopic(indexPrev);
+                                }}
+                              >
+                                <FaChevronUp className={cx("panel__icon")} />
+                                <h3 className={cx("panel__text")}>
+                                  {data?.name}
+                                </h3>
+                              </div>
+                            ) : (
+                              <div
+                                className={cx("exam__panel--title")}
+                                onClick={() => {
+                                  setIndexOpenTopic([...indexOpenTopic, i + 1]);
+                                }}
+                              >
+                                <FaChevronDown className={cx("panel__icon")} />
+                                <h3 className={cx("panel__text")}>
+                                  {data?.name}
+                                </h3>
+                              </div>
+                            )}
 
-                          <Row
-                            gutter={[12, 12]}
-                            className={
-                              indexOpenTopic.find((o) => o === i + 1)
-                                ? cx("exam__appear")
-                                : cx("exam__appear", "hide")
-                            }
-                          >
-                            {dataChild[0] &&
-                              dataChild?.map(
-                                (dataChild, iChild) =>
-                                  dataChild.status ===
-                                    TTCSconfig.STATUS_PUBLIC && (
-                                    <Col
-                                      xl={12}
-                                      lg={12}
-                                      md={12}
-                                      sm={24}
-                                      xs={24}
-                                      key={iChild}
-                                    >
-                                      <div
-                                        className={cx("exam__panel--content")}
+                            <Row
+                              gutter={[12, 12]}
+                              className={
+                                indexOpenTopic.find((o) => o === i + 1)
+                                  ? cx("exam__appear")
+                                  : cx("exam__appear", "hide")
+                              }
+                            >
+                              {dataChild[0] &&
+                                dataChild?.map(
+                                  (dataChild, iChild) =>
+                                    dataChild.status ===
+                                      TTCSconfig.STATUS_PUBLIC && (
+                                      <Col
+                                        xl={12}
+                                        lg={12}
+                                        md={12}
+                                        sm={24}
+                                        xs={24}
+                                        key={iChild}
                                       >
-                                        <span>{dataChild.name}</span>
                                         <div
-                                          className={cx("exam__panel--action")}
+                                          className={cx("exam__panel--content")}
                                         >
+                                          <span>{dataChild.name}</span>
                                           <div
-                                            className={cx("panel--action-item")}
+                                            className={cx(
+                                              "exam__panel--action"
+                                            )}
                                           >
-                                            <div>
-                                              <FaRegQuestionCircle />
-                                              <span>
-                                                {dataChild?.numQuestion} câu
-                                              </span>
+                                            <div
+                                              className={cx(
+                                                "panel--action-item"
+                                              )}
+                                            >
+                                              <div>
+                                                <FaRegQuestionCircle />
+                                                <span>
+                                                  {dataChild?.numQuestion} câu
+                                                </span>
+                                              </div>
+                                              <div>
+                                                <FaRegClock />
+                                                <span>
+                                                  {dataChild?.timeExam} phút
+                                                </span>
+                                              </div>
+                                              {userInfo?.progess?.map(
+                                                (o) =>
+                                                  o.idTopic ===
+                                                    dataChild.id && (
+                                                    <div
+                                                      className={cx(
+                                                        "exam__panel--score"
+                                                      )}
+                                                      key={o.idTopic}
+                                                    >
+                                                      <span>
+                                                        {o.score} điểm
+                                                      </span>
+                                                    </div>
+                                                  )
+                                              )}
                                             </div>
-                                            <div>
-                                              <FaRegClock />
-                                              <span>
-                                                {dataChild?.timeExam} phút
-                                              </span>
-                                            </div>
-                                            {userInfo?.progess?.map(
-                                              (o) =>
-                                                o.idTopic === dataChild.id && (
-                                                  <div
+                                            <Popconfirm
+                                              placement="top"
+                                              title="Bạn muốn làm đề này sao?"
+                                              onConfirm={() =>
+                                                navigate(`${dataChild.id}`)
+                                              }
+                                              okText="Yes"
+                                              cancelText="No"
+                                            >
+                                              {userInfo?.progess?.find(
+                                                (o) =>
+                                                  o.idTopic === dataChild.id
+                                              ) ? (
+                                                <button
+                                                  className={cx(
+                                                    "exam__panel--btn",
+                                                    "review"
+                                                  )}
+                                                >
+                                                  <span>Xem lại</span>
+                                                  <BiChevronRight
                                                     className={cx(
-                                                      "exam__panel--score"
+                                                      "exam__panel--icon"
                                                     )}
-                                                    key={o.idTopic}
-                                                  >
-                                                    <span>{o.score} điểm</span>
-                                                  </div>
-                                                )
-                                            )}
+                                                  />
+                                                </button>
+                                              ) : (
+                                                <button
+                                                  className={cx(
+                                                    "exam__panel--btn"
+                                                  )}
+                                                >
+                                                  <span>Làm bài</span>
+                                                  <BiChevronRight
+                                                    className={cx(
+                                                      "exam__panel--icon"
+                                                    )}
+                                                  />
+                                                </button>
+                                              )}
+                                            </Popconfirm>
                                           </div>
-                                          <Popconfirm
-                                            placement="top"
-                                            title="Bạn muốn làm đề này sao?"
-                                            onConfirm={() =>
-                                              navigate(`${dataChild.id}`)
-                                            }
-                                            okText="Yes"
-                                            cancelText="No"
-                                          >
-                                            {userInfo?.progess?.find(
-                                              (o) => o.idTopic === dataChild.id
-                                            ) ? (
-                                              <button
-                                                className={cx(
-                                                  "exam__panel--btn",
-                                                  "review"
-                                                )}
-                                              >
-                                                <span>Xem lại</span>
-                                                <BiChevronRight
-                                                  className={cx(
-                                                    "exam__panel--icon"
-                                                  )}
-                                                />
-                                              </button>
-                                            ) : (
-                                              <button
-                                                className={cx(
-                                                  "exam__panel--btn"
-                                                )}
-                                              >
-                                                <span>Làm bài</span>
-                                                <BiChevronRight
-                                                  className={cx(
-                                                    "exam__panel--icon"
-                                                  )}
-                                                />
-                                              </button>
-                                            )}
-                                          </Popconfirm>
                                         </div>
-                                      </div>
-                                    </Col>
-                                  )
-                              )}
-                          </Row>
+                                      </Col>
+                                    )
+                                )}
+                            </Row>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-              </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           </div>
         </div>

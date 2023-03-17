@@ -1,16 +1,22 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, notification } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
 import classNames from "classnames/bind";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { requestLogin } from "../../redux/slices/userSlice";
+import {
+  requestLogin,
+  requestLoginWithGoogle,
+} from "../../redux/slices/userSlice";
 import { RootState } from "../../redux/store";
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import styles from "./login.module.scss";
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -29,13 +35,85 @@ const LoginPages = () => {
     }
   }, [userInfo]);
 
+  const [user, setUser] = useState<any>();
+  const [profile, setProfile] = useState<any>();
+
+  console.log(profile);
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setUser(codeResponse),
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          setProfile(res.data);
+          handleLoginWithGoogle(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
+
+  const handleLoginWithGoogle = async (data: any) => {
+    try {
+      const actionResult = await dispatch(
+        requestLoginWithGoogle({
+          name: data.name,
+          account: data.email,
+          facebookId: data.id,
+          avatar: data.picture,
+        })
+      );
+
+      const res = unwrapResult(actionResult);
+      switch (res.loginCode) {
+        case TTCSconfig.LOGIN_FAILED:
+          return notification.error({
+            message: "Đăng ký thất bại",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_SUCCESS:
+          Cookies.set("token", res.token, {
+            expires: 60 * 60 * 24 * 30,
+          });
+          return notification.success({
+            message: "Đăng nhập thành công",
+            duration: 1.5,
+          });
+      }
+    } catch (err) {
+      notification.error({
+        message: "Đăng ký thất bại, lỗi server",
+        duration: 1.5,
+      });
+    }
+  };
+
+  // log out function to log the user out of google and set the profile array to null
+  const logOut = () => {
+    googleLogout();
+    setProfile(null);
+    setUser(null);
+  };
+
   const handleLogin: any = async (data: {
     account: string;
     password: string;
   }) => {
     try {
       const encodePassword = encrypt(data.password);
-      // const res: any = await apiLogin({ account: data.account, password: encodePassword })
       const actionResult = await dispatch(
         requestLogin({
           account: data.account,
@@ -134,6 +212,7 @@ const LoginPages = () => {
                 style={{ padding: "12px" }}
               />
             </Form.Item>
+
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Duy trì đăng nhập</Checkbox>
@@ -153,15 +232,28 @@ const LoginPages = () => {
               >
                 Đăng nhập
               </Button>
-              <div className={cx("login__or")}>
-                <span className={cx("login__ortext")}>HOẶC</span>
-              </div>
+
               <div className={cx("login__toregister")}>
                 Bạn chưa có tài khoản?{" "}
                 <Link to="/dang-ky" className={cx("login__toregisterlink")}>
                   Đăng ký ngay!
                 </Link>
               </div>
+
+              <div className={cx("login__or")}>
+                <span className={cx("login__ortext")}>HOẶC</span>
+              </div>
+
+              <button
+                className={cx("btn_login-google")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  login();
+                }}
+              >
+                <FcGoogle />
+                <p>Sign in with Google</p>
+              </button>
             </Form.Item>
           </Form>
         </div>

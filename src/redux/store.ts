@@ -4,6 +4,7 @@ import categoryReducer from "./slices/categorySlice";
 import courseReducer from "./slices/courseSlice";
 import topicReducer from "./slices/topicSlice";
 import questionReducer from "./slices/questionSlice";
+import commentReducer from "./slices/commentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     course: courseReducer,
     topic: topicReducer,
     question: questionReducer,
+    comment: commentReducer,
   },
   middleware: (getDefaultMiddle) =>
     getDefaultMiddle({ serializableCheck: false }),

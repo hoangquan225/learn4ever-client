@@ -292,7 +292,7 @@
   font-weight: 600;
   word-wrap: break-word;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   display: -webkit-box;
   overflow: hidden;
 }
@@ -385,7 +385,7 @@
   -webkit-box-pack: center;
   justify-content: center;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.45);
   -webkit-tap-highlight-color: transparent;
   z-index: 2;
   position: fixed;
@@ -592,7 +592,7 @@
   margin-bottom: 2.8rem;
 }
 
-.quiz-choices__item > div {
+.quiz-choices__item {
   & > div {
     width: 100%;
 
@@ -823,5 +823,96 @@
 
   @include responsive(md) {
     order: 1;
+  }
+}
+
+// COMMENT
+.learning__comment--toggle {
+  right: calc(25% + 2rem);
+  bottom: 7rem;
+  position: fixed;
+  z-index: 1;
+
+  &.hide-sider {
+    right: 2rem;
+  }
+
+  @include responsive(xs) {
+    right: 2rem;
+  }
+
+  @include responsive(sm) {
+    right: 2rem;
+  }
+
+  @include responsive(md) {
+    right: 2rem;
+  }
+}
+
+.learning__comment--btn {
+  background-color: #fff;
+  border-radius: 99rem;
+  box-shadow: 0 0 1rem rgb(0 0 0 / 20%);
+  color: var(--primaryColor);
+  cursor: pointer;
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-family: var(--font-family);
+  padding: 0.8rem 1.2rem;
+  position: relative;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include responsive(xs) {
+    border-radius: 50%;
+    padding: 1.2rem;
+  }
+
+  @include responsive(sm) {
+    border-radius: 50%;
+    padding: 1.2rem;
+  }
+}
+
+.learning__comment--icon {
+  font-size: 1.8rem;
+}
+
+.learning__comment--text {
+  margin-left: 0.8rem;
+
+  @include responsive(xs) {
+    display: none;
+  }
+
+  @include responsive(sm) {
+    display: none;
+  }
+}
+
+.comment__drawer {
+  & > div > div:nth-child(1) {
+    border: none !important;
+    padding: 1.6rem 2rem !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0.8rem !important;
+
+    & > div {
+      justify-content: flex-end !important;
+
+      & > button {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  & > div > div:nth-child(2) {
+    padding: 0 0 0 4rem !important;
   }
 }

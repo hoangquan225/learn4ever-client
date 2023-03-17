@@ -144,9 +144,41 @@
 
 .login__toregister {
   text-align: center;
+  margin-top: 2rem;
 }
 
 .login__toregisterlink {
   cursor: pointer;
   color: rgb(26, 218, 195);
+}
+
+.btn_login-google {
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  margin: auto;
+  background-color: #4185f4;
+  padding: 0.2rem;
+  border-radius: 0.4rem;
+  transition: all 0.4s ease-in-out;
+
+  & > svg {
+    font-size: 3.5rem;
+    background-color: #fff;
+    border-radius: 0.4rem;
+    padding: 0.4rem;
+  }
+
+  & > p {
+    font-size: 1.6rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+    color: #fff;
+    margin: 0 1rem;
+  }
+
+  &:hover {
+    transform: translateY(-0.6rem);
+    box-shadow: 0 4px 10px rgb(192 210 235 / 50%);
+  }
 }
