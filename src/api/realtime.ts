@@ -48,6 +48,14 @@ export class SocketService {
     })
   }
 
+  updateComment = (dispatch: any) => {
+    console.log('hello');
+
+    this.socket.on('update-comment', (data: { comment: Comment }) => {
+      dispatch(updateCommentSocket(data.comment))
+    })
+  }
+
   leaveComment = (props: { idTopic: string, userInfo: UserInfo }) => {
     this.socket.emit("leave_room_comment", props).on("leave_room_comment", (msg: string) => {
       // console.log(msg);

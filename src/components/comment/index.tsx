@@ -16,6 +16,7 @@ import reactionWow from "../../assets/img/reactionWow.svg";
 import { useAppDispatch } from "../../redux/hook";
 import {
   commentState,
+  requestSendReactionComment,
   requestUpdateComment,
   setComments,
 } from "../../redux/slices/commentSlice";
@@ -64,20 +65,6 @@ const FCComment = (props: CommentProps) => {
   const [timeoutId, setTimeoutId] = useState<number>();
   const [selectedReaction, setSelectedReaction] = useState(null);
 
-  const handleReactions = (title: any) => {
-    if (selectedReaction !== title) {
-      setSelectedReaction(title);
-    } else {
-      setSelectedReaction(null);
-    }
-  };
-
-  const handleLike = () => {
-    if (selectedReaction !== null) {
-      setSelectedReaction(null);
-    }
-  };
-
   useEffect(() => {
     if (skip) {
       handleLoadComment(TTCSconfig.LIMIT, skip);
@@ -92,6 +79,12 @@ const FCComment = (props: CommentProps) => {
     setSkip(0);
     setIsTotalComment(false);
   }, [dataTopicActive?.id]);
+
+  const handleLike = () => {
+    if (selectedReaction !== null) {
+      setSelectedReaction(null);
+    }
+  };
 
   const handleScroll = (e: any) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -141,8 +134,25 @@ const FCComment = (props: CommentProps) => {
     }
   };
 
+  const handleSendReactionComment = async (type: number, idComment: string | undefined) => {
+    try {
+      if (!idComment || !userStates.userInfo?._id) {
+        message.error("không cập nhật được !!");
+        return
+      }
+      const res = await dispatch(requestSendReactionComment({
+        idComment,
+        idUser: userStates.userInfo?._id,
+        type
+      }));
+      unwrapResult(res);
+    } catch (error) {
+      message.error("lỗi server !!");
+    }
+  };
+
   const ItemComment = (comment: Comment, key: number) => {
-    const { userInfo, content, react } = comment;
+    const { userInfo, content, react, id } = comment;
     return (
       <div className={cx("comment__detail")} key={key}>
         <div className={cx("comment__avt--wrapper")}>
@@ -210,7 +220,7 @@ const FCComment = (props: CommentProps) => {
                                 src={reaction.icon}
                                 alt="cam xuc"
                                 className={cx("reaction__icon")}
-                                onClick={() => handleReactions(reaction.title)}
+                                onClick={() => handleSendReactionComment(key, id)}
                               />
                             </Tooltip>
                           </Fragment>
@@ -372,5 +382,3 @@ const FCComment = (props: CommentProps) => {
 };
 
 export default memo(FCComment);
-{
-}

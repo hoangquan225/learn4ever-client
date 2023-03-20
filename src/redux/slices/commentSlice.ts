@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { apiLoadComments, apiUpdateComment } from "../../api/comment";
+import { apiLoadComments, apiSendReactionComment, apiUpdateComment } from "../../api/comment";
 import TTCSconfig from "../../submodule/common/config";
 import { Comment } from "../../submodule/models/comment";
 import { RootState } from "../store";
@@ -27,6 +27,19 @@ export const requestUpdateComment = createAsyncThunk(
     return res.data;
   }
 );
+
+export const requestSendReactionComment = createAsyncThunk(
+  "comment/requestSendReactionComment",
+  async (props: {
+    idComment: string,
+    idUser: string,
+    type: number
+  }) => {
+    const res = await apiSendReactionComment(props);
+    return res.data;
+  }
+);
+
 export const requestLoadComments = createAsyncThunk(
   "comment/requestLoadComments",
   async (props: { idTopic: string; limit?: number; skip?: number }) => {
@@ -98,6 +111,19 @@ export const commentSlice = createSlice({
           status: number;
         }>
       ) => {
+        state.loadingUpdate = false;
+      }
+    );
+
+    // update
+    builder.addCase(requestSendReactionComment.pending, (state) => {
+      state.loadingUpdate = true;
+    });
+    builder.addCase(requestSendReactionComment.rejected, (state) => {
+      state.loadingUpdate = false;
+    });
+    builder.addCase(
+      requestSendReactionComment.fulfilled, (state) => {
         state.loadingUpdate = false;
       }
     );
