@@ -15,9 +15,9 @@ export const apiLoadComments = async (params: {
 };
 
 export const apiSendReactionComment = async (payload: {
-  idComment: string,
-  idUser: string,
-  type: number
+  idComment: string;
+  idUser: string;
+  type: number;
 }) => {
-  return ApiConfig(EndPoint.SEND_REACTION_COMMENT, { payload })
-}
+  return ApiConfig(EndPoint.SEND_REACTION_COMMENT, { payload });
+};

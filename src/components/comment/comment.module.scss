@@ -139,6 +139,11 @@
   &.accept-btn:hover {
     opacity: 0.8;
   }
+
+  &.disable-btn {
+    pointer-events: none;
+    background: #ccc;
+  }
 }
 
 .comment__detail {
@@ -298,9 +303,27 @@
 
 .comment__detail--liketext--selected {
   font-weight: 500;
-  color: var(--primaryColor);
   opacity: 1;
   cursor: pointer;
+
+  &.like {
+    color: rgb(32, 120, 244);
+  }
+
+  &.love {
+    color: rgb(243, 62, 88);
+  }
+
+  &.haha,
+  &.wow,
+  &.sad,
+  &.care {
+    color: rgb(247, 177, 37);
+  }
+
+  &.angry {
+    color: rgb(233, 113, 15);
+  }
 }
 
 .comment__detail--time {

@@ -668,7 +668,7 @@ const LearningPages = () => {
                             (topicChild, indexChild) => {
                               return (
                                 topicChild.status ===
-                                TTCSconfig.STATUS_PUBLIC && (
+                                  TTCSconfig.STATUS_PUBLIC && (
                                   <div
                                     className={cx("learning__track--steps")}
                                     key={indexChild}
@@ -677,9 +677,9 @@ const LearningPages = () => {
                                       className={
                                         dataTopicActive?.id === topicChild.id
                                           ? cx(
-                                            "learning__track--steps-item",
-                                            "active"
-                                          )
+                                              "learning__track--steps-item",
+                                              "active"
+                                            )
                                           : cx("learning__track--steps-item")
                                       }
                                       onClick={() => {
@@ -705,7 +705,7 @@ const LearningPages = () => {
                                           )}
                                         >
                                           {topicChild?.topicType ===
-                                            TTCSconfig.TYPE_TOPIC_VIDEO ? (
+                                          TTCSconfig.TYPE_TOPIC_VIDEO ? (
                                             <FaPlayCircle
                                               className={cx("desc-icon")}
                                             />
@@ -742,12 +742,12 @@ const LearningPages = () => {
                                           (c) =>
                                             c.idTopic === topicChild.id &&
                                             c.status ===
-                                            TTCSconfig.STATUS_LEARNED
+                                              TTCSconfig.STATUS_LEARNED
                                         ) && (
-                                            <FaCheckCircle
-                                              className={cx("status-icon")}
-                                            />
-                                          )}
+                                          <FaCheckCircle
+                                            className={cx("status-icon")}
+                                          />
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -853,18 +853,18 @@ const LearningPages = () => {
                                           )
                                             ? item?.isResult
                                               ? cx(
-                                                "quiz-choices__item--radio",
-                                                "correct"
-                                              )
+                                                  "quiz-choices__item--radio",
+                                                  "correct"
+                                                )
                                               : selectedQuestions.find(
-                                                (o) =>
-                                                  o.idAnswer.toString() ===
-                                                  item?._id?.toString()
-                                              ) &&
-                                              cx(
-                                                "quiz-choices__item--radio",
-                                                "inCorrect"
-                                              )
+                                                  (o) =>
+                                                    o.idAnswer.toString() ===
+                                                    item?._id?.toString()
+                                                ) &&
+                                                cx(
+                                                  "quiz-choices__item--radio",
+                                                  "inCorrect"
+                                                )
                                             : cx("quiz-choices__item--radio")
                                         }
                                         value={item}
@@ -903,15 +903,15 @@ const LearningPages = () => {
                                   {selectedQuestions.find(
                                     (o) => o.idQuestion === question.id
                                   ) && (
-                                      <div className={cx("quiz__explain")}>
-                                        <p>Giải thích</p>
-                                        <div
-                                          dangerouslySetInnerHTML={{
-                                            __html: question.hint ?? "",
-                                          }}
-                                        ></div>
-                                      </div>
-                                    )}
+                                    <div className={cx("quiz__explain")}>
+                                      <p>Giải thích</p>
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: question.hint ?? "",
+                                        }}
+                                      ></div>
+                                    </div>
+                                  )}
                                 </Space>
                               </div>
                             </div>
@@ -991,18 +991,18 @@ const LearningPages = () => {
                                       )
                                         ? item?.isResult
                                           ? cx(
-                                            "quiz-choices__item--radio",
-                                            "correct"
-                                          )
+                                              "quiz-choices__item--radio",
+                                              "correct"
+                                            )
                                           : selectedQuestions.find(
-                                            (o) =>
-                                              o.idAnswer.toString() ===
-                                              item?._id?.toString()
-                                          ) &&
-                                          cx(
-                                            "quiz-choices__item--radio",
-                                            "inCorrect"
-                                          )
+                                              (o) =>
+                                                o.idAnswer.toString() ===
+                                                item?._id?.toString()
+                                            ) &&
+                                            cx(
+                                              "quiz-choices__item--radio",
+                                              "inCorrect"
+                                            )
                                         : cx("quiz-choices__item--radio")
                                     }
                                     value={item}
@@ -1047,15 +1047,15 @@ const LearningPages = () => {
                               {selectedQuestions.find(
                                 (o) => o.idQuestion === qs.id
                               ) && (
-                                  <div className={cx("quiz__explain")}>
-                                    <p>Giải thích</p>
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: qs.hint ?? "",
-                                      }}
-                                    ></div>
-                                  </div>
-                                )}
+                                <div className={cx("quiz__explain")}>
+                                  <p>Giải thích</p>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: qs.hint ?? "",
+                                    }}
+                                  ></div>
+                                </div>
+                              )}
                             </Space>
                           </div>
                         </div>

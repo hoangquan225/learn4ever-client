@@ -1,5 +1,14 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Avatar, Drawer, message, notification, Tooltip } from "antd";
+import {
+  Avatar,
+  Drawer,
+  Dropdown,
+  MenuProps,
+  message,
+  Modal,
+  notification,
+  Tooltip,
+} from "antd";
 import classNames from "classnames/bind";
 import { Fragment, memo, useContext, useEffect, useRef, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
@@ -28,6 +37,7 @@ import { AvatarIcon } from "../icons/icons";
 import TinyMCEEditor from "../TinyMCE";
 import styles from "./comment.module.scss";
 import { RealtimeContext } from "../../App";
+import moment from "moment";
 
 const cx = classNames.bind(styles);
 
@@ -39,6 +49,21 @@ const ReactType = [
   { icon: reactionWow, title: "Wow", name: "wow" },
   { icon: reactionBuon, title: "Buồn", name: "sad" },
   { icon: reactionPhanno, title: "Phẫn nộ", name: "angry" },
+];
+
+const items: MenuProps["items"] = [
+  {
+    label: "Báo cáo bình luận",
+    key: "0",
+  },
+  {
+    label: "Chỉnh sửa",
+    key: "1",
+  },
+  {
+    label: "Xóa",
+    key: "2",
+  },
 ];
 
 type CommentProps = {
@@ -55,6 +80,7 @@ const FCComment = (props: CommentProps) => {
   const { dataTopicActive } = props;
   const drawerRef = useRef(null);
   const content = useRef<Editor>();
+  const contentEditor = useRef<any>();
   const dispatch = useAppDispatch();
   const commentStates = useSelector(commentState);
   const userStates = useSelector(authState);
@@ -63,7 +89,12 @@ const FCComment = (props: CommentProps) => {
   const [skip, setSkip] = useState(0);
   const [isTotalComment, setIsTotalComment] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number>();
-  const [selectedReaction, setSelectedReaction] = useState(null);
+  const [isDelete, setIsDelete] = useState<boolean>(false);
+  const [keyRandom, setKeyRandom] = useState<string>();
+  const [isEditor, setIsEditor] = useState<boolean>(false);
+  const [idEditorComment, setIdEditorComment] = useState<string>();
+  const [valueEditor, setValueEditor] = useState<string>();
+  const [valueCommentEditor, setValueCommentEditor] = useState<string>();
 
   useEffect(() => {
     if (skip) {
@@ -79,12 +110,6 @@ const FCComment = (props: CommentProps) => {
     setSkip(0);
     setIsTotalComment(false);
   }, [dataTopicActive?.id]);
-
-  const handleLike = () => {
-    if (selectedReaction !== null) {
-      setSelectedReaction(null);
-    }
-  };
 
   const handleScroll = (e: any) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -134,25 +159,96 @@ const FCComment = (props: CommentProps) => {
     }
   };
 
-  const handleSendReactionComment = async (type: number, idComment: string | undefined) => {
+  const handleSendReactionComment = async (
+    type: number,
+    idComment: string | undefined
+  ) => {
     try {
       if (!idComment || !userStates.userInfo?._id) {
         message.error("không cập nhật được !!");
-        return
+        return;
       }
-      const res = await dispatch(requestSendReactionComment({
-        idComment,
-        idUser: userStates.userInfo?._id,
-        type
-      }));
+      const res = await dispatch(
+        requestSendReactionComment({
+          idComment,
+          idUser: userStates.userInfo?._id,
+          type,
+        })
+      );
       unwrapResult(res);
     } catch (error) {
       message.error("lỗi server !!");
     }
   };
 
+  const hanldeDeleteComment = async (idComment: string) => {
+    try {
+      // const res = await dispatch(
+      //   requestUpdateComment(
+      //     new Comment({
+      //       id: idComment,
+      //       status: TTCSconfig.STATUS_PRIVATE,
+      //     })
+      //   )
+      // );
+      // unwrapResult(res);
+      setIsDelete(false);
+    } catch (error) {
+      message.error("lỗi server, không gửi được comment");
+    }
+  };
+
+  const handleUpdateComment = async (comment: Comment) => {
+    const text = contentEditor.current?.getContent();
+
+    try {
+      const res = await dispatch(
+        requestUpdateComment({
+          ...comment,
+          content: text,
+        })
+      );
+      unwrapResult(res);
+      setIsEditor(false);
+    } catch (error) {
+      message.error("lỗi server, không gửi được comment");
+    }
+  };
+
+  const onClickDropDown = async (props: {
+    key: string;
+    id?: string;
+    content?: string;
+  }) => {
+    const { key, id, content } = props;
+
+    if (key === "0") {
+      notification.success({
+        message: "Đã gửi báo cáo tới quản trị viên",
+        duration: 1.5,
+      });
+    } else if (key === "1") {
+      contentEditor.current?.setContent(content);
+      setValueEditor(content);
+      setIsEditor(true);
+      setIdEditorComment(id);
+      setKeyRandom(`${Math.random()}`);
+    } else if (key === "2") {
+      setIsDelete(true);
+    }
+  };
+
   const ItemComment = (comment: Comment, key: number) => {
     const { userInfo, content, react, id } = comment;
+    const typeReaction = react?.find(
+      (o) => o.idUser === userStates.userInfo?._id
+    )?.type;
+    const diffSeconds = moment().diff(comment.createDate, "seconds");
+    const diffMinutes = moment().diff(comment.createDate, "minutes");
+    const diffHours = moment().diff(comment.createDate, "hours");
+    const diffDays = moment().diff(comment.createDate, "days");
+    const diffMonths = moment().diff(comment.createDate, "months");
+
     return (
       <div className={cx("comment__detail")} key={key}>
         <div className={cx("comment__avt--wrapper")}>
@@ -171,35 +267,67 @@ const FCComment = (props: CommentProps) => {
                 <div className={cx("comment__detail--heading")}>
                   <span>{userInfo?.name}</span>
                 </div>
-                <div
-                  className={cx("comment__detail--text")}
-                  dangerouslySetInnerHTML={{
-                    __html: content,
-                  }}
-                ></div>
-                {/* <div className={cx("comment__detail--showMore")}>
-                  <strong>Mở rộng</strong>
-                  <FaChevronDown
-                    className={cx("comment__detail--icon")}
-                  />
-                  <strong>Thu nhỏ</strong>
-                  <FaChevronUp className={cx("comment__detail--icon")} />
-                </div> */}
-                {react && react?.length > 0 && (
-                  <div className={cx("comment__detail--react")}>
-                    <Avatar.Group
-                      maxCount={7}
-                      className={cx("comment__detail--reactGroup")}
-                      size={20}
+                {isEditor && idEditorComment === id ? (
+                  <>
+                    <TinyMCEEditor
+                      editorRef={contentEditor}
+                      height={250}
+                      keyMCE={keyRandom}
+                      value={valueEditor}
+                      onChange={(value) => setValueCommentEditor(value)}
+                    />
+                    <button
+                      className={cx("comment__content--btn", "cancel-btn")}
+                      onClick={() => {
+                        setIsEditor(false);
+                      }}
                     >
-                      {react?.map((item) => {
-                        return <Avatar src={ReactType[item.type].icon} />;
-                      })}
-                    </Avatar.Group>
-                    <div className={cx("comment__detail--reactNum")}>
-                      {react?.length}
-                    </div>
-                  </div>
+                      Huỷ
+                    </button>
+                    <button
+                      className={
+                        valueCommentEditor
+                          ? cx("comment__content--btn", "accept-btn")
+                          : cx("comment__content--btn", "disable-btn")
+                      }
+                      onClick={() => handleUpdateComment(comment)}
+                    >
+                      Lưu
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className={cx("comment__detail--text")}
+                      dangerouslySetInnerHTML={{
+                        __html: content,
+                      }}
+                    ></div>
+                    {/* <div className={cx("comment__detail--showMore")}>
+                    <strong>Mở rộng</strong>
+                    <FaChevronDown
+                      className={cx("comment__detail--icon")}
+                    />
+                    <strong>Thu nhỏ</strong>
+                    <FaChevronUp className={cx("comment__detail--icon")} />
+                  </div> */}
+                    {react && react?.length > 0 && (
+                      <div className={cx("comment__detail--react")}>
+                        <Avatar.Group
+                          maxCount={7}
+                          className={cx("comment__detail--reactGroup")}
+                          size={20}
+                        >
+                          {react?.map((item) => {
+                            return <Avatar src={ReactType[item.type].icon} />;
+                          })}
+                        </Avatar.Group>
+                        <div className={cx("comment__detail--reactNum")}>
+                          {react?.length}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               <div className={cx("comment__detail--cmttime")}>
@@ -220,7 +348,9 @@ const FCComment = (props: CommentProps) => {
                                 src={reaction.icon}
                                 alt="cam xuc"
                                 className={cx("reaction__icon")}
-                                onClick={() => handleSendReactionComment(key, id)}
+                                onClick={() =>
+                                  handleSendReactionComment(key, id)
+                                }
                               />
                             </Tooltip>
                           </Fragment>
@@ -237,13 +367,20 @@ const FCComment = (props: CommentProps) => {
                         //     selectedReaction === null,
                         // })}
                         className={
-                          selectedReaction === null
+                          typeof typeReaction === "undefined"
                             ? cx("comment__detail--liketext")
-                            : cx("comment__detail--liketext--selected")
+                            : cx(
+                                "comment__detail--liketext--selected",
+                                `${ReactType[typeReaction].name}`
+                              )
                         }
-                        onClick={handleLike}
+                        onClick={() => {
+                          typeof typeReaction !== "undefined"
+                            ? handleSendReactionComment(typeReaction, id)
+                            : handleSendReactionComment(0, id);
+                        }}
                       >
-                        {selectedReaction ? selectedReaction : "Thích"}
+                        {typeReaction ? ReactType[typeReaction].title : "Thích"}
                       </span>
                     </Tooltip>
                     ·
@@ -254,14 +391,46 @@ const FCComment = (props: CommentProps) => {
                   <div className={cx("comment__detail--createRight")}>
                     ·
                     <span className={cx("comment__detail--time")}>
-                      14 giờ trước
+                      {diffSeconds < 60
+                        ? "vừa xong"
+                        : diffMinutes < 60
+                        ? `${diffMinutes} phút trước`
+                        : diffHours < 24
+                        ? `${diffHours} giờ trước`
+                        : diffDays < 30
+                        ? `${diffDays} ngày trước`
+                        : diffMonths < 12
+                        ? `${diffMonths} tháng trước`
+                        : `${Math.floor(diffMonths / 12)} năm trước`}
                     </span>
                     <span className={cx("comment__detail--more")}>
                       ·
                       <button className={cx("comment__detail--morebtn")}>
-                        <FaEllipsisH
-                          className={cx("comment__detail--moreicon")}
-                        />
+                        <Dropdown
+                          menu={{
+                            items:
+                              userInfo?._id === userStates.userInfo?._id
+                                ? items?.filter((o) => o?.key !== "0")
+                                : items?.filter((o) => o?.key === "0"),
+                            onClick: ({ key }) => {
+                              onClickDropDown({ key, id, content });
+                            },
+                          }}
+                          trigger={["click"]}
+                          placement="bottomRight"
+                        >
+                          <FaEllipsisH
+                            className={cx("comment__detail--moreicon")}
+                          />
+                        </Dropdown>
+
+                        <Modal
+                          open={isDelete}
+                          onOk={() => hanldeDeleteComment(id || "")}
+                          onCancel={() => setIsDelete(false)}
+                        >
+                          <p>Bạn có chắc muốn xóa</p>
+                        </Modal>
                       </button>
                     </span>
                   </div>
