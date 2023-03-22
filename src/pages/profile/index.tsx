@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Col,
   DatePicker,
@@ -12,7 +13,6 @@ import {
 import classNames from "classnames/bind";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
-import { AvatarIcon } from "../../components/icons/icons";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
 import {
@@ -22,9 +22,10 @@ import {
   FaRegCalendarAlt,
   FaTransgender,
   FaRegAddressCard,
+  FaCamera,
 } from "react-icons/fa";
 import styles from "./profile.module.scss";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EmailRegExp, PhoneRegExp } from "../../submodule/utils/validation";
 import { classes, genders } from "../../utils/contants";
 import { LockOutlined } from "@ant-design/icons";
@@ -37,15 +38,18 @@ import {
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import dayjs from "dayjs";
+import UploadImg from "../../components/UploadImg";
+import fallbackAvatar from "./../../assets/img/fallback-avt.jpg";
 
 const cx = classNames.bind(styles);
 
 const ProfilePages = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalChangePassword, setIsModalChangePassword] = useState(false);
   const dispatch = useAppDispatch();
-
   const [infoForm] = Form.useForm();
   const [modalForm] = Form.useForm();
+  const [isModalChangeAvatar, setIsModalChangeAvatar] = useState(false);
+  const [dataUpload, setDataUpload] = useState<string>();
 
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
@@ -63,7 +67,7 @@ const ProfilePages = () => {
   }, [infoForm]);
 
   const handleShowModal = () => {
-    setIsModalOpen(true);
+    setIsModalChangePassword(true);
   };
 
   const handleChangePassword = () => {
@@ -158,13 +162,45 @@ const ProfilePages = () => {
     });
   };
 
+  const handleUpdateAvatar = async () => {
+    const cookie = Cookies.get("token");
+
+    try {
+      const actionResult = await dispatch(
+        requestUpdateUserInfo({
+          token: cookie,
+          userInfo: { avatar: dataUpload },
+        })
+      );
+      const res = unwrapResult(actionResult);
+      switch (res.status) {
+        case TTCSconfig.STATUS_SUCCESS:
+          return notification.success({
+            message: "Cập nhật thành công!",
+            duration: 1.5,
+          });
+
+        case TTCSconfig.STATUS_FAIL:
+          return notification.warning({
+            message: "Cập nhật thất bại!",
+            duration: 1.5,
+          });
+      }
+    } catch (error) {
+      return notification.warning({
+        message: "Cập nhật thất bại, lỗi server!",
+        duration: 1.5,
+      });
+    }
+  };
+
   const handleCancelModal = () => {
     modalForm.setFieldsValue({
       password: "",
       newPassword: "",
       confirmNewPassword: "",
     });
-    setIsModalOpen(false);
+    setIsModalChangePassword(false);
   };
 
   return (
@@ -184,13 +220,47 @@ const ProfilePages = () => {
                 >
                   <Row>
                     <Col xl={8} lg={8} md={8} sm={24} xs={24}>
-                      <div className={cx("profile__avatar")}>
-                        <AvatarIcon className={cx("profile__icon")} />
+                      <div
+                        className={cx("profile__avatar")}
+                        onClick={() => setIsModalChangeAvatar(true)}
+                      >
+                        {userInfo?.avatar ? (
+                          <img
+                            className={cx("profile__img")}
+                            src={userInfo?.avatar}
+                          />
+                        ) : (
+                          <img
+                            className={cx(
+                              "profile__img",
+                              "profile__img--fallback"
+                            )}
+                            src={fallbackAvatar}
+                          />
+                        )}
+                        <FaCamera className={cx("profile__upload--icon")} />
                       </div>
                       <div className={cx("profile__username")}>
                         {userInfo?.account}
                       </div>
                     </Col>
+
+                    <Modal
+                      title="Upload Avatar"
+                      open={isModalChangeAvatar}
+                      onCancel={() => {
+                        setIsModalChangeAvatar(false);
+                      }}
+                      onOk={() => {
+                        dataUpload && handleUpdateAvatar();
+                        setIsModalChangeAvatar(false);
+                      }}
+                    >
+                      <UploadImg
+                        defaultUrl={userInfo?.avatar}
+                        onChangeUrl={(value) => setDataUpload(value)}
+                      />
+                    </Modal>
 
                     <Col xl={16} lg={16} md={16} sm={24} xs={24}>
                       <Row gutter={16}>
@@ -409,15 +479,17 @@ const ProfilePages = () => {
                         >
                           <button
                             className={cx("btn-change", "profile__button")}
-                            onClick={handleShowModal}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleShowModal();
+                            }}
                           >
                             Đổi mật khẩu
                           </button>
 
                           <Modal
                             className={cx("profile__modal")}
-                            open={isModalOpen}
-                            // onOk={handleOkModal}
+                            open={isModalChangePassword}
                             onCancel={handleCancelModal}
                             footer={[
                               <Button

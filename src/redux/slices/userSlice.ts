@@ -63,7 +63,7 @@ export const requestGetUserFromToken = createAsyncThunk(
 
 export const requestUpdateUserInfo = createAsyncThunk(
   "user/updateUserInfo",
-  async (props: { token: any; userInfo: UserInfo }) => {
+  async (props: { token: any; userInfo: any }) => {
     const res = await apiUpdateUser(props);
     return res.data;
   }

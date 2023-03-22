@@ -965,7 +965,7 @@ const LearningPages = () => {
                       <div className={cx("game__view")} key={index}>
                         <div className={cx("game__view--question")}>
                           <div className={cx("game__view--question-index")}>
-                            <span>{qs.index}.&nbsp;</span>
+                            <span>{index + 1}.&nbsp;</span>
                           </div>
                           <div className={cx("game__view--question-text")}>
                             <div

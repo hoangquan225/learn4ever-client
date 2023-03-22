@@ -38,6 +38,7 @@ import TinyMCEEditor from "../TinyMCE";
 import styles from "./comment.module.scss";
 import { RealtimeContext } from "../../App";
 import moment from "moment";
+import fallbackAvatar from "./../../assets/img/fallback-avt.jpg";
 
 const cx = classNames.bind(styles);
 
@@ -255,9 +256,7 @@ const FCComment = (props: CommentProps) => {
           {userInfo?.avatar ? (
             <Avatar src={userInfo?.avatar} />
           ) : (
-            <Avatar style={{ backgroundColor: "#fde3cf", color: "#f56a00" }}>
-              {userInfo?.name.charAt(0)}
-            </Avatar>
+            <Avatar src={fallbackAvatar} />
           )}
         </div>
         <div className={cx("comment__detail--cmtbody")}>
@@ -471,7 +470,18 @@ const FCComment = (props: CommentProps) => {
 
               <div className={cx("comment__cmtbox")}>
                 <div className={cx("comment__avt--wrapper")}>
-                  <AvatarIcon className={cx("comment__avt--fallback")} />
+                  {/* <AvatarIcon className={cx("comment__avt--fallback")} /> */}
+                  {userStates?.userInfo?.avatar ? (
+                    <Avatar
+                      className={cx("comment__avt")}
+                      src={userStates?.userInfo?.avatar}
+                    />
+                  ) : (
+                    <Avatar
+                      className={cx("comment__avt", "comment__avt--fallback")}
+                      src={fallbackAvatar}
+                    />
+                  )}
                 </div>
                 <div className={cx("comment__content--wrapper")}>
                   <div className={cx("comment__content--placeholder")}>
