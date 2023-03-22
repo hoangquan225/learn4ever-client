@@ -14,7 +14,7 @@ import { Fragment, memo, useContext, useEffect, useRef, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Editor } from "tinymce";
-import { apiLoadComments } from "../../api/comment";
+import { apiDeleteComment, apiLoadComments } from "../../api/comment";
 import reactionBuon from "../../assets/img/reactionBuon.svg";
 import reactionHaha from "../../assets/img/reactionHaha.svg";
 import reactionLike from "../../assets/img/reactionLike.svg";
@@ -91,6 +91,7 @@ const FCComment = (props: CommentProps) => {
   const [isTotalComment, setIsTotalComment] = useState(false);
   const [timeoutId, setTimeoutId] = useState<number>();
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  const [commentInfo, setCommentInfo] = useState<Comment>();
   const [keyRandom, setKeyRandom] = useState<string>();
   const [isEditor, setIsEditor] = useState<boolean>(false);
   const [idEditorComment, setIdEditorComment] = useState<string>();
@@ -182,18 +183,13 @@ const FCComment = (props: CommentProps) => {
     }
   };
 
-  const hanldeDeleteComment = async (idComment: string) => {
+  const hanldeDeleteComment = async (comment: Comment | undefined) => {
     try {
-      // const res = await dispatch(
-      //   requestUpdateComment(
-      //     new Comment({
-      //       id: idComment,
-      //       status: TTCSconfig.STATUS_PRIVATE,
-      //     })
-      //   )
-      // );
-      // unwrapResult(res);
       setIsDelete(false);
+      const res = await apiDeleteComment({
+        idComment: comment?.id || "",
+        idTopic: comment?.idTopic || "",
+      });
     } catch (error) {
       message.error("lỗi server, không gửi được comment");
     }
@@ -413,6 +409,7 @@ const FCComment = (props: CommentProps) => {
                                 ? items?.filter((o) => o?.key !== "0")
                                 : items?.filter((o) => o?.key === "0"),
                             onClick: ({ key }) => {
+                              setCommentInfo(comment);
                               onClickDropDown({ key, id, content });
                             },
                           }}
@@ -425,14 +422,6 @@ const FCComment = (props: CommentProps) => {
                         </Dropdown>
                       </button>
                     </span>
-                    <Modal
-                      open={isDelete}
-                      onOk={() => hanldeDeleteComment(id || "")}
-                      onCancel={() => setIsDelete(false)}
-                      mask={false}
-                    >
-                      <p>Bạn có chắc muốn xóa</p>
-                    </Modal>
                   </div>
                 </div>
               </div>
@@ -493,26 +482,26 @@ const FCComment = (props: CommentProps) => {
                           // keyMCE={`${Math.random()}`}
                           placeholder="Bạn có thắc mắc gì trong bài học này?"
                           height={300}
-                          onChange={(value: string) => {
-                            // Nếu timeoutId đã được đặt trước đó, hủy bỏ
-                            if (timeoutId) {
-                              window.clearTimeout(timeoutId);
-                            }
+                          // onChange={(value: string) => {
+                          //   // Nếu timeoutId đã được đặt trước đó, hủy bỏ
+                          //   if (timeoutId) {
+                          //     window.clearTimeout(timeoutId);
+                          //   }
 
-                            // Đặt timeout để gọi sau 2 giây
-                            setTimeoutId(
-                              window.setTimeout(() => {
-                                // console.log(`Kết quả: ${value}`);
+                          //   // Đặt timeout để gọi sau 2 giây
+                          //   setTimeoutId(
+                          //     window.setTimeout(() => {
+                          //       // console.log(`Kết quả: ${value}`);
 
-                                dataTopicActive.id &&
-                                  userStates.userInfo &&
-                                  realtime.writingComment({
-                                    idTopic: dataTopicActive.id || "",
-                                    userInfo: userStates.userInfo,
-                                  });
-                              }, 800)
-                            );
-                          }}
+                          //       dataTopicActive.id &&
+                          //         userStates.userInfo &&
+                          //         realtime.writingComment({
+                          //           idTopic: dataTopicActive.id || "",
+                          //           userInfo: userStates.userInfo,
+                          //         });
+                          //     }, 800)
+                          //   );
+                          // }}
                         />
                         <div className={cx("comment__content--action")}>
                           <button
@@ -553,6 +542,14 @@ const FCComment = (props: CommentProps) => {
               {commentStates.comments.map((comment, key) => {
                 return ItemComment(comment, key);
               })}
+              <Modal
+                open={isDelete}
+                onOk={() => hanldeDeleteComment(commentInfo)}
+                onCancel={() => setIsDelete(false)}
+                mask={false}
+              >
+                <p>Bạn có chắc muốn xóa</p>
+              </Modal>
             </div>
           </div>
         </Drawer>

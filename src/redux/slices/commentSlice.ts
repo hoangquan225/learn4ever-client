@@ -66,6 +66,16 @@ export const commentSlice = createSlice({
         state.total++;
       }
     },
+    deleteCommentSoket: (
+      state,
+      action: PayloadAction<{ id: string; idTopic: string }>
+    ) => {
+      const comments = [...state.comments];
+      state.comments = comments.filter(
+        (comment) => comment.id !== action.payload.id
+      );
+    },
+
     setComments: (state, action) => {
       const data = action.payload;
       state.comments = [...state.comments, ...data];
@@ -129,7 +139,8 @@ export const commentSlice = createSlice({
   },
 });
 
-export const { updateCommentSocket, setComments } = commentSlice.actions;
+export const { updateCommentSocket, setComments, deleteCommentSoket } =
+  commentSlice.actions;
 
 export const commentState = (state: RootState) => state.comment;
 

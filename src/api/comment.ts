@@ -21,3 +21,10 @@ export const apiSendReactionComment = async (payload: {
 }) => {
   return ApiConfig(EndPoint.SEND_REACTION_COMMENT, { payload });
 };
+
+export const apiDeleteComment = async (payload: {
+  idComment: string;
+  idTopic: string;
+}) => {
+  return ApiConfig(EndPoint.DELETE_COMMENT, { payload });
+};

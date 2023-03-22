@@ -484,6 +484,7 @@ const LearningPages = () => {
         realtime.joinComment({ idTopic: dataTopicActive?.id, userInfo });
       realtime.loadComment(dispatch);
       realtime.updateComment(dispatch);
+      realtime.deleteComment(dispatch);
     } catch (error) {
       // console.log(error);
       notification.error({

@@ -1,5 +1,8 @@
 import io from "socket.io-client";
-import { updateCommentSocket } from "../redux/slices/commentSlice";
+import {
+  deleteCommentSoket,
+  updateCommentSocket,
+} from "../redux/slices/commentSlice";
 import { Comment } from "../submodule/models/comment";
 import { UserInfo } from "../submodule/models/user";
 
@@ -56,6 +59,17 @@ export class SocketService {
     this.socket.on("update-comment", (data: { comment: Comment }) => {
       dispatch(updateCommentSocket(data.comment));
     });
+  };
+
+  deleteComment = (dispatch: any) => {
+    // console.log('hello');
+
+    this.socket.on(
+      "delete-comment",
+      (data: { id: string; idTopic: string }) => {
+        dispatch(deleteCommentSoket(data));
+      }
+    );
   };
 
   leaveComment = (props: { idTopic: string; userInfo: UserInfo }) => {
