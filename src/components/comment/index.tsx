@@ -272,24 +272,26 @@ const FCComment = (props: CommentProps) => {
                       value={valueEditor}
                       onChange={(value) => setValueCommentEditor(value)}
                     />
-                    <button
-                      className={cx("comment__content--btn", "cancel-btn")}
-                      onClick={() => {
-                        setIsEditor(false);
-                      }}
-                    >
-                      Huỷ
-                    </button>
-                    <button
-                      className={
-                        valueCommentEditor
-                          ? cx("comment__content--btn", "accept-btn")
-                          : cx("comment__content--btn", "disable-btn")
-                      }
-                      onClick={() => handleUpdateComment(comment)}
-                    >
-                      Lưu
-                    </button>
+                    <div className={cx("comment__content--action")}>
+                      <button
+                        className={cx("comment__content--btn", "cancel-btn")}
+                        onClick={() => {
+                          setIsEditor(false);
+                        }}
+                      >
+                        Huỷ
+                      </button>
+                      <button
+                        className={
+                          valueCommentEditor
+                            ? cx("comment__content--btn", "accept-btn")
+                            : cx("comment__content--btn", "disable-btn")
+                        }
+                        onClick={() => handleUpdateComment(comment)}
+                      >
+                        Lưu
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>

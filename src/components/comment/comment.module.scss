@@ -191,6 +191,16 @@
   color: #1c1e21;
   padding: 0.9rem 1.2rem;
   position: relative;
+
+  @include responsive(xs) {
+    max-width: 32rem;
+    min-width: 32rem;
+  }
+
+  @include responsive(sm) {
+    max-width: 46rem;
+    min-width: 46rem;
+  }
 }
 
 .comment__detail--heading {
