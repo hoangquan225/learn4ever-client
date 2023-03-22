@@ -9,6 +9,8 @@ import {
   notification,
   Row,
   Select,
+  Spin,
+  Upload,
 } from "antd";
 import classNames from "classnames/bind";
 import Footer from "../../components/footer";
@@ -38,8 +40,8 @@ import {
 import TTCSconfig from "../../submodule/common/config";
 import { encrypt } from "../../submodule/utils/crypto";
 import dayjs from "dayjs";
-import UploadImg from "../../components/UploadImg";
 import fallbackAvatar from "./../../assets/img/fallback-avt.jpg";
+import { apiUploadFile } from "../../api/upload";
 
 const cx = classNames.bind(styles);
 
@@ -48,8 +50,8 @@ const ProfilePages = () => {
   const dispatch = useAppDispatch();
   const [infoForm] = Form.useForm();
   const [modalForm] = Form.useForm();
-  const [isModalChangeAvatar, setIsModalChangeAvatar] = useState(false);
-  const [dataUpload, setDataUpload] = useState<string>();
+  const [avatarUrl, setAvatarUrl] = useState<string>();
+  const [isLoad, setIsLoad] = useState<boolean>(true);
 
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
@@ -134,6 +136,8 @@ const ProfilePages = () => {
     infoForm.validateFields().then(async (value) => {
       const cookie = Cookies.get("token");
       value.birth = value.birth?.valueOf();
+      value.avatar = avatarUrl;
+      console.log(value);
 
       try {
         const actionResult = await dispatch(
@@ -162,37 +166,37 @@ const ProfilePages = () => {
     });
   };
 
-  const handleUpdateAvatar = async () => {
-    const cookie = Cookies.get("token");
+  // const handleUpdateAvatar = async () => {
+  //   const cookie = Cookies.get("token");
 
-    try {
-      const actionResult = await dispatch(
-        requestUpdateUserInfo({
-          token: cookie,
-          userInfo: { avatar: dataUpload },
-        })
-      );
-      const res = unwrapResult(actionResult);
-      switch (res.status) {
-        case TTCSconfig.STATUS_SUCCESS:
-          return notification.success({
-            message: "Cập nhật thành công!",
-            duration: 1.5,
-          });
+  //   try {
+  //     const actionResult = await dispatch(
+  //       requestUpdateUserInfo({
+  //         token: cookie,
+  //         userInfo: { avatar: dataUpload },
+  //       })
+  //     );
+  //     const res = unwrapResult(actionResult);
+  //     switch (res.status) {
+  //       case TTCSconfig.STATUS_SUCCESS:
+  //         return notification.success({
+  //           message: "Cập nhật thành công!",
+  //           duration: 1.5,
+  //         });
 
-        case TTCSconfig.STATUS_FAIL:
-          return notification.warning({
-            message: "Cập nhật thất bại!",
-            duration: 1.5,
-          });
-      }
-    } catch (error) {
-      return notification.warning({
-        message: "Cập nhật thất bại, lỗi server!",
-        duration: 1.5,
-      });
-    }
-  };
+  //       case TTCSconfig.STATUS_FAIL:
+  //         return notification.warning({
+  //           message: "Cập nhật thất bại!",
+  //           duration: 1.5,
+  //         });
+  //     }
+  //   } catch (error) {
+  //     return notification.warning({
+  //       message: "Cập nhật thất bại, lỗi server!",
+  //       duration: 1.5,
+  //     });
+  //   }
+  // };
 
   const handleCancelModal = () => {
     modalForm.setFieldsValue({
@@ -220,23 +224,74 @@ const ProfilePages = () => {
                 >
                   <Row>
                     <Col xl={8} lg={8} md={8} sm={24} xs={24}>
-                      <div
-                        className={cx("profile__avatar")}
-                        onClick={() => setIsModalChangeAvatar(true)}
-                      >
+                      <div className={cx("profile__avatar")}>
                         {userInfo?.avatar ? (
-                          <img
-                            className={cx("profile__img")}
-                            src={userInfo?.avatar}
-                          />
-                        ) : (
-                          <img
-                            className={cx(
-                              "profile__img",
-                              "profile__img--fallback"
+                          <Upload
+                            className={cx("profile__avatar--upload")}
+                            customRequest={async (options) => {
+                              const { file } = options;
+                              try {
+                                setIsLoad(false);
+                                const res = await apiUploadFile(file);
+                                setAvatarUrl(res.data);
+                                setIsLoad(true);
+                              } catch (error: any) {
+                                notification.error({
+                                  message: "Lỗi server",
+                                  duration: 1.5,
+                                });
+                              }
+                            }}
+                            name="avatar"
+                            maxCount={1}
+                            accept="image/*"
+                            showUploadList={false}
+                          >
+                            {isLoad ? (
+                              <img
+                                className={cx("profile__img")}
+                                src={avatarUrl ? avatarUrl : userInfo?.avatar}
+                              />
+                            ) : (
+                              <div className={cx("profile__img--loading")}>
+                                <Spin />
+                              </div>
                             )}
-                            src={fallbackAvatar}
-                          />
+                          </Upload>
+                        ) : (
+                          <Upload
+                            className={cx("profile__avatar--upload")}
+                            customRequest={async (options) => {
+                              const { file } = options;
+                              try {
+                                const res = await apiUploadFile(file);
+                                setAvatarUrl(res.data);
+                              } catch (error: any) {
+                                notification.error({
+                                  message: "Lỗi server",
+                                  duration: 1.5,
+                                });
+                              }
+                            }}
+                            name="avatar"
+                            maxCount={1}
+                            accept="image/*"
+                            showUploadList={false}
+                          >
+                            {isLoad ? (
+                              <img
+                                className={cx(
+                                  "profile__img",
+                                  "profile__img--fallback"
+                                )}
+                                src={avatarUrl ? avatarUrl : fallbackAvatar}
+                              />
+                            ) : (
+                              <div className={cx("profile__img--loading")}>
+                                <Spin />
+                              </div>
+                            )}
+                          </Upload>
                         )}
                         <FaCamera className={cx("profile__upload--icon")} />
                       </div>
@@ -245,7 +300,7 @@ const ProfilePages = () => {
                       </div>
                     </Col>
 
-                    <Modal
+                    {/* <Modal
                       title="Upload Avatar"
                       open={isModalChangeAvatar}
                       onCancel={() => {
@@ -260,7 +315,7 @@ const ProfilePages = () => {
                         defaultUrl={userInfo?.avatar}
                         onChangeUrl={(value) => setDataUpload(value)}
                       />
-                    </Modal>
+                    </Modal> */}
 
                     <Col xl={16} lg={16} md={16} sm={24} xs={24}>
                       <Row gutter={16}>

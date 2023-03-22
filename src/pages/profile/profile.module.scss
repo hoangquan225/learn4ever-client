@@ -89,8 +89,37 @@
     height: 18rem;
   }
 
-  &:hover ~ .profile__upload--icon {
-    opacity: 1;
+  // &:hover ~ .profile__upload--icon {
+  //   opacity: 1;
+  // }
+}
+
+.profile__img--loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  height: 20rem;
+  width: 20rem;
+
+  background: rgba(0, 0, 0, 0.08);
+  position: relative;
+  cursor: pointer;
+  border-radius: 50%;
+
+  @include responsive(xs) {
+    width: 15rem;
+    height: 15rem;
+  }
+
+  @include responsive(sm) {
+    width: 16rem;
+    height: 16rem;
+  }
+
+  @include responsive(md) {
+    width: 18rem;
+    height: 18rem;
   }
 }
 
@@ -128,6 +157,12 @@
     align-items: center;
     justify-content: center;
     transform: scale(1) translate(-50%, -2%) !important;
+  }
+}
+
+.profile__avatar--upload {
+  &:hover ~ .profile__upload--icon {
+    opacity: 1;
   }
 }
 
