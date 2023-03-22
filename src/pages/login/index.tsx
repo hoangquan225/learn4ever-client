@@ -73,6 +73,7 @@ const LoginPages = () => {
           account: data.email,
           facebookId: data.id,
           avatar: data.picture,
+          email: data.email,
         })
       );
 

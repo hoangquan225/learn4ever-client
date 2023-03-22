@@ -19,6 +19,7 @@ export const apiLoginWithGoogle = (payload: {
   account: string;
   facebookId: string;
   avatar: string;
+  email: string;
 }) => {
   return ApiConfig(EndPoint.LOGIN_WITH_GOOGLE, { payload });
 };

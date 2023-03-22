@@ -46,6 +46,7 @@ export const requestLoginWithGoogle = createAsyncThunk(
     account: string;
     facebookId: string;
     avatar: string;
+    email: string;
   }) => {
     const res = await apiLoginWithGoogle(props);
     return res.data;
