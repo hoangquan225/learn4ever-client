@@ -341,7 +341,6 @@ const LearningPages = () => {
       if (
         !userInfo?.progess?.find((o) => o.idTopic === idTopic && o.status === 2)
       ) {
-        console.log("b");
         if (status) {
           const result = await dispatch(
             requestUpdateStudiedForUser({
@@ -486,7 +485,7 @@ const LearningPages = () => {
       realtime.loadComment(dispatch);
       realtime.updateComment(dispatch);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       notification.error({
         message: "lỗi server, không tải được dữ liệu",
         duration: 1.5,

@@ -129,7 +129,7 @@ const FCComment = (props: CommentProps) => {
       });
       dispatch(setComments(res.data.data));
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       notification.error({
         message: "lỗi server, không tải được dữ liệu",
         duration: 1.5,
@@ -259,6 +259,7 @@ const FCComment = (props: CommentProps) => {
             <Avatar src={fallbackAvatar} />
           )}
         </div>
+
         <div className={cx("comment__detail--cmtbody")}>
           <div className={cx("comment__detail--cmtinner")}>
             <div className={cx("comment__detail--cmtwrapper")}>
@@ -422,16 +423,16 @@ const FCComment = (props: CommentProps) => {
                             className={cx("comment__detail--moreicon")}
                           />
                         </Dropdown>
-
-                        <Modal
-                          open={isDelete}
-                          onOk={() => hanldeDeleteComment(id || "")}
-                          onCancel={() => setIsDelete(false)}
-                        >
-                          <p>Bạn có chắc muốn xóa</p>
-                        </Modal>
                       </button>
                     </span>
+                    <Modal
+                      open={isDelete}
+                      onOk={() => hanldeDeleteComment(id || "")}
+                      onCancel={() => setIsDelete(false)}
+                      mask={false}
+                    >
+                      <p>Bạn có chắc muốn xóa</p>
+                    </Modal>
                   </div>
                 </div>
               </div>
