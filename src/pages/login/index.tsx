@@ -67,7 +67,7 @@ const LoginPages = () => {
         requestLoginWithGoogle({
           name: data.name,
           account: data.email,
-          facebookId: data.id,
+          googleId: data.id,
           avatar: data.picture,
           email: data.email,
         })

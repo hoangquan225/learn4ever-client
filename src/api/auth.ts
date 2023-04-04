@@ -17,7 +17,7 @@ export const apiLogout = (payload: { idUser: string }) => {
 export const apiLoginWithGoogle = (payload: {
   name: string;
   account: string;
-  facebookId: string;
+  googleId: string;
   avatar: string;
   email: string;
 }) => {
