@@ -81,6 +81,7 @@ export const requestUpdateStudiedForUser = createAsyncThunk(
   "user/updateStudiedForUser",
   async (props: {
     idTopic: string;
+    idCourse: string;
     idUser: string;
     status?: number;
     timeStudy: number;

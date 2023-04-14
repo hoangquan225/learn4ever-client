@@ -137,7 +137,6 @@ const ProfilePages = () => {
       const cookie = Cookies.get("token");
       value.birth = value.birth?.valueOf();
       value.avatar = avatarUrl;
-      console.log(value);
 
       try {
         const actionResult = await dispatch(
