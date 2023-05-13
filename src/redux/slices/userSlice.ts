@@ -102,6 +102,9 @@ export const authSlice = createSlice({
     loadUserInfo: (state, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
     },
+    setLoadingCheckLogin: (state, action: PayloadAction<boolean>) => {
+      state.loadingCheckLogin = action.payload
+    }
   },
   extraReducers: (builder) => {
     /**
@@ -226,5 +229,5 @@ export const authSlice = createSlice({
 
 export const authState = (state: RootState) => state.authState;
 
-export const { loadUserInfo } = authSlice.actions;
+export const { loadUserInfo, setLoadingCheckLogin } = authSlice.actions;
 export default authSlice.reducer;
