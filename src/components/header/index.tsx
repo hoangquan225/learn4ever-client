@@ -8,7 +8,7 @@ import { Dropdown, MenuProps, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
-import { requestGetUserFromToken } from "../../redux/slices/userSlice";
+import { requestGetUserFromToken, setLoadingCheckLogin } from "../../redux/slices/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import {
   FaBars,
@@ -84,9 +84,13 @@ const Header = () => {
       },
       onClick: async () => {
         const cookie = Cookies.get("token");
+        if (!cookie) {
+          dispatch(setLoadingCheckLogin(false))
+          return
+        }
         try {
           const result = await dispatch(
-            requestGetUserFromToken({ token: cookie || "" })
+            requestGetUserFromToken({ token: cookie })
           );
 
           unwrapResult(result);

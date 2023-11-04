@@ -8,7 +8,7 @@ import Loading from "./components/loading";
 import ArrowToTop from "./helpers/ArrowToTop";
 import ScrollToTop from "./helpers/ScrollToTop";
 import { useAppDispatch, useAppSelector } from "./redux/hook";
-import { requestGetUserFromToken } from "./redux/slices/userSlice";
+import { requestGetUserFromToken, setLoadingCheckLogin } from "./redux/slices/userSlice";
 import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 
@@ -39,9 +39,13 @@ function App() {
 
   const checkLogin = async () => {
     const cookie = Cookies.get("token");
+    if (!cookie) {
+      dispatch(setLoadingCheckLogin(false))
+      return
+    }
     try {
       const result = await dispatch(
-        requestGetUserFromToken({ token: cookie || "" })
+        requestGetUserFromToken({ token: cookie })
       );
       unwrapResult(result);
     } catch (error) {
