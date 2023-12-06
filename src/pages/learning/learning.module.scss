@@ -713,7 +713,7 @@
   }
 }
 
-.learning__footer--btn-next {
+.learning__footer--btn {
   border: 0.2rem solid var(--primaryColor);
   border-radius: 0.6rem;
   color: var(--primaryColor);
@@ -730,6 +730,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  width: 140px;
 
   & > span {
     padding: 0.8rem;
@@ -737,7 +738,12 @@
 
   &:hover {
     opacity: 0.8;
+    transform: translateY(-0.2rem);
   }
+
+  // &:active {
+  //   transform: translateY(0);
+  // }
 }
 
 .learning__footer--toggle {
@@ -910,9 +916,21 @@
         margin: 0 !important;
       }
     }
+
+    @include responsive(xs) {
+      padding: 1.6rem 0.8rem !important;
+    }
   }
 
   & > div > div:nth-child(2) {
     padding: 0 0 0 4rem !important;
+
+    @include responsive(xs) {
+      padding: 0 0 0 1.6rem !important;
+    }
+
+    @include responsive(sm) {
+      padding: 0 0 0 2.4rem !important;
+    }
   }
 }

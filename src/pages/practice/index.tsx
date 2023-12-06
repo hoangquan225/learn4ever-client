@@ -84,26 +84,43 @@ const PracticePages = () => {
   const [idQuestion, setIdQuestion] = useState<string>();
   const [timeCoundown, setTimeCoundown] = useState<number>(moment().valueOf());
   const [timeRemake, setTimeRemake] = useState<any>(0);
-
+  const [progress, setProgress] = useState<any[]>([]);
+  const [submitted, setSubmitted] = useState(false);
   const timePratice = useRef<any>();
   const { Countdown } = Statistic;
+
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
+
     return () => {
       window.removeEventListener("scroll", handleClockStick);
     };
   }, []);
 
   useEffect(() => {
-    if (userInfo?.progess?.find((o) => o.idTopic === params.idChild)) {
-      userInfo?.progess?.find(
-        (o) => o.idTopic === params.idChild && setSelectedQuestions(o.answers)
+    loadQuestionByTopic(params.idChild || "", 1);
+    loadCourse(params.slugChild || "");
+    loadTopicById(params.idChild || "");
+  }, [params.idChild, params.slugChild]);
+
+  useEffect(() => {
+    let progress;
+    if (params.id) {
+      const arg = params.id.split("-");
+      progress = { ...userInfo?.progress }[arg[0]];
+      setProgress({ ...userInfo?.progress }[arg[0]]);
+    }
+
+    if (progress?.find((o) => o.idTopic === params.idChild)) {
+      progress?.find(
+        (o) =>
+          o.idTopic === params.idChild && setSelectedQuestions(o.answers || [])
       );
       // setTimeRemake(
-      //   userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.timeStudy
+      //   progress?.find((o) => o.idTopic === params.idChild)?.timeStudy
       // );
       setStatusLearn(
-        userInfo?.progess?.find((o) => o.idTopic === params.idChild)?.status
+        progress?.find((o) => o.idTopic === params.idChild)?.status
       );
       setIsReview(true);
       setCorrect(0);
@@ -114,13 +131,7 @@ const PracticePages = () => {
       setIsReview(false);
       setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
     }
-  }, [params.idChild, userInfo, topic?.id]);
-
-  useEffect(() => {
-    loadQuestionByTopic(params.idChild || "", 1);
-    loadCourse(params.slugChild || "");
-    loadTopicById(params.idChild || "");
-  }, [params.idChild, params.slugChild]);
+  }, [params.idChild, userInfo, topic?.id, params.id]);
 
   // useEffect(() => {
   //   if (!isReview) {
@@ -132,6 +143,18 @@ const PracticePages = () => {
   //     };
   //   }
   // }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue =
+        "Bạn có chắc chắn muốn rời khỏi trang này? Dữ liệu chưa được lưu.";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -151,6 +174,8 @@ const PracticePages = () => {
   };
 
   const handleClockStick = () => {
+    console.log("handleClockStick");
+
     if (window !== undefined) {
       let windowHeight = window.scrollY;
       windowHeight > 180
@@ -195,9 +220,11 @@ const PracticePages = () => {
 
   const handleSubmitOk = async () => {
     try {
+      setSubmitted(true);
       const result = await dispatch(
         requestUpdateStudiedForUser({
           idTopic: topic?.id || "",
+          idCourse: course?.id || "",
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNED,
           timeStudy: timePratice.current,
@@ -221,6 +248,7 @@ const PracticePages = () => {
       const result = await dispatch(
         requestUpdateStudiedForUser({
           idTopic: topic?.id || "",
+          idCourse: course?.id || "",
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNING,
           timeStudy: timePratice.current,
@@ -680,7 +708,7 @@ const PracticePages = () => {
                       {isReview &&
                         statusLearn === TTCSconfig.STATUS_LEARNED && (
                           <div className={cx("practice__palette--review")}>
-                            {userInfo?.progess?.map(
+                            {progress?.map(
                               (o, i) =>
                                 o.idTopic === topic?.id && (
                                   <div key={i}>
@@ -900,7 +928,7 @@ const PracticePages = () => {
                     <div className={cx("practice__palette--body")}>
                       {isReview && (
                         <div className={cx("practice__palette--review")}>
-                          {userInfo?.progess?.map(
+                          {progress?.map(
                             (o, i) =>
                               o.idTopic === topic?.id && (
                                 <div key={i}>
@@ -934,7 +962,7 @@ const PracticePages = () => {
                                         Câu đúng
                                       </span>
                                       <span style={{ fontSize: "2.2rem" }}>
-                                        {o.correctQuestion}
+                                        {o.correctQuestion || 0}
                                       </span>
                                     </Col>
                                     <Col
