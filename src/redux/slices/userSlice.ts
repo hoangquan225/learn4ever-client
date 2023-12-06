@@ -214,9 +214,6 @@ export const authSlice = createSlice({
       }
     );
 
-    /**
-     * updateStudiedUser
-     */
     builder.addCase(requestUpdateStudiedForUser.pending, (state) => {
       state.loading = true;
     });
