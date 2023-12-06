@@ -110,6 +110,16 @@ const LearningPages = () => {
   });
   const [progress, setProgress] = useState<any[]>([]);
   const videoPlayerRef = useRef<any>(null);
+  const [indexTopicChild, setIndexTopicChild] = useState<any>();
+
+  const listIndexTopic = topics.reduce((result: any, topic) => {
+    topic.topicChildData.forEach((data: Topic) => {
+      if (data.status === 1) {
+        result.push(data.id);
+      }
+    });
+    return result;
+  }, []);
 
   useEffect(() => {
     if (params.id) {
@@ -295,6 +305,7 @@ const LearningPages = () => {
       const res = await apiLoadTopicById({ id });
       setDataTopicActive(res.data);
       setIsExercise(true);
+      setIndexTopicChild(id);
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -303,6 +314,22 @@ const LearningPages = () => {
     }
     if (screenSize.width < 992) {
       setIsShowSider(false);
+    }
+  };
+
+  const handlePrevTopic = () => {
+    let targetIndex = listIndexTopic.indexOf(indexTopicChild);
+    if (targetIndex > 0 && targetIndex !== -1) {
+      const beforeValue = listIndexTopic[targetIndex - 1];
+      handleChangeTopic(beforeValue);
+    }
+  };
+
+  const handleNextTopic = () => {
+    let targetIndex = listIndexTopic.indexOf(indexTopicChild);
+    if (targetIndex < listIndexTopic.length - 1 && targetIndex !== -1) {
+      const afterValue = listIndexTopic[targetIndex + 1];
+      handleChangeTopic(afterValue);
     }
   };
 
@@ -1073,12 +1100,18 @@ const LearningPages = () => {
         {/* FOOTER */}
         <div className={cx("learning__footer")}>
           <div className={cx("learning__footer--wrapper")}>
-            <button className={cx("learning__footer--btn-prev")}>
+            <button
+              className={cx("learning__footer--btn")}
+              onClick={handlePrevTopic}
+            >
               <FaChevronLeft className={cx("learning__footer--btn-icon")} />
               <span>BÀI TRƯỚC</span>
             </button>
 
-            <button className={cx("learning__footer--btn-next")}>
+            <button
+              className={cx("learning__footer--btn")}
+              onClick={handleNextTopic}
+            >
               <span>BÀI TIẾP</span>
               <FaChevronRight className={cx("learning__footer--btn-icon")} />
             </button>

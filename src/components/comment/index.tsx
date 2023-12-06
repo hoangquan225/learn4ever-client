@@ -373,6 +373,8 @@ const FCComment = (props: CommentProps) => {
                               )
                         }
                         onClick={() => {
+                          console.log({ typeof: typeof typeReaction });
+
                           typeof typeReaction !== "undefined"
                             ? handleSendReactionComment(typeReaction, id)
                             : handleSendReactionComment(0, id);

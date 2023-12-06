@@ -713,7 +713,7 @@
   }
 }
 
-.learning__footer--btn-next {
+.learning__footer--btn {
   border: 0.2rem solid var(--primaryColor);
   border-radius: 0.6rem;
   color: var(--primaryColor);
@@ -730,6 +730,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  width: 140px;
 
   & > span {
     padding: 0.8rem;
@@ -737,7 +738,12 @@
 
   &:hover {
     opacity: 0.8;
+    transform: translateY(-0.2rem);
   }
+
+  // &:active {
+  //   transform: translateY(0);
+  // }
 }
 
 .learning__footer--toggle {
