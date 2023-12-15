@@ -741,9 +741,9 @@
     transform: translateY(-0.2rem);
   }
 
-  // &:active {
-  //   transform: translateY(0);
-  // }
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .learning__footer--toggle {

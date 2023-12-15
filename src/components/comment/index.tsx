@@ -7,6 +7,7 @@ import {
   message,
   Modal,
   notification,
+  Tabs,
   Tooltip,
 } from "antd";
 import classNames from "classnames/bind";
@@ -235,11 +236,29 @@ const FCComment = (props: CommentProps) => {
     }
   };
 
-  const ItemComment = (comment: Comment, key: number) => {
+  const ItemComment = (props: { comment: Comment; index: number }) => {
+    const { comment, index } = props;
     const { userInfo, content, react, id } = comment;
+    const [uniqueReactTypes, setUniqueReactTypes] = useState<number[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const typeReaction = react?.find(
       (o) => o.idUser === userStates.userInfo?._id
     )?.type;
+    const showModal = () => {
+      setIsModalOpen(true);
+    };
+    const handleCancel = () => {
+      setIsModalOpen(false);
+    };
+
+    react?.map((item) => {
+      const typeExists = uniqueReactTypes.includes(item.type);
+      if (!typeExists) {
+        setUniqueReactTypes([...uniqueReactTypes, item.type]);
+      }
+    });
+
     const diffSeconds = moment().diff(comment.createDate, "seconds");
     const diffMinutes = moment().diff(comment.createDate, "minutes");
     const diffHours = moment().diff(comment.createDate, "hours");
@@ -247,7 +266,7 @@ const FCComment = (props: CommentProps) => {
     const diffMonths = moment().diff(comment.createDate, "months");
 
     return (
-      <div className={cx("comment__detail")} key={key}>
+      <div className={cx("comment__detail")} key={index}>
         <div className={cx("comment__avt--wrapper")}>
           {userInfo?.avatar ? (
             <Avatar src={userInfo?.avatar} />
@@ -310,14 +329,20 @@ const FCComment = (props: CommentProps) => {
                     <FaChevronUp className={cx("comment__detail--icon")} />
                   </div> */}
                     {react && react?.length > 0 && (
-                      <div className={cx("comment__detail--react")}>
+                      <div
+                        className={cx("comment__detail--react")}
+                        onClick={showModal}
+                      >
                         <Avatar.Group
                           maxCount={7}
                           className={cx("comment__detail--reactGroup")}
                           size={20}
+                          key={index}
                         >
-                          {react?.map((item) => {
-                            return <Avatar src={ReactType[item.type].icon} />;
+                          {uniqueReactTypes?.map((item, index) => {
+                            return (
+                              <Avatar key={index} src={ReactType[item].icon} />
+                            );
                           })}
                         </Avatar.Group>
                         <div className={cx("comment__detail--reactNum")}>
@@ -432,6 +457,56 @@ const FCComment = (props: CommentProps) => {
             </div>
           </div>
         </div>
+        <Modal
+          title={null}
+          open={isModalOpen}
+          onCancel={handleCancel}
+          footer={null}
+          style={{ top: "40%", height: "400px", maxHeight: "400px" }}
+        >
+          <Tabs
+            defaultActiveKey="0"
+            items={[
+              {
+                label: (
+                  <div
+                    style={{
+                      color: "rgb(32, 120, 244)",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Tất cả &nbsp;
+                    {react?.length}
+                  </div>
+                ),
+                key: "0",
+                children: react?.map((a) => (
+                  <div key={a.idUser}>{a.idUser}</div>
+                )),
+              },
+              ...uniqueReactTypes?.map((item, i) => {
+                return {
+                  label: (
+                    <div>
+                      <Avatar
+                        size={"small"}
+                        key={i + 1}
+                        src={ReactType[item].icon}
+                      />{" "}
+                      &nbsp;
+                      {react?.filter((a) => a.type === item).length}
+                    </div>
+                  ),
+                  key: `${i + 1}`,
+                  children: react
+                    ?.filter((a) => a.type === item)
+                    .map((a) => <div key={a.idUser}>{a.idUser}</div>),
+                };
+              }),
+            ]}
+          />
+        </Modal>
       </div>
     );
   };
@@ -543,8 +618,11 @@ const FCComment = (props: CommentProps) => {
                 </div>
               </div>
 
-              {commentStates.comments.map((comment, key) => {
-                return ItemComment(comment, key);
+              {commentStates.comments.map((comment, index) => {
+                // return ItemComment(comment, key)
+                return (
+                  <ItemComment comment={comment} index={index} key={index} />
+                );
               })}
               <Modal
                 open={isDelete}
