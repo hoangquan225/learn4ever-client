@@ -12,11 +12,7 @@ import React, { useEffect } from "react";
 
 import styles from "./register.module.scss";
 import classNames from "classnames/bind";
-import {
-  EmailRegExp,
-  isValidPhone,
-  PhoneRegExp,
-} from "../../submodule/utils/validation";
+import { EmailRegExp } from "../../submodule/utils/validation";
 import { encrypt } from "../../submodule/utils/crypto";
 import TTCSconfig from "../../submodule/common/config";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
 import Cookies from "js-cookie";
 import { classes, genders } from "../../utils/contants";
+import { FaArrowLeft } from "react-icons/fa";
 
 const cx = classNames.bind(styles);
 
@@ -44,6 +41,10 @@ const RegisterPages = () => {
       navigate(-1);
     }
   }, [userInfo]);
+
+  const backToHome = () => {
+    navigate("/");
+  };
 
   const handleRegister = async (data: any) => {
     const { confirm, ...rest } = data;
@@ -95,6 +96,9 @@ const RegisterPages = () => {
     <>
       <div className={cx("register__over")}>
         <div className={cx("register__wrapper")}>
+          <div className={cx("arrow__back")} onClick={backToHome}>
+            <FaArrowLeft />
+          </div>
           <h2 className={cx("register__title")}>Tạo tài khoản</h2>
           <Form
             name="register"

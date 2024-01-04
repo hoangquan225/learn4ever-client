@@ -16,11 +16,13 @@ import { encrypt } from "../../submodule/utils/crypto";
 import styles from "./login.module.scss";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
+import { FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 
 const cx = classNames.bind(styles);
 
 const LoginPages = () => {
+  const [user, setUser] = useState<any>();
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
@@ -35,7 +37,9 @@ const LoginPages = () => {
     }
   }, [userInfo]);
 
-  const [user, setUser] = useState<any>();
+  const backToHome = () => {
+    navigate("/");
+  };
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => setUser(codeResponse),
@@ -77,7 +81,7 @@ const LoginPages = () => {
       switch (res.loginCode) {
         case TTCSconfig.LOGIN_FAILED:
           return notification.error({
-            message: "Đăng ký thất bại",
+            message: "Đăng nhập thất bại",
             duration: 1.5,
           });
 
@@ -92,7 +96,7 @@ const LoginPages = () => {
       }
     } catch (err) {
       notification.error({
-        message: "Đăng ký thất bại, lỗi server",
+        message: "Đăng nhập thất bại, lỗi server",
         duration: 1.5,
       });
     }
@@ -158,6 +162,9 @@ const LoginPages = () => {
     <>
       <div className={cx("login__over")}>
         <div className={cx("login__wrapper")}>
+          <div className={cx("arrow__back")} onClick={backToHome}>
+            <FaArrowLeft />
+          </div>
           <h2 className={cx("login__title")}>Đăng Nhập</h2>
           <Form
             name="normal_login"

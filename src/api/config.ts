@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 
 export const PREFIX_API = process.env.REACT_APP_PREFIX_API;
@@ -21,6 +21,19 @@ axiosInstance.interceptors.request.use((config) => {
 
   return config;
 });
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response && error.response.status === 401) {
+      console.log("/login");
+      // const navigate = useNavigate();
+      // navigate("/dang-nhap");
+      window.location.href = "/dang-nhap"
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const ApiConfig = async (
   url: string,

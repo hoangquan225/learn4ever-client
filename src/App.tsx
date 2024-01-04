@@ -75,13 +75,14 @@ function App() {
               return isLoading ? (
                 <Route key={index} path={route.path} element={<Loading />} />
               ) : (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={
-                    userInfo?._id ? <Page /> : <Navigate to={"/dang-nhap"} />
-                  }
-                />
+                // <Route
+                //   key={index}
+                //   path={route.path}
+                //   element={
+                //     userInfo?._id ? <Page /> : <Navigate to={"/dang-nhap"} />
+                //   }
+                // />
+                <Route key={index} path={route.path} element={<Page />} />
               );
             })}
           </Routes>
