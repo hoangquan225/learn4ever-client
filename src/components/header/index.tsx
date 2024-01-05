@@ -8,7 +8,7 @@ import { Dropdown, MenuProps, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
-import { requestGetUserFromToken, setLoadingCheckLogin } from "../../redux/slices/userSlice";
+import { requestGetUserFromToken } from "../../redux/slices/userSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import {
   FaBars,
@@ -22,7 +22,6 @@ import {
   categoryState,
   requestLoadCategorys,
 } from "../../redux/slices/categorySlice";
-import { Category } from "../../submodule/models/category";
 import { apiLogout } from "../../api/auth";
 
 const cx = classNames.bind(styles);
@@ -39,12 +38,11 @@ const Header = () => {
 
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
-  const loading = categoryStates.loading;
 
   const handleLogout = useCallback(async () => {
     try {
       if (userInfo?._id) {
-        const res = apiLogout({ idUser: userInfo?._id });
+        apiLogout({ idUser: userInfo?._id });
       }
       Cookies.remove("token");
       window.location.href = "/";
@@ -54,7 +52,7 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    loadCategorys();
+    // loadCategorys();
   }, []);
 
   const loadCategorys = async () => {
@@ -64,7 +62,7 @@ const Header = () => {
           status: 1,
         })
       );
-      const res = unwrapResult(actionResult);
+      unwrapResult(actionResult);
     } catch (error) {
       notification.error({
         message: "không tải được danh sach danh mục",
@@ -83,22 +81,15 @@ const Header = () => {
         padding: "0.8rem",
       },
       onClick: async () => {
-        const cookie = Cookies.get("token");
-        if (!cookie) {
-          dispatch(setLoadingCheckLogin(false))
-          return
-        }
         try {
           const result = await dispatch(
-            requestGetUserFromToken({ token: cookie })
+            requestGetUserFromToken()
           );
-
           unwrapResult(result);
         } catch (error) {
-          if (cookie)
-            notification.error({
-              message: "Server đang bị lỗi",
-            });
+          notification.error({
+            message: "Server đang bị lỗi",
+          });
         }
       },
     },

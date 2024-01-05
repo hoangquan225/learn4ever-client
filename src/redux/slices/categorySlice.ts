@@ -10,6 +10,7 @@ import _ from "lodash";
 interface CategoryState {
   categorys: Category[];
   loading: boolean;
+  loadingCheckLogin: boolean;
   error: string;
   categoryInfo: Category | null;
   courses: Course[];
@@ -19,6 +20,7 @@ interface CategoryState {
 const initialState: CategoryState = {
   categorys: [],
   loading: false,
+  loadingCheckLogin: true,
   error: "",
   categoryInfo: null,
   courses: [],
@@ -46,7 +48,7 @@ export const categorySlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const actionList = [requestLoadCategorys, requestLoadCategoryBySlug];
+    const actionList = [requestLoadCategoryBySlug];
     actionList.forEach((action) => {
       builder.addCase(action.pending, (state) => {
         state.loading = true;
@@ -59,6 +61,9 @@ export const categorySlice = createSlice({
     });
 
     // load
+    builder.addCase(requestLoadCategorys.pending, (state) => {
+      state.loadingCheckLogin = true;
+    });
     builder.addCase(
       requestLoadCategorys.fulfilled,
       (
@@ -69,9 +74,13 @@ export const categorySlice = createSlice({
         }>
       ) => {
         state.loading = false;
+        state.loadingCheckLogin = false;
         state.categorys = _.orderBy(action.payload.data, ["index"], ["asc"]);
       }
     );
+    builder.addCase(requestLoadCategorys.rejected, (state) => {
+      state.loadingCheckLogin = false;
+    });
 
     // load by slug
     builder.addCase(
@@ -94,7 +103,7 @@ export const categorySlice = createSlice({
   },
 });
 
-export const {} = categorySlice.actions;
+export const { } = categorySlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const categoryState = (state: RootState) => state.category;

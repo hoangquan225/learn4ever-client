@@ -55,8 +55,8 @@ export const requestLoginWithGoogle = createAsyncThunk(
 
 export const requestGetUserFromToken = createAsyncThunk(
   "user/requestGetUserFromToken",
-  async (props: { token: string }) => {
-    const res = await apiGetUserFromToken(props.token);
+  async () => {
+    const res = await apiGetUserFromToken();
     return res.data;
   }
 );
@@ -101,7 +101,9 @@ export const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    loadUserInfo: (state, action: PayloadAction<UserInfo>) => {
+    loadUserInfo: (state, action: PayloadAction<UserInfo | null>) => {
+      console.log({ user: action.payload });
+
       state.userInfo = action.payload;
     },
     setLoadingCheckLogin: (state, action: PayloadAction<boolean>) => {

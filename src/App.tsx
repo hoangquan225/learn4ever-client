@@ -11,6 +11,8 @@ import { useAppDispatch, useAppSelector } from "./redux/hook";
 import { requestGetUserFromToken, setLoadingCheckLogin } from "./redux/slices/userSlice";
 import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes/routes";
+import { useAxios } from "./api/config";
+import { requestLoadCategorys } from "./redux/slices/categorySlice";
 
 export const RealtimeContext: React.Context<SocketService> = createContext(
   new SocketService()
@@ -23,42 +25,65 @@ function App() {
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
-  const isLoading = useAppSelector(
+  const isLoading1 = useAppSelector(
     (state: RootState) => state.authState.loadingCheckLogin
+  );
+  const isLoading = useAppSelector(
+    (state: RootState) => state.category.loadingCheckLogin
   );
 
   useLayoutEffect(() => {
     checkLogin();
+    loadCategorys();
   }, []);
+
+  function L4EHooks() {
+    useAxios()
+    return null
+  }
 
   useEffect(() => {
     if (userInfo) {
       realtime.joinSocket({ userInfo });
     }
   }, [userInfo]);
-
+  
   const checkLogin = async () => {
-    const cookie = Cookies.get("token");
-    if (!cookie) {
-      dispatch(setLoadingCheckLogin(false))
-      return
-    }
+    // const cookie = Cookies.get("token");
+    // if (!cookie) {
+    //   dispatch(setLoadingCheckLogin(false))
+    //   return
+    // }
     try {
       const result = await dispatch(
-        requestGetUserFromToken({ token: cookie })
+        requestGetUserFromToken()
       );
-      unwrapResult(result);
     } catch (error) {
-      if (cookie)
-        notification.error({
-          message: "Server đang bị lỗi",
-        });
+      notification.error({
+        message: "Server đang bị lỗi",
+      });
+    }
+  };
+
+  const loadCategorys = async () => {
+    try {
+      const actionResult = await dispatch(
+        requestLoadCategorys({
+          status: 1,
+        })
+      );
+      unwrapResult(actionResult);
+    } catch (error) {
+      notification.error({
+        message: "không tải được danh sach danh mục",
+      });
     }
   };
 
   return (
     <RealtimeContext.Provider value={realtime.init()}>
       <BrowserRouter>
+        <L4EHooks />
         <ScrollToTop />
         <div className="App">
           <Routes>
@@ -75,14 +100,14 @@ function App() {
               return isLoading ? (
                 <Route key={index} path={route.path} element={<Loading />} />
               ) : (
-                // <Route
-                //   key={index}
-                //   path={route.path}
-                //   element={
-                //     userInfo?._id ? <Page /> : <Navigate to={"/dang-nhap"} />
-                //   }
-                // />
-                <Route key={index} path={route.path} element={<Page />} />
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    userInfo?._id ? <Page /> : <Navigate to={"/dang-nhap"} />
+                  }
+                />
+                // <Route key={index} path={route.path} element={<Page />} />
               );
             })}
           </Routes>

@@ -2,11 +2,9 @@ import { ApiConfig } from "./config";
 import EndPoint from "../submodule/common/endpoint";
 import { UserInfo } from "../submodule/models/user";
 
-export const apiGetUserFromToken = (token: string) => {
+export const apiGetUserFromToken = () => {
   return ApiConfig(EndPoint.GET_USER_FROM_TOKEN, {
-    payload: {
-      token,
-    },
+
   });
 };
 
