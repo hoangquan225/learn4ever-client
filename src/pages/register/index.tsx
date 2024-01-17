@@ -7,7 +7,7 @@ import {
   UserOutlined,
   WomanOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, Row, Col, Select, notification } from "antd";
+import { Button, Form, Input, Row, Col, Select, notification, Tooltip } from "antd";
 import React, { useEffect } from "react";
 
 import styles from "./register.module.scss";
@@ -96,9 +96,11 @@ const RegisterPages = () => {
     <>
       <div className={cx("register__over")}>
         <div className={cx("register__wrapper")}>
-          <div className={cx("arrow__back")} onClick={backToHome}>
-            <FaArrowLeft />
-          </div>
+          <Tooltip placement="top" title="Quay lại Trang chủ">
+            <div className={cx("arrow__back")} onClick={backToHome}>
+              <FaArrowLeft />
+            </div>
+          </Tooltip>
           <h2 className={cx("register__title")}>Tạo tài khoản</h2>
           <Form
             name="register"

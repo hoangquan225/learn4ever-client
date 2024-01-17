@@ -11,6 +11,7 @@ interface CourseState {
   loading: boolean;
   error: string;
   course: Course | null;
+  option: any;
   topics: Topic[];
 }
 
@@ -19,12 +20,13 @@ const initialState: CourseState = {
   loading: false,
   error: "",
   course: null,
+  option: {},
   topics: [],
 };
 
 export const requestLoadCourseBySlug = createAsyncThunk(
   "course/requestLoadCourseBySlug",
-  async (props: { slug: string; status?: number }) => {
+  async (props: { slug: string; status?: number, isInfoTopic?: boolean }) => {
     const res = await apiLoadCourseBySlug(props);
     return res.data;
   }
@@ -56,16 +58,18 @@ export const courseSlice = createSlice({
         action: PayloadAction<{
           data: Course;
           status: number;
+          option: any;
         }>
       ) => {
         state.course = action.payload.data;
+        state.option = action.payload.option;
         state.loading = false;
       }
     );
   },
 });
 
-export const {} = courseSlice.actions;
+export const { } = courseSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const courseState = (state: RootState) => state.course;

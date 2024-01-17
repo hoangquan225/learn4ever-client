@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/js-cookie": "^3.0.1",
+    "@types/pubsub-js": "^1.8.6",
     "sass": "^1.56.1"
   },
   "scripts": {

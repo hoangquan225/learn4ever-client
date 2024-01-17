@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, notification } from "antd";
+import { Button, Checkbox, Form, Input, Tooltip, notification } from "antd";
 import { useEffect, useState } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
 import classNames from "classnames/bind";
@@ -162,9 +162,11 @@ const LoginPages = () => {
     <>
       <div className={cx("login__over")}>
         <div className={cx("login__wrapper")}>
-          <div className={cx("arrow__back")} onClick={backToHome}>
-            <FaArrowLeft />
-          </div>
+          <Tooltip placement="top" title="Quay lại Trang chủ">
+            <div className={cx("arrow__back")} onClick={backToHome}>
+              <FaArrowLeft />
+            </div>
+          </Tooltip>
           <h2 className={cx("login__title")}>Đăng Nhập</h2>
           <Form
             name="normal_login"

@@ -4,7 +4,7 @@ import styles from "./header.module.scss";
 import logo from "../../assets/img/logo.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { RootState } from "../../redux/store";
-import { Dropdown, MenuProps, notification } from "antd";
+import { Drawer, Dropdown, MenuProps, notification } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineUser } from "react-icons/ai";
@@ -116,14 +116,11 @@ const Header = () => {
     },
   ];
 
-  const handleNavbar = () => {
-    if (showNavbar === true) {
-      document.body.style.overflowY = "scroll";
-      setShowNavbar(!showNavbar);
-    } else {
-      document.body.style.overflowY = "hidden";
-      setShowNavbar(!showNavbar);
-    }
+  const openNavbar = () => {
+    setShowNavbar(true);
+  };
+  const onClose = () => {
+    setShowNavbar(false);
   };
 
   useEffect(() => {
@@ -212,12 +209,41 @@ const Header = () => {
 
               {/* MOBILE */}
               <div className={cx("navbar__icon--open")}>
-                <button className={cx("navbar__btn")} onClick={handleNavbar}>
+                <button className={cx("navbar__btn")} onClick={openNavbar}>
                   <FaBars className={cx("nav__icon")} />
                 </button>
               </div>
 
-              <div className={cx("navbar__sidebar")}>
+              <Drawer title="Danh mục" placement="left" onClose={onClose} open={showNavbar} closable={false} >
+                <div className={cx("navbar__sidebar")}>
+                  <div
+                    // className={
+                    //   showNavbar
+                    //     ? cx("navbar__list--mobile", "active")
+                    //     : cx("navbar__list--mobile")
+                    // }  
+                  >
+                    {categorys.length > 0 &&
+                      categorys?.map((data, index) => (
+                        <div key={index} className={cx("navbar__item--mobile")}>
+                          <div
+                            onClick={() => {
+                              navigate(`/${data.slug}`);
+                              onClose();
+                            }}
+                            className={cx("navbar__link--mobile")}
+                          >
+                            <div className={cx("navbar__title")}>
+                              <span>{data.name}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </Drawer>
+
+              {/* <div className={cx("navbar__sidebar")}>
                 <div
                   className={
                     showNavbar ? cx("overlay", "active") : cx("overlay")
@@ -257,7 +283,7 @@ const Header = () => {
                       </div>
                     ))}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <Link

@@ -1,7 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
-import { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
 import PubSub from 'pubsub-js';
 
 export const PREFIX_API = process.env.REACT_APP_PREFIX_API;

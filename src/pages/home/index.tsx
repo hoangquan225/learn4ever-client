@@ -20,6 +20,7 @@ const cx = classNames.bind(styles);
 const HomePages = () => {
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
+  const dispatch = useAppDispatch();
 
   const categoryList: Category[] = [];
   for (var key in categorys) {
@@ -27,27 +28,6 @@ const HomePages = () => {
       categoryList.push(categorys[key]);
     }
   }
-
-  const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   loadCategorys();
-  // }, []);
-
-  // const loadCategorys = async () => {
-  //   try {
-  //     const actionResult = await dispatch(
-  //       requestLoadCategorys({
-  //         status: 1,
-  //       })
-  //     );
-  //     const res = unwrapResult(actionResult);
-  //   } catch (error) {
-  //     notification.error({
-  //       message: "không tải được danh sach danh mục",
-  //     });
-  //   }
-  // };
 
   const PrevArrowCarousel = (props: any) => {
     const { className, style, onClick } = props;

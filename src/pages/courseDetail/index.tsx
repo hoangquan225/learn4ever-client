@@ -34,55 +34,55 @@ const CourseDetail = () => {
   const dispatch = useAppDispatch();
   const courseReducer = useAppSelector(courseState);
   const course = courseReducer.course;
+  const option = courseReducer.option;
   const loading = courseReducer.loading;
-  const topicStates = useAppSelector(topicState);
-  const topics = topicStates.topics;
-  const topicTotal = topicStates.total;
-  const [totalExam, setTotalExam] = useState<number>(0);
 
   useEffect(() => {
     loadCourse(params.slugChild || "");
   }, [params.slugChild]);
 
-  useEffect(() => {
-    if (course?.id) {
-      loadTopicByCourse(course?.id || "", 1);
-      loadTopicByCourse(course?.id || "", 2);
-    }
-  }, [course?.id]);
-
-  const loadTopicByCourse = async (
-    idCourse: string,
-    type: number,
-    parentId?: string
-  ) => {
-    try {
-      if (type === TTCSconfig.TYPE_LESSON) {
-        const result = await dispatch(
-          requestLoadTopicByCourse({
-            idCourse,
-            type,
-            parentId,
-            status: TTCSconfig.STATUS_PUBLIC,
-          })
-        );
-        unwrapResult(result);
-      } else {
-        const res = await apiLoadTopicByCourse({
-          idCourse,
-          type,
-          parentId,
-          status: TTCSconfig.STATUS_PUBLIC,
-        });
-        setTotalExam(res.data.total);
-      }
-    } catch (error) {
-      notification.error({
-        message: "server error!!",
-        duration: 1.5,
-      });
-    }
-  };
+  // const topicStates = useAppSelector(topicState);
+  // const topics = topicStates.topics;
+  // const topicTotal = topicStates.total;
+  // const [totalExam, setTotalExam] = useState<number>(0);
+  // useEffect(() => {
+  //   if (course?.id) {
+  //     loadTopicByCourse(course?.id || "", 1);
+  //     loadTopicByCourse(course?.id || "", 2);
+  //   }
+  // }, [course?.id]);
+  // const loadTopicByCourse = async (
+  //   idCourse: string,
+  //   type: number,
+  //   parentId?: string
+  // ) => {
+  //   try {
+  //     if (type === TTCSconfig.TYPE_LESSON) {
+  //       const result = await dispatch(
+  //         requestLoadTopicByCourse({
+  //           idCourse,
+  //           type,
+  //           parentId,
+  //           status: TTCSconfig.STATUS_PUBLIC,
+  //         })
+  //       );
+  //       unwrapResult(result);
+  //     } else {
+  //       const res = await apiLoadTopicByCourse({
+  //         idCourse,
+  //         type,
+  //         parentId,
+  //         status: TTCSconfig.STATUS_PUBLIC,
+  //       });
+  //       setTotalExam(res.data.total);
+  //     }
+  //   } catch (error) {
+  //     notification.error({
+  //       message: "server error!!",
+  //       duration: 1.5,
+  //     });
+  //   }
+  // };
 
   const loadCourse = async (slugChild: string) => {
     try {
@@ -90,6 +90,7 @@ const CourseDetail = () => {
         requestLoadCourseBySlug({
           slug: slugChild,
           status: TTCSconfig.STATUS_PUBLIC,
+          isInfoTopic: true
         })
       );
       unwrapResult(result);
@@ -180,7 +181,6 @@ const CourseDetail = () => {
                             </button>
                           </NavLink>
                         </Col>
-
                         <Col xl={24} lg={24} md={12} sm={24} xs={24}>
                           <NavLink
                             to={`de-kiem-tra/${course?.id}-2`}
@@ -201,37 +201,20 @@ const CourseDetail = () => {
                       <li className={cx("detail__item")}>
                         <FaFilm className={cx("detail__icon")} />
                         <span>
-                          Tổng số <strong>{topicTotal}</strong> bài học
+                          Tổng số <strong>{option?.totalLesson}</strong> bài học
                         </span>
                       </li>
                       <li className={cx("detail__item")}>
                         <FaClock className={cx("detail__icon")} />
                         <span>
                           Thời lượng{" "}
-                          <strong>
-                            {moment(
-                              topics
-                                ?.map((topic, i) =>
-                                  topic?.topicChildData.reduce(
-                                    (accumulator, currentValue) =>
-                                      accumulator +
-                                      Number(currentValue.timeExam),
-                                    0
-                                  )
-                                )
-                                .reduce(
-                                  (accumulator, currentValue) =>
-                                    accumulator + currentValue,
-                                  0
-                                ) * 1000
-                            ).format("mm:ss")}
-                          </strong>
+                          <strong>{option?.totalTime}</strong>
                         </span>
                       </li>
                       <li className={cx("detail__item")}>
                         <FaPencilRuler className={cx("detail__icon")} />
                         <span>
-                          <strong>{totalExam}</strong> Đề kiểm tra
+                          <strong>{option?.totalTest}</strong> Đề kiểm tra
                         </span>
                       </li>
                       <li className={cx("detail__item")}>
@@ -246,7 +229,6 @@ const CourseDetail = () => {
           </div>
         </div>
       </div>
-
       <Footer />
     </>
   );

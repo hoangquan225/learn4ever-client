@@ -41,7 +41,7 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
 } from "react-icons/io5";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { apiLoadTopicById } from "../../api/topic";
 import { RealtimeContext } from "../../App";
 import logo from "../../assets/img/learn4ever-icon.png";
@@ -132,10 +132,13 @@ const LearningPages = () => {
       }
     }
     loadCourse(params.slugChild || "");
-    // if (topics.length) {
-    //   handleChangeTopic(topics[0]?.topicChild[0]);
-    // }
   }, [params.slugChild, params.id]);
+  
+  useEffect(() => {
+    if (listIndexTopic.length) {
+      handleChangeTopic(listIndexTopic[0]);
+    }
+  }, [topics]);
 
   useEffect(() => {
     if (course?.id && userInfo?._id) {
@@ -540,9 +543,12 @@ const LearningPages = () => {
               />
             </Link>
 
-            <div className={cx("learning__header--title")}>
+            <NavLink
+              to={`/${course?.category?.slug}/${course?.slug}`}
+              className={cx("learning__header--title")}
+            >
               {course?.courseName}
-            </div>
+            </NavLink>
 
             {!loading && (
               <div className={cx("learning__header--progress")}>
@@ -1167,7 +1173,7 @@ const LearningPages = () => {
               placement={"right"}
               open={isCommentOpen}
               onClose={handleCloseComment}
-              width={screenSize.width >= 768 ? "100vh" : "100%"}
+              width={screenSize.width >= 768 ? "80vh" : "100%"}
               zIndex={6}
               dataTopicActive={dataTopicActive}
             />
