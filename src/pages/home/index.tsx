@@ -14,6 +14,15 @@ import { BiChevronRight } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Category } from "../../submodule/models/category";
 import Chatbot from "../../components/chatbot";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import bannerImg from "../../assets/img/banner.webp";
+import bannerImg1 from "../../assets/img/banner1.webp";
+import bannerImg2 from "../../assets/img/banner2.webp";
+import bannerImg3 from "../../assets/img/banner3.webp";
+import bannerImg4 from "../../assets/img/banner4.webp";
+import bannerImg5 from "../../assets/img/banner5.webp";
+import bannerImg6 from "../../assets/img/banner6.webp";
 
 const cx = classNames.bind(styles);
 
@@ -67,7 +76,45 @@ const HomePages = () => {
     <>
       <div className={cx("home")}>
         <Header />
-        <Banner1 />
+        {/* <Banner1 /> */}
+        <Swiper
+          modules={[Navigation, Pagination, Scrollbar, A11y]}
+          navigation
+          pagination={{ clickable: true }}
+          scrollbar={{ draggable: true }}
+        >
+          <SwiperSlide> 
+            <a href="/lop-12">
+              <img src={bannerImg1} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide>
+          <SwiperSlide>
+            <a href="/de-thi-thu">
+              <img src={bannerImg2} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide>
+          {/* <SwiperSlide>
+            <a href="/tai-lieu">
+              <img src={bannerImg3} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide> */}
+          <SwiperSlide>
+            <a href="/lop-11">
+              <img src={bannerImg4} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide>
+          <SwiperSlide> 
+            <a href="/lop-10">
+              <img src={bannerImg5} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide>
+          <SwiperSlide> 
+            <a href="#">
+              <img src={bannerImg6} alt="bannerimage" className={cx("banner-img")} />
+            </a>
+          </SwiperSlide>
+        </Swiper>
+        
         <Chatbot />
         <div className={cx("category")}>
           <div className={cx("category__container")}>

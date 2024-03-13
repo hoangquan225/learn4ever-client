@@ -57,21 +57,22 @@ export const questionSlice = createSlice({
           total: number;
         }>
       ) => {
-        state.questions = _.orderBy(
-          action.payload.data,
-          ["index"],
-          ["asc"]
-        ).map((question) => {
-          return {
-            ...question,
-            answer: _.orderBy(question.answer, ["index"], ["asc"]).map(
-              (answer, index) => ({
-                ...answer,
-                index,
-              })
-            ),
-          };
-        });
+        // state.questions = _.orderBy(
+        //   action.payload.data,
+        //   ["index"],
+        //   ["asc"]
+        // ).map((question) => {
+        //   return {
+        //     ...question,
+        //     answer: _.orderBy(question.answer, ["index"], ["asc"]).map(
+        //       (answer, index) => ({
+        //         ...answer,
+        //         index,
+        //       })
+        //     ),
+        //   };
+        // });
+        state.questions = action.payload.data
         state.total = action.payload.total;
         state.loading = false;
       }
@@ -79,7 +80,7 @@ export const questionSlice = createSlice({
   },
 });
 
-export const {} = questionSlice.actions;
+export const { } = questionSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const QuestionState = (state: RootState) => state.question;

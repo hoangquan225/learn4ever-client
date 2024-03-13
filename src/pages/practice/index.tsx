@@ -52,6 +52,7 @@ import TTCSconfig from "../../submodule/common/config";
 import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
 import moment from "moment";
+import _ from "lodash";
 
 const cx = classNames.bind(styles);
 
@@ -91,7 +92,6 @@ const PracticePages = () => {
 
   useEffect(() => {
     window.addEventListener("scroll", handleClockStick);
-
     return () => {
       window.removeEventListener("scroll", handleClockStick);
     };
@@ -104,34 +104,36 @@ const PracticePages = () => {
   }, [params.idChild, params.slugChild]);
 
   useEffect(() => {
-    let progress;
-    if (params.id) {
-      const arg = params.id.split("-");
-      progress = { ...userInfo?.progress }[arg[0]];
-      setProgress({ ...userInfo?.progress }[arg[0]]);
+    if(isReview) {
+      let progress;
+      if (params.id) {
+        const arg = params.id.split("-");
+        progress = { ...userInfo?.progress }[arg[0]];
+        setProgress({ ...userInfo?.progress }[arg[0]]);
+      }
+      if (progress?.find((o) => o.idTopic === params.idChild)) {
+        progress?.find(
+          (o) =>
+            o.idTopic === params.idChild && setSelectedQuestions(o.answers || [])
+        );
+        // setTimeRemake(
+        //   progress?.find((o) => o.idTopic === params.idChild)?.timeStudy
+        // );
+        setStatusLearn(
+          progress?.find((o) => o.idTopic === params.idChild)?.status
+        );
+        // setIsReview(true);
+        setCorrect(0);
+        setCorrectQuestions([]);
+        console.log({selectedQuestions});
+      } else {
+        setStatusLearn(0);
+        setSelectedQuestions([]);
+        // setIsReview(false);
+        setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
+      }
     }
-
-    if (progress?.find((o) => o.idTopic === params.idChild)) {
-      progress?.find(
-        (o) =>
-          o.idTopic === params.idChild && setSelectedQuestions(o.answers || [])
-      );
-      // setTimeRemake(
-      //   progress?.find((o) => o.idTopic === params.idChild)?.timeStudy
-      // );
-      setStatusLearn(
-        progress?.find((o) => o.idTopic === params.idChild)?.status
-      );
-      setIsReview(true);
-      setCorrect(0);
-      setCorrectQuestions([]);
-    } else {
-      setStatusLearn(0);
-      setSelectedQuestions([]);
-      setIsReview(false);
-      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
-    }
-  }, [params.idChild, userInfo, topic?.id, params.id]);
+  }, [params.idChild, topic?.id, params.id, userInfo]);
 
   // useEffect(() => {
   //   if (!isReview) {
@@ -234,6 +236,7 @@ const PracticePages = () => {
         })
       );
       unwrapResult(result);
+      // handleReview()
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -242,6 +245,30 @@ const PracticePages = () => {
     }
     setIsOpenModelSubmit(false);
   };
+
+
+  const handleReview = () => {
+    let progress;
+    if (params.id) {
+      const arg = params.id.split("-");
+      progress = { ...userInfo?.progress }[arg[0]];
+      setProgress({ ...userInfo?.progress }[arg[0]]);
+    }
+    
+    if (progress?.find((o) => o.idTopic === params.idChild)) {
+      progress?.find(
+        (o) =>
+          o.idTopic === params.idChild && setSelectedQuestions(o.answers || [])
+      );
+      setStatusLearn(
+        progress?.find((o) => o.idTopic === params.idChild)?.status
+      );
+      setIsReview(true);
+      setCorrect(0);
+      setCorrectQuestions([]);
+      console.log({selectedQuestions});
+    } 
+  }
 
   const handleLoadPage = async () => {
     try {
@@ -328,6 +355,7 @@ const PracticePages = () => {
 
   const handleReviewExam = () => {
     if (statusLearn === TTCSconfig.STATUS_LEARNED) {
+      loadQuestionByTopic(params.idChild || "", 1);
       setSelectedQuestions([]);
       setStatusLearn(0);
       setIsOpenReviewExam(false);
@@ -421,6 +449,7 @@ const PracticePages = () => {
                     <span className={cx("practice__clock--time")}>
                       {/* {!isReview && ( */}
                       <Countdown
+                        // value={timeCoundown }
                         value={!isReview ? timeCoundown : 0}
                         onFinish={handleSubmitOk}
                         onChange={(val: StatisticProps["value"]) => {
@@ -471,6 +500,7 @@ const PracticePages = () => {
 
                                 <div className={cx("game__view--quiz-choices")}>
                                   <div className={cx("quiz-choices__item")}>
+                                  {/* <Radio.Group > */}
                                     <Space direction="vertical">
                                       {qs.answer?.map((item, i) => {
                                         return (
@@ -497,7 +527,7 @@ const PracticePages = () => {
                                                     "quiz-choices__item--radio"
                                                   )
                                             }
-                                            value={item}
+                                            value={item._id}
                                             key={i}
                                             checked={
                                               !!selectedQuestions.find(
@@ -523,7 +553,7 @@ const PracticePages = () => {
                                                 "quiz-choices__item--answer"
                                               )}
                                             >
-                                              {answers[item.index]}.&nbsp;
+                                              {answers[i]}.&nbsp;
                                               <span
                                                 dangerouslySetInnerHTML={{
                                                   __html: item.text ?? "",
@@ -590,6 +620,7 @@ const PracticePages = () => {
                                           </div>
                                         )}
                                     </Space>
+                                    {/* </Radio.Group> */}
                                   </div>
                                 </div>
                               </div>

@@ -17,12 +17,13 @@ import {
   FaSignOutAlt,
   FaUser,
 } from "react-icons/fa";
-import { GrClose } from "react-icons/gr";
 import {
   categoryState,
   requestLoadCategorys,
 } from "../../redux/slices/categorySlice";
 import { apiLogout } from "../../api/auth";
+import { DownOutlined } from "@ant-design/icons";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
 const cx = classNames.bind(styles);
 
@@ -115,6 +116,21 @@ const Header = () => {
       },
     },
   ];
+  
+
+  const itemsCategory = categorys.map(e => ({
+    label: e.name,
+    key: e.id,
+    onClick: () => {
+      navigate(`/${e.slug}`);
+    },
+    style: {
+      fontFamily: "var(--font-family)",
+      padding: "0.8rem",
+      fontSize: "1.4rem",
+      width: "120px"
+    }
+  })) as ItemType[];
 
   const openNavbar = () => {
     setShowNavbar(true);
@@ -188,9 +204,37 @@ const Header = () => {
           <div className={cx("navbar__container")}>
             <div className={cx("navbar__list")}>
               {/* DESKTOP */}
-
               <div className={cx("navbar__list--desktop")}>
-                {categorys.length > 0 &&
+                <div className={cx("navbar__item--desktop")}>
+                  <div className={cx("navbar__link--desktop")}>
+                    Luyện thị THPT QG
+                  </div>
+                </div>
+                <Dropdown
+                  menu={{ items: itemsCategory  }}
+                  trigger={["hover"]}
+                  placement={"bottomLeft"}
+                >
+                  <div className={cx("navbar__item--desktop")}>
+                    <div className={cx("navbar__link--desktop")}>
+                      THPT <DownOutlined style={{ fontSize: '11px',marginLeft: '4px'}}/>
+                    </div>
+                  </div>
+                </Dropdown>
+
+                <div className={cx("navbar__item--desktop")}>
+                  <div
+                    onClick={async () => {
+                      navigate(`/tai-lieu`);
+                    }}
+                    className={cx("navbar__link--desktop")}
+                  >
+                    <div className={cx("navbar__title")}>
+                      <span>Tài liệu</span>
+                    </div>
+                  </div>
+                </div>
+                {/* {categorys.length > 0 &&
                   categorys?.map((data, index) => (
                     <div key={index} className={cx("navbar__item--desktop")}>
                       <div
@@ -204,7 +248,7 @@ const Header = () => {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  ))} */}
               </div>
 
               {/* MOBILE */}

@@ -25,12 +25,13 @@ function App() {
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
-  const isLoading1 = useAppSelector(
+  const isLoading = useAppSelector(
     (state: RootState) => state.authState.loadingCheckLogin
   );
-  const isLoading = useAppSelector(
+  const isLoading1 = useAppSelector(
     (state: RootState) => state.category.loadingCheckLogin
   );
+  
 
   useLayoutEffect(() => {
     checkLogin();
@@ -49,15 +50,11 @@ function App() {
   }, [userInfo]);
   
   const checkLogin = async () => {
-    // const cookie = Cookies.get("token");
-    // if (!cookie) {
-    //   dispatch(setLoadingCheckLogin(false))
-    //   return
-    // }
     try {
       const result = await dispatch(
         requestGetUserFromToken()
       );
+      unwrapResult(result);
     } catch (error) {
       notification.error({
         message: "Server đang bị lỗi",

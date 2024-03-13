@@ -316,6 +316,7 @@
   transition: 0.5s;
   padding: 1.7rem;
   color: #fff;
+  font-family: var(--font-family);
 
   @include responsive(lg) {
     padding: 1rem;

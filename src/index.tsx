@@ -6,6 +6,10 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import GlobalStyles from "./styles";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
