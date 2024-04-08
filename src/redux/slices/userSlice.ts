@@ -124,6 +124,10 @@ export const authSlice = createSlice({
         state.userInfo = new UserInfo(action.payload.userLogin);
       }
     );
+    builder.addCase(requestLogin.rejected, (state) => {
+      state.loading = false;
+    });
+
     // requestGetUserFromToken
     builder.addCase(requestGetUserFromToken.pending, (state) => {
       state.loadingCheckLogin = true;

@@ -132,6 +132,11 @@ const PracticePages = () => {
         // setIsReview(false);
         setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
       }
+    } else {
+      setStatusLearn(0);
+      setSelectedQuestions([]);
+      // setIsReview(false);
+      setTimeCoundown(Date.now() + (topic?.timeExam || 0) * 1000 * 60);
     }
   }, [params.idChild, topic?.id, params.id, userInfo]);
 
@@ -222,7 +227,7 @@ const PracticePages = () => {
 
   const handleSubmitOk = async () => {
     try {
-      setSubmitted(true);
+      setIsReview(true);
       const result = await dispatch(
         requestUpdateStudiedForUser({
           idTopic: topic?.id || "",
@@ -263,6 +268,7 @@ const PracticePages = () => {
       setStatusLearn(
         progress?.find((o) => o.idTopic === params.idChild)?.status
       );
+      // setStatusLearn(2)
       setIsReview(true);
       setCorrect(0);
       setCorrectQuestions([]);

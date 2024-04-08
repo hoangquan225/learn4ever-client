@@ -12,6 +12,7 @@ import PrivacyPages from "../pages/privacy";
 import ProfilePages from "../pages/profile";
 import RegisterPages from "../pages/register";
 import ExamPages from "../pages/exam";
+import AchievementPages from "../pages/achievement";
 
 // Public routers
 export const publicRoutes = [
@@ -30,6 +31,7 @@ export const publicRoutes = [
 // Private routes
 export const privateRoutes = [
   { path: "/thong-tin-ca-nhan", component: ProfilePages },
+  { path: "/achievement", component: AchievementPages },
   {
     path: "/:slug/:slugChild/de-kiem-tra/:id/:idChild",
     component: PracticePages,

@@ -265,7 +265,7 @@ const ExamPages = () => {
                                                     "review"
                                                   )}
                                                 >
-                                                  <span>Xem lại</span>
+                                                  <span>Làm lại</span>
                                                   <BiChevronRight
                                                     className={cx(
                                                       "exam__panel--icon"
