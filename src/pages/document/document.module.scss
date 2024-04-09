@@ -1,0 +1,267 @@
+@mixin responsive($breakpoint) {
+  @if $breakpoint== xs {
+    @media (max-width: 575.98px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== sm {
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== md {
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== lg {
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint== xl {
+    @media (min-width: 1200px) {
+      @content;
+    }
+  }
+}
+
+.document {
+  background: rgb(243, 247, 249);
+}
+
+.document__container {
+  padding: 0 2.4rem;
+  font-family: var(--font-family);
+
+  @include responsive(xs) {
+    padding: 0 1.6rem;
+  }
+
+  @include responsive(sm) {
+    padding: 0 2.4rem;
+  }
+
+  @include responsive(md) {
+    padding: 0 2.4rem;
+  }
+
+  @include responsive(lg) {
+    padding: 0 2.4rem;
+  }
+}
+
+.document__wrapper {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+
+  & nav {
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--textColor);
+  }
+
+  @include responsive(xs) {
+    padding: 0 1.6rem;
+  }
+
+  @include responsive(sm) {
+    padding: 0 2.4rem;
+  }
+
+  @include responsive(md) {
+    padding: 0 2.4rem;
+  }
+
+  @include responsive(lg) {
+    padding: 0 2.4rem;
+  }
+}
+
+.category__breadcrumb {
+  margin-bottom: 2rem;
+}
+
+.category__breadcumb--link {
+  &:hover {
+    -webkit-text-decoration: underline;
+    text-decoration: underline;
+    background-color: transparent !important;
+  }
+}
+
+.category__breadcumb--link.active {
+  color: var(--primaryColor);
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  opacity: 0.9;
+
+  &:hover {
+    color: var(--primaryColor);
+    opacity: 1;
+  }
+}
+
+.document__header {
+}
+
+.document__heading {
+  text-align: center;
+  margin: 2.4rem 0;
+
+  @include responsive(xs) {
+    font-size: 2.8rem;
+  }
+
+  @include responsive(sm) {
+    font-size: 2.8rem;
+  }
+
+  @include responsive(md) {
+    font-size: 2.8rem;
+  }
+
+  @include responsive(lg) {
+    font-size: 2.8rem;
+  }
+}
+
+.document__frame {
+
+}
+
+.document__side-bar {
+  & > ul {
+    background-color: #fff;
+    border-radius: 10px;
+    list-style: none;
+    padding-left: unset;
+    overflow: hidden;
+    position: sticky;
+    top: 100px;
+    margin: unset;
+    font-size: 16px;
+
+    & > li:first-child {
+      font-size: 16px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 18px;
+      padding: 10px;
+      cursor: default;
+    }
+
+    & > li {
+      font-size: 16px;
+      padding: 12px 0 12px 12px;
+      color: var(--textColor);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    & > .active {
+      color: var(--primaryColor);
+      background-color: #e9ecf3;
+    }
+  }
+}
+
+
+.document__content {
+}
+
+.document__content--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.document__content--btn {
+}
+
+.document__content--btn .btn {
+  background-color: #fff;
+  padding: 0.8rem 1.6rem;
+  margin-right: 1.2rem;
+  border-radius: 1rem;
+  border: 0.1rem solid #fff;
+  cursor: pointer;
+
+  color: var(--textColor);
+  font-family: var(--font-family);
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all ease 0.3s ;
+
+  &.active {
+    color: #fff !important;
+    background: var(--primaryColor) !important;
+    border: 0.1rem solid var(--primaryColor) !important;
+  }
+
+  &:hover {
+    color: var(--primaryColor);
+    background: #fff;
+    border: 0.1rem solid var(--primaryColor);
+  }
+}
+
+.document__content--main {
+  margin-top: 16px;
+  padding: 16px 8px;
+  border-radius: 10px;
+  border: 1px solid #dde3ee;
+  background-color: #e9edf3;
+  margin-left: unset !important; 
+  margin-right: unset !important;
+}
+
+.document__content-item {
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .5s;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.document__content-item-header {
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 13px;
+  color: var(--textColor);
+  font-weight: 600;
+  font-family: var(--font-family);
+}
+
+.document-content-item-actions {
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  & > div {
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+  }
+
+  & span {
+    margin-left: 8px;
+    font-family: var(--font-family);
+    font-size: 12px;
+  }
+}

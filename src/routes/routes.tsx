@@ -13,6 +13,8 @@ import ProfilePages from "../pages/profile";
 import RegisterPages from "../pages/register";
 import ExamPages from "../pages/exam";
 import AchievementPages from "../pages/achievement";
+import DocumentPages from "../pages/document";
+import DocumentDetailPages from "../pages/document-detail";
 
 // Public routers
 export const publicRoutes = [
@@ -25,6 +27,8 @@ export const publicRoutes = [
   { path: "/chinh-sach-bao-mat", component: PrivacyPages },
   { path: "/dang-nhap", component: LoginPages },
   { path: "/dang-ky", component: RegisterPages },
+  { path: "/tai-lieu", component: DocumentPages },
+  { path: "/tai-lieu/:param", component: DocumentDetailPages },
   { path: "*", component: NotFoundPages },
 ];
 

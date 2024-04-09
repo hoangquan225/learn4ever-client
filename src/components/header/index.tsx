@@ -118,7 +118,8 @@ const Header = () => {
   ];
   
 
-  const itemsCategory = categorys.map(e => ({
+  // const filteredArray = categorys.filter(item => !item.name.startsWith("Lớp"));
+  const itemsCategory = categorys.filter(item => item.name.startsWith("Lớp")).map(e => ({
     label: e.name,
     key: e.id,
     onClick: () => {
@@ -205,11 +206,26 @@ const Header = () => {
             <div className={cx("navbar__list")}>
               {/* DESKTOP */}
               <div className={cx("navbar__list--desktop")}>
-                <div className={cx("navbar__item--desktop")}>
+                {/* <div className={cx("navbar__item--desktop")}>
                   <div className={cx("navbar__link--desktop")}>
                     Luyện thị THPT QG
                   </div>
-                </div>
+                </div> */}
+                { categorys.filter(item => !item.name.startsWith("Lớp")).length > 0 &&
+                  categorys.filter(item => !item.name.startsWith("Lớp"))?.map((data, index) => (
+                    <div key={index} className={cx("navbar__item--desktop")}>
+                      <div
+                        onClick={async () => {
+                          navigate(`/${data.slug}`);
+                        }}
+                        className={cx("navbar__link--desktop")}
+                      >
+                        <div className={cx("navbar__title")}>
+                          <span>{data.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 <Dropdown
                   menu={{ items: itemsCategory  }}
                   trigger={["hover"]}
