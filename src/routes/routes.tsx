@@ -15,6 +15,7 @@ import ExamPages from "../pages/exam";
 import AchievementPages from "../pages/achievement";
 import DocumentPages from "../pages/document";
 import DocumentDetailPages from "../pages/document-detail";
+import ResetPasswordPages from "../pages/reset-password";
 
 // Public routers
 export const publicRoutes = [
@@ -26,6 +27,7 @@ export const publicRoutes = [
   { path: "/dieu-khoan-su-dung", component: PolicyPages },
   { path: "/chinh-sach-bao-mat", component: PrivacyPages },
   { path: "/dang-nhap", component: LoginPages },
+  { path: "/reset-password", component: ResetPasswordPages },
   { path: "/dang-ky", component: RegisterPages },
   { path: "/tai-lieu", component: DocumentPages },
   { path: "/tai-lieu/:param", component: DocumentDetailPages },

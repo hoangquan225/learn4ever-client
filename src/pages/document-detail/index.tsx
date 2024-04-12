@@ -93,7 +93,7 @@ const DocumentDetailPages = () => {
 
               <div className={cx("pdf__container")}>
                 <div className={cx("pdf__container__document")}>
-                  <Document file="/assets/docs/59462484.pdf" onLoadSuccess={onDocumentLoadSuccess}>
+                  <Document file="https://storage.googleapis.com/hocthongminhs.appspot.com/undefined/2023/02/14/87937788.pdf" onLoadSuccess={onDocumentLoadSuccess}>
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page
                         key={`page_${index + 1}`}
@@ -102,6 +102,12 @@ const DocumentDetailPages = () => {
                       />
                     ))}
                   </Document>
+                </div>
+              </div>
+
+              <div className={cx("pdf__container")}>
+                <div className={cx("pdf__container__document")}>
+                 <iframe src="https://59462484.tiiny.site/"></iframe>
                 </div>
               </div>
 

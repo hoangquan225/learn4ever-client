@@ -53,6 +53,7 @@ import { answers, feedbackChild } from "../../utils/contants";
 import styles from "./practice.module.scss";
 import moment from "moment";
 import _ from "lodash";
+import { requestUpsertTopicProgress } from "../../redux/slices/topicProgressSlice";
 
 const cx = classNames.bind(styles);
 
@@ -234,13 +235,28 @@ const PracticePages = () => {
           idCourse: course?.id || "",
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNED,
-          timeStudy: timePratice.current,
+          timeStudy: Math.round((((topic?.timeExam || 0) * 60000 - timePratice.current) / 6000)) / 10,
           score: Math.round((correct / totalQuestion) * 100) / 10,
           correctQuestion: correct,
           answers: selectedQuestions,
         })
       );
       unwrapResult(result);
+      const a = await dispatch(
+        requestUpsertTopicProgress({
+          idTopic: topic?.id || "",
+          idCourse: course?.id || "",
+          idUser: userInfo?._id || "",
+          status: TTCSconfig.STATUS_LEARNED,
+          timeStudy: Math.round((((topic?.timeExam || 0) * 60000 - timePratice.current) / 6000)) / 10,
+          // timeStudy: timePratice.current,
+          score: Math.round((correct / totalQuestion) * 100) / 10,
+          correctQuestion: correct, 
+          answers: selectedQuestions,
+          type: 2,
+        })
+      )
+      unwrapResult(a);
       // handleReview()
     } catch (error) {
       notification.error({
@@ -284,7 +300,8 @@ const PracticePages = () => {
           idCourse: course?.id || "",
           idUser: userInfo?._id || "",
           status: TTCSconfig.STATUS_LEARNING,
-          timeStudy: timePratice.current,
+          timeStudy: Math.round((((topic?.timeExam || 0) * 60000 - timePratice.current) / 6000)) / 10,
+          // timeStudy: timePratice.current,
           answers: selectedQuestions,
         })
       );
@@ -822,7 +839,7 @@ const PracticePages = () => {
                                           {moment(
                                             Math.abs(
                                               (topic?.timeExam || 0) * 60000 -
-                                                o.timeStudy
+                                                o.timeStudy*60000
                                             )
                                           ).format("mm:ss")}
                                         </span>

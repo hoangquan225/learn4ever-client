@@ -1,5 +1,5 @@
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Tooltip, notification } from "antd";
+import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Form, Input, Modal, Tooltip, notification } from "antd";
 import { useEffect, useState } from "react";
 import { unwrapResult } from "@reduxjs/toolkit";
 import classNames from "classnames/bind";
@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import {
+  requestForgotPassword,
   requestLogin,
   requestLoginWithGoogle,
 } from "../../redux/slices/userSlice";
@@ -18,6 +19,8 @@ import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 import { FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
+import { IoClose } from "react-icons/io5";
+import { EmailRegExp } from "../../submodule/utils/validation";
 
 const cx = classNames.bind(styles);
 
@@ -29,7 +32,20 @@ const LoginPages = () => {
   const loading = useAppSelector((state: RootState) => state.authState.loading);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  // lay token tu cookie
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [formForget] = Form.useForm();
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
 
   useEffect(() => {
     if (userInfo?._id) {
@@ -83,6 +99,12 @@ const LoginPages = () => {
           return notification.error({
             message: "Đăng nhập thất bại",
             duration: 1.5,
+          });
+
+        case TTCSconfig.LOGIN_EMAIL_IS_USED:
+          return notification.warning({
+            message: "Tài khoản Google(email) của bạn đã được sử dụng. Hãy đăng nhập bằng tài khoản của bạn",
+            duration: 3,
           });
 
         case TTCSconfig.LOGIN_SUCCESS:
@@ -158,6 +180,25 @@ const LoginPages = () => {
     }
   };
 
+  const handleForgotPassword: any = async (value) => {
+    console.log({value});
+    
+    // try {
+    //   const actionResult = await dispatch(
+    //     requestForgotPassword({email})
+    //   );
+    //   const res = unwrapResult(actionResult);
+    //   console.log({res});
+      
+    // } catch (err) {
+    //   return notification.error({
+    //     message: "Đăng nhập thất bại, lỗi server",
+    //     duration: 1.5,
+    //   });
+    // }
+  };
+
+
   return (
     <>
       <div className={cx("login__over")}>
@@ -223,7 +264,7 @@ const LoginPages = () => {
                 <Checkbox>Duy trì đăng nhập</Checkbox>
               </Form.Item>
 
-              <a className={cx("login-form-forgot")} href="/">
+              <a className={cx("login-form-forgot")} onClick={showModal}>
                 Quên mật khẩu
               </a>
             </Form.Item>
@@ -263,6 +304,71 @@ const LoginPages = () => {
           </Form>
         </div>
       </div>
+
+      <Modal 
+        open={isModalOpen} 
+        onCancel={handleCancel}
+        footer={null}
+        closable={false}
+      >
+        <div>
+          <div>
+            <div className={cx("close-forget-pass")} onClick={handleCancel}>
+              <IoClose style={{fontSize: "24px", color: "var(--primaryColor)"}}/>
+            </div>
+            <h2 className={cx("forgot-pass__title")}>Đặt lại mật khẩu</h2>
+            <div style={{fontSize: "16px"}}>Quên mật khẩu? Hãy điền địa chỉ email của bạn. Bạn sẽ nhận được một liên kết để tạo mật khẩu mới qua email.</div>
+            <Form
+              name="forget_pass"
+              initialValues={{
+                remember: true,
+              }}
+              onFinish={handleForgotPassword}
+              form={formForget}
+            >
+              <Form.Item
+                name="email"
+                rules={[
+                  {
+                    pattern: EmailRegExp,
+                    message: "Email không đúng định dạng!",
+                  },
+                  {
+                    required: true,
+                    message: "Vui lòng nhập trường này!",
+                  },
+                ]}
+              >
+                <div className={cx("forgot-pass__form")}>
+                  <label>
+                    Email
+                  </label>
+                  <Input
+                    prefix={
+                      <MailOutlined
+                        className={cx("site-form-item-icon input__icon")}
+                        style={{ fontSize: "1.8rem", marginRight: "0.8rem" }}
+                      />
+                    }
+                    placeholder="Nhập email"
+                    style={{ padding: "12px" }}
+                  />
+                </div>
+              </Form.Item>
+              <div style={{marginTop: "16px"}}>
+                <Button
+                  type="primary"
+                  className={cx("login-form-button")}
+                  htmlType="submit"
+                  // loading={loading}
+                >
+                  Quên mật khẩu
+                </Button>
+              </div>
+            </Form>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

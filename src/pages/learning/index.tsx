@@ -70,6 +70,7 @@ import { Topic } from "../../submodule/models/topic";
 import { UserInfo } from "../../submodule/models/user";
 import { answers } from "../../utils/contants";
 import styles from "./learning.module.scss";
+import { requestUpsertTopicProgress } from "../../redux/slices/topicProgressSlice";
 
 const cx = classNames.bind(styles);
 
@@ -353,6 +354,17 @@ const LearningPages = () => {
           })
         );
         unwrapResult(result);
+        const a = await dispatch(
+          requestUpsertTopicProgress({
+            idTopic,
+            idCourse: course?.id || "",
+            idUser,
+            status: TTCSconfig.STATUS_LEARNED,
+            timeStudy: 0,
+            type: 1,
+          })
+        )
+        unwrapResult(a);
       }
     } catch (error) {
       notification.error({
@@ -392,7 +404,19 @@ const LearningPages = () => {
           );
           unwrapResult(result);
         }
+        const a = await dispatch(
+          requestUpsertTopicProgress({
+            idTopic,
+            idCourse: course?.id || "",
+            idUser,
+            status,
+            timeStudy: 0,
+            type: 1,
+          })
+        )
+        unwrapResult(a);
       }
+      
     } catch (error) {
       notification.error({
         message: "server error!!",
@@ -434,6 +458,17 @@ const LearningPages = () => {
         })
       );
       unwrapResult(result);
+      const a = await dispatch(
+        requestUpsertTopicProgress({
+          idTopic: dataTopicActive?.id || "",
+          idCourse: course?.id || "",
+          idUser: userInfo?._id || "",
+          status: TTCSconfig.STATUS_LEARNED,
+          timeStudy: 0,
+          answers: selectedQuestions,
+          type: 1,
+        })
+      )
     } catch (error) {
       notification.error({
         message: "server error!!",

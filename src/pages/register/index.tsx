@@ -74,6 +74,12 @@ const RegisterPages = () => {
             message: "Tài khoản đã tồn tại",
             duration: 1.5,
           });
+        
+        case TTCSconfig.LOGIN_EMAIL_IS_USED:
+          return notification.warning({
+            message: "Email đã tồn tại",
+            duration: 1.5,
+          });
 
         case TTCSconfig.LOGIN_SUCCESS:
           Cookies.set("token", res.token, {

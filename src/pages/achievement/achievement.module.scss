@@ -104,7 +104,7 @@
     font-size: 16px !important;
     font-weight: 600 !important;
     color: var(--primaryColor) !important;
-    width: 125px  !important;
+    min-width: 125px  !important;
 
     display: flex;
     align-items: center;
@@ -183,4 +183,65 @@
   font-size: 20px;
   padding: 5px 12px;
   outline: none;
+}
+
+.achievement__item {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  padding-top: 10px;
+}
+
+.achievement__title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  
+  & > span {
+    font-weight: bold;
+    font-size: 18px;
+  }
+}
+
+
+.exam__panel--btn {
+  font-size: 1.3rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+  box-shadow: 0 0.4rem 1rem rgb(192 210 235 / 75%);
+  color: #fff;
+  background-color: var(--primaryColor);
+  padding: 0.6rem 0.8rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  text-wrap: nowrap;
+  margin: auto;
+  
+  &.review {
+    background-color: #ffba34;
+  }
+  @include responsive(sm) {
+    margin-left: auto;
+  }
+
+  @include responsive(xs) {
+    margin-left: auto;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgb(192 210 235 / 50%);
+  }
+
+  &:active {
+    transform: unset;
+    box-shadow: 0 4px 10px rgb(192 210 235 / 50%);
+  }
+}
+
+.exam__panel--icon {
+  font-size: 2rem;
 }

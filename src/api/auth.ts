@@ -23,3 +23,9 @@ export const apiLoginWithGoogle = (payload: {
 }) => {
   return ApiConfig(EndPoint.LOGIN_WITH_GOOGLE, { payload });
 };
+
+export const apiForgotPassword = (payload: {
+  email: string;
+}) => {
+  return ApiConfig(EndPoint.FORGOT_PASSWORD, { payload });
+};

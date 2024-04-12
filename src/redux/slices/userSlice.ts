@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { UserInfo } from "../../submodule/models/user";
-import { apiLogin, apiLoginWithGoogle, apiRegister } from "../../api/auth";
+import { apiForgotPassword, apiLogin, apiLoginWithGoogle, apiRegister } from "../../api/auth";
 import {
   apiChangePassword,
   apiGetUserFromToken,
@@ -15,14 +15,19 @@ export interface UserState {
   userInfo: UserInfo | null;
   loading: boolean;
   loadingCheckLogin: boolean;
+  data: {
+    data: any,
+    status: any,
+    message: any
+  } | {}
 }
 
 const initialState: UserState = {
   userInfo: null,
   loading: false,
   loadingCheckLogin: true,
-};
-
+  data: {}
+}
 export const requestLogin = createAsyncThunk(
   "auth/login",
   async (props: { account: string; password: string }) => {
@@ -93,6 +98,14 @@ export const requestUpdateStudiedForUser = createAsyncThunk(
     }>;
   }) => {
     const res = await apiUpdateStudiedForUser(props);
+    return res.data;
+  }
+);
+
+export const requestForgotPassword = createAsyncThunk(
+  "user/requestForgotPassword",
+  async (props: { email: any; }) => {
+    const res = await apiForgotPassword(props);
     return res.data;
   }
 );
@@ -229,6 +242,22 @@ export const authSlice = createSlice({
         state.userInfo = new UserInfo(action.payload.data);
       }
     );
+
+    // ----forgot pass----
+    builder.addCase(requestForgotPassword.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      requestForgotPassword.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        console.log(action.payload);
+        state.userInfo = action.payload;
+      }
+    );
+    builder.addCase(requestForgotPassword.rejected, (state) => {
+      state.loading = false;
+    });
   },
 });
 

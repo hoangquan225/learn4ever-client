@@ -96,7 +96,7 @@ export const categorySlice = createSlice({
         }>
       ) => {
         state.categoryInfo = action.payload.data.categorys;
-        state.courses = action.payload.data.course;
+        state.courses = action.payload.data.course?.map(e => new Course(e));
         state.loading = false;
       }
     );

@@ -5,6 +5,7 @@ import courseReducer from "./slices/courseSlice";
 import topicReducer from "./slices/topicSlice";
 import questionReducer from "./slices/questionSlice";
 import commentReducer from "./slices/commentSlice";
+import topicProgressReducer from "./slices/topicProgressSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     topic: topicReducer,
     question: questionReducer,
     comment: commentReducer,
+    topicProgress: topicProgressReducer,
   },
   middleware: (getDefaultMiddle) =>
     getDefaultMiddle({ serializableCheck: false }),
