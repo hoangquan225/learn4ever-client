@@ -29,3 +29,16 @@ export const apiForgotPassword = (payload: {
 }) => {
   return ApiConfig(EndPoint.FORGOT_PASSWORD, { payload });
 };
+
+export const apiCheckTokenExpires = (payload: {
+  token: string;
+}) => {
+  return ApiConfig(EndPoint.CHECK_TOKEN_EXPIRES, { payload });
+};
+
+export const apiResetPassword = (payload: {
+  token: string;
+  newPassword: string;
+}) => {
+  return ApiConfig(EndPoint.RESET_PASSWORD, { payload });
+};

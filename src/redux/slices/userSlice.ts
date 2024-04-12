@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { UserInfo } from "../../submodule/models/user";
-import { apiForgotPassword, apiLogin, apiLoginWithGoogle, apiRegister } from "../../api/auth";
+import { apiCheckTokenExpires, apiForgotPassword, apiLogin, apiLoginWithGoogle, apiRegister, apiResetPassword } from "../../api/auth";
 import {
   apiChangePassword,
   apiGetUserFromToken,
@@ -20,13 +20,15 @@ export interface UserState {
     status: any,
     message: any
   } | {}
+  loadingForgot: boolean;
 }
 
 const initialState: UserState = {
   userInfo: null,
   loading: false,
   loadingCheckLogin: true,
-  data: {}
+  data: {},
+  loadingForgot: false,
 }
 export const requestLogin = createAsyncThunk(
   "auth/login",
@@ -106,6 +108,22 @@ export const requestForgotPassword = createAsyncThunk(
   "user/requestForgotPassword",
   async (props: { email: any; }) => {
     const res = await apiForgotPassword(props);
+    return res.data;
+  }
+);
+
+export const requestCheckTokenExpires = createAsyncThunk(
+  "user/requestCheckTokenExpires",
+  async (props: { token: string }) => {
+    const res = await apiCheckTokenExpires(props);
+    return res.data;
+  }
+);
+
+export const requestResetPassword = createAsyncThunk(
+  "user/requestResetPassword",
+  async (props: { token: string; newPassword: string; }) => {
+    const res = await apiResetPassword(props);
     return res.data;
   }
 );
@@ -245,18 +263,47 @@ export const authSlice = createSlice({
 
     // ----forgot pass----
     builder.addCase(requestForgotPassword.pending, (state) => {
-      state.loading = true;
+      state.loadingForgot = true;
     });
     builder.addCase(
       requestForgotPassword.fulfilled,
       (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        console.log(action.payload);
-        state.userInfo = action.payload;
+        state.loadingForgot = false;
+        state.data = action.payload;
       }
     );
     builder.addCase(requestForgotPassword.rejected, (state) => {
-      state.loading = false;
+      state.loadingForgot = false;
+    });
+
+    // ----check token reset pass----
+    builder.addCase(requestCheckTokenExpires.pending, (state) => {
+      state.loadingForgot = true;
+    });
+    builder.addCase(
+      requestCheckTokenExpires.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loadingForgot = false;
+        state.data = action.payload;
+      }
+    );
+    builder.addCase(requestCheckTokenExpires.rejected, (state) => {
+      state.loadingForgot = false;
+    });
+
+    // ----reset pass----
+    builder.addCase(requestResetPassword.pending, (state) => {
+      state.loadingForgot = true;
+    });
+    builder.addCase(
+      requestResetPassword.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.loadingForgot = false;
+        state.data = action.payload;
+      }
+    );
+    builder.addCase(requestResetPassword.rejected, (state) => {
+      state.loadingForgot = false;
     });
   },
 });

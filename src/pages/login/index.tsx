@@ -30,10 +30,10 @@ const LoginPages = () => {
     (state: RootState) => state.authState.userInfo
   );
   const loading = useAppSelector((state: RootState) => state.authState.loading);
+  const loadingForgot = useAppSelector((state: RootState) => state.authState.loadingForgot);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [email, setEmail] = useState("");
   const [formForget] = Form.useForm();
 
   const showModal = () => {
@@ -180,24 +180,35 @@ const LoginPages = () => {
     }
   };
 
-  const handleForgotPassword: any = async (value) => {
-    console.log({value});
-    
-    // try {
-    //   const actionResult = await dispatch(
-    //     requestForgotPassword({email})
-    //   );
-    //   const res = unwrapResult(actionResult);
-    //   console.log({res});
-      
-    // } catch (err) {
-    //   return notification.error({
-    //     message: "Đăng nhập thất bại, lỗi server",
-    //     duration: 1.5,
-    //   });
-    // }
+  const handleForgotPassword: any = async (data) => {
+    try {
+      const actionResult = await dispatch(
+        requestForgotPassword({email: data.email})
+      );
+      const res = unwrapResult(actionResult);
+      console.log({res});
+      switch (res.status) {
+        case TTCSconfig.STATUS_FAIL:
+          notification.error({
+            message: res.message ? res.message : "Thất bại",
+            duration: 2.5,
+          });
+          break;
+        case TTCSconfig.STATUS_SUCCESS:
+          notification.success({
+            message: res.message ? res.message : "Thành công",
+            duration: 2.5,
+          });
+          navigate("/")
+          break;
+      }
+    } catch (err) {
+      return notification.error({
+        message: "Hệ thống đang xảy ra xử cố, vui lòng thử lại sau!",
+        duration: 2.5,
+      });
+    }
   };
-
 
   return (
     <>
@@ -360,7 +371,7 @@ const LoginPages = () => {
                   type="primary"
                   className={cx("login-form-button")}
                   htmlType="submit"
-                  // loading={loading}
+                  loading={loadingForgot}
                 >
                   Quên mật khẩu
                 </Button>
