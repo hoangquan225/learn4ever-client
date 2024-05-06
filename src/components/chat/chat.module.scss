@@ -7,7 +7,7 @@
   height: 4.4rem;
   padding: 0rem 1.6rem;
   right: 2.4rem;
-  bottom: 6rem;
+  bottom: 1.4rem;
   background-color: var(--primaryColor);
   box-shadow: rgb(5 24 43 / 10%) 0rem 1rem 3rem 0rem;
   z-index: 2;
@@ -136,4 +136,105 @@
   line-height: 1.5;
   font-family: var(--font-family);
   margin: 0;
+}
+
+// --------------
+.comment__avt {
+  background: transparent;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+}
+
+.chatbot__inner {
+  background-color: #fff;
+  border-top: 0.05rem solid #d4d4d4 !important;
+  border-right: 0.05rem solid #d4d4d4 !important;
+  border-bottom: 0.05rem solid #d4d4d4 !important;
+  border-left: none;
+}
+
+.chatbot__msg--info {
+  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.2);
+  position: sticky !important;
+  top: 0;
+  z-index: 2;
+  background-color: #fff;
+  padding: 0.6rem;
+  display: flex;
+}
+
+.chatbot__msg--info-img {
+  height: 2.5rem;
+  width: 2.5rem;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.01rem rgba(0, 0, 0, 0.1);
+  margin-right: 0.8rem;
+}
+
+.chatbot__msg--info-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.chatbot__message {
+  border: none !important;
+  padding: 2px 5px !important;
+
+  &--user {
+    justify-content: flex-end !important;
+  }
+
+  &--user > div {
+    background-color: #0084ff;
+    max-width: 60% !important;
+    padding: 0.6rem;
+    border-radius: 1.6rem;
+    flex: unset !important;
+
+    & > div {
+      flex: unset !important;
+      width: unset !important;
+
+      & > div {
+        color: #e4e6eb !important;
+      }
+    }
+  }
+
+  &--bot > div {
+    background-color: #e4e6eb;
+    max-width: 60% !important;
+    padding: 0.6rem;
+    border-radius: 1.6rem;
+    flex: unset !important;
+
+    & > div {
+      flex: unset !important;
+      width: unset !important;
+
+      & > div {
+        color: #050505 !important;
+      }
+    }
+  }
+}
+
+.chatbot__msg--action {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.chatbot__msg--input {
+  width: 88%;
+}
+
+.chatbot__msg--action-icon {
+  font-size: 1.2rem;
+  margin: 0.4rem;
 }
