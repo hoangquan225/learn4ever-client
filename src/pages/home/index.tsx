@@ -24,6 +24,7 @@ import bannerImg4 from "../../assets/img/banner4.webp";
 import bannerImg5 from "../../assets/img/banner5.webp";
 import bannerImg6 from "../../assets/img/banner6.webp";
 import Chat from "../../components/chat";
+import { useState } from "react";
 
 const cx = classNames.bind(styles);
 

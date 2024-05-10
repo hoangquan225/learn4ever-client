@@ -65,6 +65,7 @@ export const commentSlice = createSlice({
         state.comments = [data, ...comments];
         state.total++;
       }
+      console.log({comments});
     },
     deleteCommentSoket: (
       state,

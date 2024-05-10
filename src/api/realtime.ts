@@ -6,7 +6,7 @@ import {
 import { Comment } from "../submodule/models/comment";
 
 import { UserInfo } from "../submodule/models/user";
-import { Chat } from "../submodule/models/chat";
+import { Message } from "../submodule/models/chat";
 import { deleteChatSoket, updateChatSocket } from "../redux/slices/chatSlice";
 
 const REACT_APP_ENDPOINT =
@@ -40,27 +40,30 @@ export class SocketService {
     this.socket.emit("join_socket", props).on("join_socket", (msg: string) => {
       // console.log(msg);
     });
+    // this.socket.on("getOnlineUsers", (users) => {
+    // });
   };
 
   joinComment = (props: { idTopic: string; userInfo: UserInfo }) => {
     this.socket
       .emit("join_room_comment", props)
       .on("join_room_comment", (msg: string) => {
-        // console.log(msg);
+        console.log(msg);
       });
   };
 
   loadComment = (dispatch: any) => {
     this.socket.on("send-comment", (data: { comment: Comment }) => {
       dispatch(updateCommentSocket(data.comment));
+      console.log(data);
     });
   };
 
   updateComment = (dispatch: any) => {
     // console.log('hello');
-
     this.socket.on("update-comment", (data: { comment: Comment }) => {
       dispatch(updateCommentSocket(data.comment));
+      console.log(data);
     });
   };
 
@@ -101,13 +104,16 @@ export class SocketService {
   };
 
   loadChat = (dispatch: any) => {
-    this.socket.on("send-chat", (data: { chat: Chat }) => {
+    this.socket.on("send-chat", (data: { chat: Message }) => {
       dispatch(updateChatSocket(data.chat));
+      console.log(data);
     });
   };
 
   updateChat = (dispatch: any) => {
-    this.socket.on("update-chat", (data: { chat: Chat }) => {
+    this.socket.on("update-chat", (data: { chat: Message }) => {
+      console.log(data);
+
       dispatch(updateChatSocket(data.chat));
     });
   };

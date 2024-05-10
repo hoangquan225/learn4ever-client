@@ -5,14 +5,14 @@ import {
   apiUpdateChat,
 } from "../../api/chat";
 import TTCSconfig from "../../submodule/common/config";
-import { Chat } from "../../submodule/models/chat";
+import { Message } from "../../submodule/models/chat";
 import { RootState } from "../store";
 
 interface ChatState {
-  chats: Chat[];
+  chats: Message[];
   loading: boolean;
   loadingUpdate: boolean;
-  chatInfo: Chat | null;
+  chatInfo: Message | null;
   total: number;
 }
 
@@ -26,7 +26,7 @@ const initialState: ChatState = {
 
 export const requestUpdateChat = createAsyncThunk(
   "chat/updateChat",
-  async (props: Chat) => {
+  async (props: Message) => {
     const res = await apiUpdateChat(props);
     return res.data;
   }
@@ -52,7 +52,7 @@ export const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    updateChatSocket: (state, action: PayloadAction<Chat>) => {
+    updateChatSocket: (state, action: PayloadAction<Message>) => {
       const data = action.payload;
       const chats = [...state.chats];
       const indexData = chats.findIndex((chat) => chat.id === data.id);

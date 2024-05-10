@@ -1,13 +1,14 @@
 import { ApiConfig } from "./config";
 import EndPoint from "../submodule/common/endpoint";
-import { Chat } from "../submodule/models/chat";
+import { Message } from "../submodule/models/chat";
 
-export const apiUpdateChat = async (payload: Chat) => {
+export const apiUpdateChat = async (payload: Message) => {
   return ApiConfig(EndPoint.UPDATE_CHAT, { payload });
 };
 
 export const apiLoadChats = async (params: {
-  idChat: string;
+  userIdSend: string,
+  userIdReceive: string,
   limit?: number;
   skip?: number;
 }) => {
@@ -22,7 +23,7 @@ export const apiSendReactionChat = async (payload: {
   return ApiConfig(EndPoint.SEND_REACTION_CHAT, { payload });
 };
 
-export const apiDeleteChat = async (payload: {  
+export const apiDeleteChat = async (payload: {
   idChat: string;
   idTopic: string;
 }) => {

@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import styles from "./chat.module.scss";
-import React, { useState } from "react";
-import { Input, Button, List, Avatar, Row, Col, Drawer, Space } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import { Input, Button, List, Avatar, Row, Col, Drawer, Space, message, notification } from "antd";
 import {
   MessageOutlined,
   MinusOutlined,
@@ -11,14 +11,17 @@ import Modal from "antd/es/modal/Modal";
 import {
   FaFacebookMessenger,
   FaLink,
-  FaPaperclip,
-  FaPaperPlane,
   FaTelegramPlane,
-  FaWindowMinimize,
 } from "react-icons/fa";
-import logo from "../../assets/img/learn4ever-icon.png";
 import Sider from "antd/es/layout/Sider";
-import { Content } from "antd/es/layout/layout";
+import { chatState, requestUpdateChat, setChats } from "../../redux/slices/chatSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { Message } from "../../submodule/models/chat";
+import { authState } from "../../redux/slices/userSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { apiLoadChats } from "../../api/chat";
+import { RealtimeContext } from "../../App";
+import { useSelector } from "react-redux";
 const cx = classNames.bind(styles);
 
 type ChatbotMessage = {
@@ -32,23 +35,14 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState("");
   const [chat, setChat] = useState(false);
   const [chatDetail, setChatDetail] = useState(false);
+  const dispatch = useAppDispatch();
+  // const [userIdReceive, setUserIdReceive] = useState();
+  const userInfo = useAppSelector(authState).userInfo;
+  const [userIdReceive, setUserIdReceive] = useState('');
+  const realtime = useContext(RealtimeContext);
+  const chatStates = useSelector(chatState);
 
-  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setInputValue(event.target.value);
-  // };
-  // const handleSendMessage = () => {
-  //   if (inputValue.trim()) {
-  //     const newMessage: ChatbotMessage = {
-  //       id: new Date().toISOString(),
-  //       message: inputValue,
-  //       isUser: true,
-  //     };
-  //     setMessages([...messages, newMessage]);
-  //     setInputValue("");
-  //   }
-  // };
-
-  const friends = [
+  let friends = [
     {
       src: "https://fullstack.edu.vn/static/media/fallback-avatar.155cdb2376c5d99ea151.jpg",
       title: "Quan",
@@ -75,112 +69,86 @@ const Chat = () => {
     },
   ];
 
-  const messages = [
+  console.log(chatStates);
+  
+
+  let messages = [
     {
-      desc: "co cong viec gi khong a",
+      message: "co cong viec gi khong a",
       isMe: true,
     },
     {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    {
-      desc: "xem cac danh gia va cap nhat luon",
-      isMe: false,
-    },
-    {
-      desc: "da oke sep",
-      isMe: true,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    {
-      desc: "xem cac danh gia va cap nhat luon",
-      isMe: false,
-    },
-    {
-      desc: "da oke sep",
-      isMe: true,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    {
-      desc: "xem cac danh gia va cap nhat luon",
-      isMe: false,
-    },
-    {
-      desc: "da oke sep",
-      isMe: true,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
-      isMe: false,
-    },
-    
-    {
-      desc: "xem cac danh gia va cap nhat luon",
-      isMe: false,
-    },
-    {
-      desc: "da oke sep",
-      isMe: true,
-    },
-    {
-      desc: "co cong viec gi khong a",
-      isMe: true,
-    },
-    {
-      desc: "chinh sua cac bai hoc di nhe",
+      message: "chinh sua cac bai hoc di nhe",
       isMe: false,
     },
   ];
 
+  useEffect(() => {
+    if (userIdReceive) {
+      handleLoadChat()
+    }
+  },[userIdReceive])
+
+
+  // useEffect(() => {
+  //   messages = chatStates.chats.map((e => ({
+  //     message: e.content,
+  //     isMe: e.userIdSend === userInfo?._id
+  //   })))
+  //   console.log(chatStates.chats);
+  // },[chatStates.chats])
+  
+
   const openDetailMessenger = () => {
     setChatDetail(true);
+    setUserIdReceive(userInfo?._id || '')
   }
 
-  // const handleSubmit = () => {
-  //   const newMessage: ChatbotMessage = {
-  //     id: new Date().toISOString(),
-  //     message: inputValue,
-  //     isUser: true,
-  //   };
-  //   setMessages([...messages, newMessage]);
-  //   // Xử lý response của chatbot và thêm vào messages
-  //   setInputValue("");
-  // };
+  const handleSendMessage = async () => {
+    if (inputValue.trim()) {
+      const newMessage: ChatbotMessage = {
+        id: new Date().toISOString(),
+        message: inputValue,
+        isUser: true,
+      };
+      try {
+        const res = await dispatch(
+          requestUpdateChat(
+            new Message({
+              // idChat: ,
+              userIdSend: userInfo?._id,
+              userIdReceive: "663deeed03a238f27ccd63f8",
+              users: [userInfo?._id, "663deeed03a238f27ccd63f8"],
+              content: inputValue,
+            })
+          )
+        );
+        unwrapResult(res);
+        // setMessages([...messages, newMessage]);
+        setInputValue("");
+      } catch (error) {
+        message.error("lỗi server, không gửi được comment");
+      }
+    }
+  };
+
+  const handleLoadChat = async (limit?: number, skip?: number) => {
+    try {
+      const res = await apiLoadChats({
+        userIdSend: `${userInfo?._id}`,
+        userIdReceive: `663deeed03a238f27ccd63f8`,
+        limit,
+        skip,
+      });
+      dispatch(setChats(res.data.data));
+    } catch (error) {
+      // console.log(error);
+      notification.error({
+        message: "lỗi server, không tải được dữ liệu",
+        duration: 1.5,
+      });
+    }
+  };
 
   return (
     <>
@@ -248,7 +216,10 @@ const Chat = () => {
           </div>
           <List
             className={cx("chatbot__msg--list")}
-            dataSource={messages}
+            dataSource={chatStates.chats.map(e => ({
+              message: e.content,
+              isMe: e.userIdSend === userInfo?._id
+            }))}
             renderItem={(message) => (
               <List.Item
                 className={cx("chatbot__message", {
@@ -262,7 +233,7 @@ const Chat = () => {
                 <div
                       className={cx("comment__detail--text")}
                       dangerouslySetInnerHTML={{
-                        __html: message.desc,
+                        __html: message.message,
                       }}
                     ></div>
               </List.Item>
@@ -277,11 +248,9 @@ const Chat = () => {
               rows={1}
               placeholder="Aa"
               autoSize={{ minRows: 1, maxRows: 5 }}
-              // onPressEnter={handleSendMessage}
-              // value={message}
-              // onChange={handleChangeMessage}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <FaTelegramPlane className={cx("chatbot__msg--action-icon")} />
+            <FaTelegramPlane className={cx("chatbot__msg--action-icon")} onClick={handleSendMessage}/>
           </div>
         </div>
       </Drawer>
