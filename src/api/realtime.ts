@@ -4,15 +4,21 @@ import {
   updateCommentSocket,
 } from "../redux/slices/commentSlice";
 import { Comment } from "../submodule/models/comment";
-
 import { UserInfo } from "../submodule/models/user";
-import { Message } from "../submodule/models/chat";
 import { deleteChatSoket, updateChatSocket } from "../redux/slices/chatSlice";
+import { useAppSelector } from "../redux/hook";
+import { RootState } from "../redux/store";
+import { Message } from "../submodule/models/message";
+// import notificationSound from "../assets/sounds/notification.mp3";
 
 const REACT_APP_ENDPOINT =
   process.env.REACT_APP_ENDPOINT || "http://localhost:3001";
 
 export class SocketService {
+  // private userInfo = useAppSelector(
+  //   (state: RootState) => state.authState.userInfo
+  // );
+
   private socket: any;
   public init = () => {
     this.socket = io(REACT_APP_ENDPOINT, {
@@ -22,6 +28,9 @@ export class SocketService {
       timeout: 1000,
       reconnectionDelay: 3000,
       reconnectionDelayMax: 30000,
+      // query: {
+      //   userId: this.userInfo._id,
+      // },
     });
 
     this.socket.on("connect", () => {
@@ -38,7 +47,7 @@ export class SocketService {
   joinSocket = (props: { userInfo: UserInfo | null }) => {
     // console.log({ props, socket: this.socket });
     this.socket.emit("join_socket", props).on("join_socket", (msg: string) => {
-      // console.log(msg);
+      console.log(msg);
     });
     // this.socket.on("getOnlineUsers", (users) => {
     // });
@@ -95,25 +104,24 @@ export class SocketService {
       });
   };
 
-  joinChat = (props: { idChat: string; userInfo: UserInfo }) => {
+  joinChat = (props: { roomId: string; userInfo: UserInfo }) => {
     this.socket
       .emit("join_room_chat", props)
       .on("join_room_chat", (msg: string) => {
-        // console.log(msg);
+        console.log(msg);
       });
   };
 
   loadChat = (dispatch: any) => {
     this.socket.on("send-chat", (data: { chat: Message }) => {
+      // const sound = new Audio(notificationSound);
+      // sound.play();
       dispatch(updateChatSocket(data.chat));
-      console.log(data);
     });
   };
 
   updateChat = (dispatch: any) => {
     this.socket.on("update-chat", (data: { chat: Message }) => {
-      console.log(data);
-
       dispatch(updateChatSocket(data.chat));
     });
   };

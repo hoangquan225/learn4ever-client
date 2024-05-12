@@ -1,6 +1,6 @@
 import { ApiConfig } from "./config";
 import EndPoint from "../submodule/common/endpoint";
-import { Message } from "../submodule/models/chat";
+import { Message } from "../submodule/models/message";
 
 export const apiUpdateChat = async (payload: Message) => {
   return ApiConfig(EndPoint.UPDATE_CHAT, { payload });
@@ -9,6 +9,7 @@ export const apiUpdateChat = async (payload: Message) => {
 export const apiLoadChats = async (params: {
   userIdSend: string,
   userIdReceive: string,
+  roomId: string;
   limit?: number;
   skip?: number;
 }) => {
@@ -29,3 +30,23 @@ export const apiDeleteChat = async (payload: {
 }) => {
   return ApiConfig(EndPoint.DELETE_CHAT, { payload });
 };
+
+export const getOrCreateRoomChat = async (payload: {
+  userIdSend: any;
+  userIdReceive: any;
+}) => {
+  return ApiConfig("/room-chat/get-or-craete", { payload });
+};
+
+export const getFriendRoomChat = async (payload: {
+  userId: any;
+}) => {
+  return ApiConfig("/room-chat/get-friend", { payload });
+};
+
+export const findByEmail = async (payload: {
+  email: any;
+}) => {
+  return ApiConfig("/user/find-by-email", { payload });
+};
+

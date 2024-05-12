@@ -11,6 +11,7 @@ export const apiLoadComments = async (params: {
   limit?: number;
   skip?: number;
 }) => {
+  console.log("apiLoadComments");
   return ApiConfig(EndPoint.GET_COMMENT, { params });
 };
 

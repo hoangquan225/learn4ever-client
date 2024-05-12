@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { categoryState } from "../../redux/slices/categorySlice";
 import { Link } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaComments, FaFacebookMessenger } from "react-icons/fa";
 import { Category } from "../../submodule/models/category";
 import Chatbot from "../../components/chatbot";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -24,7 +24,7 @@ import bannerImg4 from "../../assets/img/banner4.webp";
 import bannerImg5 from "../../assets/img/banner5.webp";
 import bannerImg6 from "../../assets/img/banner6.webp";
 import Chat from "../../components/chat";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +32,7 @@ const HomePages = () => {
   const categoryStates = useAppSelector(categoryState);
   const categorys = categoryStates.categorys;
   const dispatch = useAppDispatch();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const categoryList: Category[] = [];
   for (var key in categorys) {
@@ -56,6 +57,14 @@ const HomePages = () => {
       </div>
     );
   };
+  
+  const handleOpenChat = () => {
+    setIsChatOpen(true);
+  }
+
+  const handleCloseChat = useCallback(() => {
+    setIsChatOpen(false);
+  }, []);
 
   const NextArrowCarousel = (props: any) => {
     const { className, style, onClick } = props;
@@ -118,7 +127,27 @@ const HomePages = () => {
         </Swiper>
         
         <Chatbot />
-        <Chat />
+        {/* <div onClick={handleOpenChat} className={cx("btn__chatbot")}>
+          <FaFacebookMessenger />
+          <span>Messenger</span>
+        </div>
+        {isChatOpen && <Chat 
+          className={cx("chat__drawer")}
+          placement={"right"}
+          open={isChatOpen}
+          onClose={handleCloseChat}
+          width={400}
+          zIndex={6}
+        />} */}
+
+        <Chat 
+          className={cx("chat__drawer")}
+          placement={"right"}
+          open={isChatOpen}
+          onClose={handleCloseChat}
+          width={400}
+          zIndex={6}
+        />
         
         <div className={cx("category")}>
           <div className={cx("category__container")}>

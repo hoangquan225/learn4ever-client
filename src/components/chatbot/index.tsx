@@ -1,22 +1,17 @@
-import classNames from "classnames/bind";
-import styles from "./chatbot.module.scss";
-import React, { useState } from "react";
-import { Input, Button, List, Avatar, Row, Col } from "antd";
 import {
-  MessageOutlined,
-  MinusOutlined,
-  SendOutlined,
+  MinusOutlined
 } from "@ant-design/icons";
+import { Input } from "antd";
 import Modal from "antd/es/modal/Modal";
+import classNames from "classnames/bind";
+import React, { useState } from "react";
 import {
   FaFacebookMessenger,
-  FaPaperclip,
   FaPaperPlane,
-  FaWindowMinimize,
+  FaPaperclip
 } from "react-icons/fa";
 import logo from "../../assets/img/learn4ever-icon.png";
-import logo1 from "../../assets/img/logo.png";
-import { GrSubtract } from "react-icons/gr";
+import styles from "./chatbot.module.scss";
 
 const cx = classNames.bind(styles);
 

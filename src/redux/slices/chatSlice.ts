@@ -5,8 +5,8 @@ import {
   apiUpdateChat,
 } from "../../api/chat";
 import TTCSconfig from "../../submodule/common/config";
-import { Message } from "../../submodule/models/chat";
 import { RootState } from "../store";
+import { Message } from "../../submodule/models/message";
 
 interface ChatState {
   chats: Message[];
@@ -42,9 +42,15 @@ export const requestSendReactionChat = createAsyncThunk(
 
 export const requestLoadChats = createAsyncThunk(
   "chat/requestLoadChats",
-  async (props: { idTopic: string; limit?: number; skip?: number }) => {
-    // const res = await apiLoadChats(props);
-    // return res.data;
+  async (props: {
+    userIdSend: string,
+    userIdReceive: string,
+    roomId: string;
+    limit?: number;
+    skip?: number;
+  }) => {
+    const res = await apiLoadChats(props);
+    return res.data;
   }
 );
 
@@ -62,7 +68,7 @@ export const chatSlice = createSlice({
         state.chats = chats;
       } else {
         // create
-        state.chats = [data, ...chats];
+        state.chats = [...chats, data];
         state.total++;
       }
     },
@@ -89,21 +95,21 @@ export const chatSlice = createSlice({
     builder.addCase(requestLoadChats.rejected, (state) => {
       state.loading = false;
     });
-    // builder.addCase(
-    //   requestLoadChats.fulfilled,
-    //   (
-    //     state,
-    //     action: PayloadAction<{
-    //       data: Chat[];
-    //       total: number;
-    //       status: number;
-    //     }>
-    //   ) => {
-    //     state.loading = false;
-    //     state.chats = action.payload.data;
-    //     state.total = action.payload.total;
-    //   }
-    // );
+    builder.addCase(
+      requestLoadChats.fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          data: Message[];
+          total: number;
+          status: number;
+        }>
+      ) => {
+        state.loading = false;
+        state.chats = action.payload.data;
+        state.total = action.payload.total;
+      }
+    );
 
     // // update
     // builder.addCase(requestUpdateChat.pending, (state) => {
