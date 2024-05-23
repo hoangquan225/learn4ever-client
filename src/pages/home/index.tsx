@@ -57,14 +57,6 @@ const HomePages = () => {
       </div>
     );
   };
-  
-  const handleOpenChat = () => {
-    setIsChatOpen(true);
-  }
-
-  const handleCloseChat = useCallback(() => {
-    setIsChatOpen(false);
-  }, []);
 
   const NextArrowCarousel = (props: any) => {
     const { className, style, onClick } = props;
@@ -143,8 +135,6 @@ const HomePages = () => {
         <Chat 
           className={cx("chat__drawer")}
           placement={"right"}
-          open={isChatOpen}
-          onClose={handleCloseChat}
           width={400}
           zIndex={6}
         />

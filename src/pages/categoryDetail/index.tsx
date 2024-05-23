@@ -14,6 +14,7 @@ import Footer from "../../components/footer";
 import { Link, NavLink } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
 import TTCSconfig from "../../submodule/common/config";
+import Chat from "../../components/chat";
 
 const cx = classNames.bind(styles);
 

@@ -210,7 +210,7 @@
 
   &--bot > div {
     background-color: #e4e6eb;
-    max-width: 60% !important;
+    max-width: 60%;
     padding: 0.6rem;
     border-radius: 1.6rem;
     flex: unset !important;
@@ -266,4 +266,10 @@
   & > p {
     margin: 1.2rem 0;
   }
+}
+
+.chat__position-left {
+  right: unset !important;
+  left: 2rem !important;
+  bottom: 7rem !important;
 }

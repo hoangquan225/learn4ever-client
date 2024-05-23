@@ -26,6 +26,7 @@ import {
 } from "../../redux/slices/topicSlice";
 import TTCSconfig from "../../submodule/common/config";
 import styles from "./courseDetail.module.scss";
+import Chat from "../../components/chat";
 
 const cx = classNames.bind(styles);
 

@@ -71,6 +71,7 @@ import { UserInfo } from "../../submodule/models/user";
 import { answers } from "../../utils/contants";
 import styles from "./learning.module.scss";
 import { requestUpsertTopicProgress } from "../../redux/slices/topicProgressSlice";
+import Chat from "../../components/chat";
 
 const cx = classNames.bind(styles);
 
@@ -559,6 +560,12 @@ const LearningPages = () => {
 
   return (
     <>
+    <Chat
+        className={cx("chat__position-left")}
+        placement={"right"}
+        width={400}
+        zIndex={6}
+      />
       <div className={cx("learning")}>
         {/* HEADER */}
         <header className={cx("learning__header")}>

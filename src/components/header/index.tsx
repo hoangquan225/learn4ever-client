@@ -226,7 +226,7 @@ const Header = () => {
                       </div>
                     </div>
                   ))}
-                <Dropdown
+                {/* <Dropdown
                   menu={{ items: itemsCategory  }}
                   trigger={["hover"]}
                   placement={"bottomLeft"}
@@ -236,8 +236,7 @@ const Header = () => {
                       THPT <DownOutlined style={{ fontSize: '11px',marginLeft: '4px'}}/>
                     </div>
                   </div>
-                </Dropdown>
-
+                </Dropdown> */}
                 <div className={cx("navbar__item--desktop")}>
                   <div
                     onClick={async () => {
@@ -250,7 +249,7 @@ const Header = () => {
                     </div>
                   </div>
                 </div>
-                {/* {categorys.length > 0 &&
+                {categorys.length > 0 &&
                   categorys?.map((data, index) => (
                     <div key={index} className={cx("navbar__item--desktop")}>
                       <div
@@ -264,7 +263,7 @@ const Header = () => {
                         </div>
                       </div>
                     </div>
-                  ))} */}
+                  ))}
               </div>
 
               {/* MOBILE */}

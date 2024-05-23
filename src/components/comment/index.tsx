@@ -40,6 +40,7 @@ import styles from "./comment.module.scss";
 import { RealtimeContext } from "../../App";
 import moment from "moment";
 import fallbackAvatar from "./../../assets/img/fallback-avt.jpg";
+import Chat from "../chat";
 
 const cx = classNames.bind(styles);
 
@@ -265,14 +266,38 @@ const FCComment = (props: CommentProps) => {
     const diffDays = moment().diff(comment.createDate, "days");
     const diffMonths = moment().diff(comment.createDate, "months");
 
+    const onClickOpenMessage = (key, userIdSend, userIdReceive) => {
+      console.log("asddd");
+    }
+
     return (
       <div className={cx("comment__detail")} key={index}>
         <div className={cx("comment__avt--wrapper")}>
-          {userInfo?.avatar ? (
-            <Avatar src={userInfo?.avatar} />
-          ) : (
-            <Avatar src={fallbackAvatar} />
-          )}
+          <Dropdown
+            menu={{
+              items:
+                userInfo?._id !== userStates.userInfo?._id
+                  ? [{
+                    label: "Nhắn tin",
+                    key: "0",
+                  }]
+                  : [],
+              onClick: ({ key }) => {
+                onClickOpenMessage(key, userStates.userInfo?._id, userInfo?._id);
+              },
+            }}
+            trigger={["click"]}
+            placement="bottomRight"
+          >    
+            {userInfo?.avatar ? (
+                    
+                <Avatar src={userInfo?.avatar} />
+              
+              // <Avatar src={userInfo?.avatar} />
+            ) : (
+              <Avatar src={fallbackAvatar} />
+            )}
+          </Dropdown>
         </div>
 
         <div className={cx("comment__detail--cmtbody")}>

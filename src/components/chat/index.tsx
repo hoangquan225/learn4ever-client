@@ -30,8 +30,6 @@ const cx = classNames.bind(styles);
 
 type MessageProps = {
   placement?: any;
-  open: boolean;
-  onClose: () => void;
   width: string | number;
   zIndex: number;
   className: string;
@@ -240,14 +238,17 @@ const Chat = (props: MessageProps) => {
   }
   return (
     <>
-      <div onClick={() => setChat(true)} className={cx("btn__chatbot")}>
-        <FaFacebookMessenger />
-        <span>Messenger</span>
-      </div>
+      {userInfo?._id 
+        ? 
+        <div onClick={() => setChat(true)} className={cx("btn__chatbot", props.className)}>
+          <FaFacebookMessenger />
+          <span>Message</span>
+        </div>
+        : <></>
+      }
 
       <Drawer 
-        title="Messenger"
-        className={props.className}
+        title="Message"
         placement={props.placement}
         // onClose={props.onClose}
         // open={props.open}
