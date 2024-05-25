@@ -43,7 +43,7 @@ const TinyMCEEditor = (props: {
       <Editor
         ref={editorRef}
         key={keyMCE}
-        apiKey="x7iqyfri0yduoqx0qrv9r5h50yq6gj7bybcu12uc2x2a9qkl"
+        apiKey="2i87lxjkitsxz31fxzqcend9g80z4p8lhz5x7mhkpysy6l5m"
         // onChange={(_, editor) => {onChange}}
         onEditorChange={(value, editor) => {
           onChange && onChange(value);
