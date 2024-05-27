@@ -170,7 +170,7 @@ const Describe = () => {
                   gutter={{ sm: 24, md: 16, lg: 24 }}
                   style={{ justifyContent: "center" }}
                 >
-                  <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
+                  {/* <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
                     <div className={cx("describe__member--inner")}>
                       <div className={cx("describe__member--center")}>
                         <div className={cx("describe__member--img")}>
@@ -190,7 +190,7 @@ const Describe = () => {
                         </div>
                       </div>
                     </div>
-                  </Col>
+                  </Col> */}
 
                   {/* space */}
                   <Col
@@ -215,7 +215,7 @@ const Describe = () => {
                             Hoàng Quân
                           </h5>
                           <p className={cx("describe__member--subtitle")}>
-                            Làm tất
+                            CT040438
                           </p>
                         </div>
                       </div>
@@ -230,7 +230,7 @@ const Describe = () => {
                     lg={3}
                   ></Col>
 
-                  <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
+                  {/* <Col className={cx("describe__col")} sm={16} md={8} lg={6}>
                     <div className={cx("describe__member--inner")}>
                       <div className={cx("describe__member--center")}>
                         <div className={cx("describe__member--img")}>
@@ -250,7 +250,7 @@ const Describe = () => {
                         </div>
                       </div>
                     </div>
-                  </Col>
+                  </Col> */}
                 </Row>
               </div>
 

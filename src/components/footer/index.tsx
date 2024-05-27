@@ -38,7 +38,7 @@ const Footer = () => {
                 </div>
                 <div className={cx("footer__info")}>
                   <span className={cx("footer__info-item")}>
-                    Phát triển bởi Nhom24_TTCS Học viện kỹ thuật Mật Mã
+                    Phát triển bởi Hoàng Hồng Quân - Học viện kỹ thuật Mật Mã
                   </span>
                 </div>
                 <div className={cx("footer__info")}>
@@ -50,7 +50,7 @@ const Footer = () => {
                 <div className={cx("footer__info")}>
                   <span className={cx("footer__item-item")}>
                     <MailOutlined className={cx("footer__icon")} />
-                    nhom24_ttcs@gmail.com
+                    hoangquan225.qh@gmail.com
                   </span>
                 </div>
                 <div className={cx("footer__info")}>

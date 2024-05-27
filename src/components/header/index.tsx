@@ -237,7 +237,7 @@ const Header = () => {
                     </div>
                   </div>
                 </Dropdown> */}
-                <div className={cx("navbar__item--desktop")}>
+                {/* <div className={cx("navbar__item--desktop")}>
                   <div
                     onClick={async () => {
                       navigate(`/tai-lieu`);
@@ -248,7 +248,7 @@ const Header = () => {
                       <span>Tài liệu</span>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 {categorys.length > 0 &&
                   categorys?.map((data, index) => (
                     <div key={index} className={cx("navbar__item--desktop")}>

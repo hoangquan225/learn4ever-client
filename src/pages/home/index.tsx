@@ -164,8 +164,8 @@ const HomePages = () => {
                 draggable={false}
                 autoplaySpeed={4000}
                 initialSlide={0}
-                slidesToShow={4}
-                slidesToScroll={4}
+                slidesToShow={3}
+                slidesToScroll={3}
                 arrows={true}
                 nextArrow={<NextArrowCarousel />}
                 prevArrow={<PrevArrowCarousel />}
