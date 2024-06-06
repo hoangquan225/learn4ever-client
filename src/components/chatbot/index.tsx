@@ -43,6 +43,17 @@ const Chatbot = () => {
     scrollToBottom(); 
   }, [messages]);
 
+  useEffect(() => {
+    const storedMessages = localStorage.getItem('chatbotMessages');
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
+
+  const setMessagesLocalStorage = (messages) => {
+    localStorage.setItem('chatbotMessages', JSON.stringify(messages));
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -60,8 +71,10 @@ const Chatbot = () => {
       const responseBot = await handleRasa(inputValue);
       if(typeof responseBot === 'object' && !!responseBot.length) {
         setMessages([...messages, newMessage, ...responseBot]);
+        setMessagesLocalStorage([...messages, newMessage, ...responseBot])
       } else {
         setMessages([...messages, newMessage, responseBot]);
+        setMessagesLocalStorage([...messages, newMessage, responseBot])
       }
       setIsLoading(false);
     }
