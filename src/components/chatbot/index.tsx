@@ -4,7 +4,7 @@ import {
 import { Input } from "antd";
 import Modal from "antd/es/modal/Modal";
 import classNames from "classnames/bind";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FaFacebookMessenger,
   FaPaperPlane,
@@ -30,13 +30,26 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [modalChatBot, setModalChatBot] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
   const userInfo = useAppSelector(
     (state: RootState) => state.authState.userInfo
   );
-  const navigate = useNavigate();
+
+  const messagesEndRef: any = useRef(null);
+
+  useEffect(() => {
+    scrollToBottom(); 
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleSendMessage = async () => {
     if (inputValue.trim()) {
+      setIsLoading(true);
       const newMessage: ChatbotMessage = {
         message: inputValue,
         type: "text",
@@ -50,6 +63,7 @@ const Chatbot = () => {
       } else {
         setMessages([...messages, newMessage, responseBot]);
       }
+      setIsLoading(false);
     }
   };
 
@@ -63,15 +77,15 @@ const Chatbot = () => {
       message: message
     })
     const data: any = res.data[0]
-    if(data.text) {
+    if(data?.text) {
       const newMessage: ChatbotMessage = {
         message: data.text,
         type: "text",
         isUser: false,
       };
       return newMessage
-    } else {
-      const arrayMes = data.custom.data.map(e => ({
+    } else if(data?.custom) {
+      const arrayMes = data?.custom?.data?.map(e => ({
         message: e.message,
         type: e.type,
         isUser: false,
@@ -80,6 +94,7 @@ const Chatbot = () => {
       return arrayMes;
       // setMessages([. ..messages, ...arrayMes]);
     }
+    return [];
   }
 
   useEffect(() => {
@@ -138,18 +153,18 @@ const Chatbot = () => {
               nối với chúng tôi!
             </p>
           </div>
-          {messages.map((item) => {
-            switch(item.type) {
+          {messages?.map((item) => {
+            switch(item?.type) {
               case 'text':
                 return (
                   <div
                     className={cx("chatbot__message-item", {
-                      "chatbot__message-item--user": item.isUser,
-                      "chatbot__message-item--bot": !item.isUser,
+                      "chatbot__message-item--user": item?.isUser,
+                      "chatbot__message-item--bot": !item?.isUser,
                     })}
                     key={Math.random()}
                   >
-                    <p className={cx("chatbot__message-content")}>{item.message}</p>
+                    <p className={cx("chatbot__message-content")}>{item?.message}</p>
                   </div>
                 );
 
@@ -157,21 +172,35 @@ const Chatbot = () => {
                 return (
                   <div
                     className={cx("chatbot__message-item", {
-                      "chatbot__message-item--user": item.isUser,
-                      "chatbot__message-item--bot": !item.isUser,
+                      "chatbot__message-item--user": item?.isUser,
+                      "chatbot__message-item--bot": !item?.isUser,
                     })}
                     key={Math.random()}
-                    onClick={() => item.path ? navigate(`${item.path}`) : null}
+                    onClick={() => item?.path ? navigate(`${item?.path}`) : null}
                   >
-                    <p className={cx("chatbot__message-content")}>{item.message}</p>
+                    <p className={cx("chatbot__message-content")}>{item?.message}</p>
                   </div>
                 );
-
               default:
-                return 'foo';
+                return '';
             }
             
           })}
+          {isLoading &&  
+            <div
+              className={cx("chatbot__message-item", "chatbot__message-item--bot")}
+              key={Math.random()}
+            >
+              <div id="loading-container">
+                <div id="loading-dots">
+                  <div className={cx("loading-dot")}></div>
+                  <div className={cx("loading-dot")}></div>
+                  <div className={cx("loading-dot")}></div>
+                </div>
+              </div>
+            </div>
+          }
+          <div style={{width: "100%", float: "left"}} ref={messagesEndRef} />
         </div>
       </Modal>
 
