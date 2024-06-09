@@ -55,6 +55,8 @@ const Chatbot = () => {
   }
 
   const scrollToBottom = () => {
+    console.log("a");
+    
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -81,33 +83,38 @@ const Chatbot = () => {
   };
 
   const handleRasa = async (message: string) => {
-    const sender = JSON.stringify({
-      userId: userInfo?._id,
-      aaa: "63e14eaa1174bb4a93a0de40"
-    })
-    const res = await axios.post('http://localhost:5005/webhooks/rest/webhook', {
-      sender: sender,
-      message: message
-    })
-    const data: any = res.data[0]
-    if(data?.text) {
-      const newMessage: ChatbotMessage = {
-        message: data.text,
-        type: "text",
-        isUser: false,
-      };
-      return newMessage
-    } else if(data?.custom) {
-      const arrayMes = data?.custom?.data?.map(e => ({
-        message: e.message,
-        type: e.type,
-        isUser: false,
-        path: e.path
-      }))
-      return arrayMes;
-      // setMessages([. ..messages, ...arrayMes]);
+    try {
+      const sender = JSON.stringify({
+        userId: userInfo?._id,
+        aaa: "63e14eaa1174bb4a93a0de40"
+      })
+      const res = await axios.post('http://localhost:5005/webhooks/rest/webhook', {
+        sender: sender,
+        message: message
+      })
+      const data: any = res.data[0]
+      if(data?.text) {
+        const newMessage: ChatbotMessage = {
+          message: data.text,
+          type: "text",
+          isUser: false,
+        };
+        return newMessage
+      } else if(data?.custom) {
+        const arrayMes = data?.custom?.data?.map(e => ({
+          message: e.message,
+          type: e.type,
+          isUser: false,
+          path: e.path
+        }))
+        return arrayMes;
+        // setMessages([. ..messages, ...arrayMes]);
+      }
+      return [];
+    } catch (error) {
+      setIsLoading(false);
+      return [];
     }
-    return [];
   }
 
   useEffect(() => {
@@ -119,7 +126,6 @@ const Chatbot = () => {
         <FaFacebookMessenger />
         <span>Chat</span>
       </div>
-
       <Modal
         getContainer={false}
         className={cx("chatbot__modal")}
@@ -177,7 +183,13 @@ const Chatbot = () => {
                     })}
                     key={Math.random()}
                   >
-                    <p className={cx("chatbot__message-content")}>{item?.message}</p>
+                    {/* <p className={cx("chatbot__message-content")}>{item?.message}</p> */}
+                    <div
+                      className={cx("chatbot__message-content")}
+                      dangerouslySetInnerHTML={{
+                        __html: item.message,
+                      }}
+                    ></div>
                   </div>
                 );
 

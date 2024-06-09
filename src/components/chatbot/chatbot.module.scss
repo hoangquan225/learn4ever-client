@@ -118,7 +118,7 @@
 .chatbot__message-item--user {
   background-color: var(--primaryColor);
   float: right;
-  & > p {
+  & > div {
     color: #fff;
   }
 }
@@ -126,7 +126,7 @@
 .chatbot__message-item--bot {
   background-color: #e4e6eb;
   float: left;
-  & > p {
+  & > div {
     color: var(--textColor);
   }
 }
